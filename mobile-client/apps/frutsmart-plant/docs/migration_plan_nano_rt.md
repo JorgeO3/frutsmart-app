@@ -1,0 +1,496 @@
+Sí. Aquí va el plan rehecho, incorporando explícitamente el tema de buffers/workspaces y enfocado en mover el runtime endurecido a FrutSmartP/modules/nano-rt sin romper la integración Expo actual.
+No hice cambios; esto es solo el plan.
+Objetivo
+- Migrar el intérprete endurecido de RNOptimizedPipelines al módulo Expo FrutSmartP/modules/nano-rt.
+- Mantener intacta la integración actual:
+  - bridge Expo/JS
+  - workflows plant/field
+  - pipelines base
+  - assets/modelos
+  - outputs uri + confidences
+  - warmup/readiness
+- Elevar el módulo nano-rt al mismo nivel de robustez que ya tiene RNOptimizedPipelines:
+  - actor model
+  - lifecycle correcto
+  - shutdown/startup robustos
+  - correctness de delegates/GPU
+  - tests de concurrencia
+  - soak manual
+- Añadir una fase nueva obligatoria para validar el impacto de la estrategia actual de buffers sobre workspaces y rendimiento.
+No negociables
+- No romper NativeNanoRT ni su API JS en FrutSmartP/modules/nano-rt/src/NanoRTModule.ts.
+- No romper useNanoRT, useNanoRTReady, NanoRTClassifier ni el bootstrap del host app.
+- No romper los workflows actuales del módulo:
+  - classifyPlantExternal
+  - classifyPlantInternal
+  - classifyFieldExternal
+  - classifyFieldInternal
+- No perder las optimizaciones actuales de pipelines/workspaces sin medir primero el costo.
+- No afirmar “migración perfecta” sin que el módulo nano-rt tenga su propia batería de tests y su propio soak.
+Diagnóstico resumido
+- RNOptimizedPipelines ya tiene el core correcto en:
+  - RNOptimizedPipelines/app/src/main/java/com/example/rnoptimizedpipelines/module/interpreter/ModelManager.kt
+  - RNOptimizedPipelines/app/src/main/java/com/example/rnoptimizedpipelines/module/interpreter/internal/InterpreterActor.kt
+  - RNOptimizedPipelines/app/src/main/java/com/example/rnoptimizedpipelines/module/interpreter/NanoRTInterpreter.kt
+  - RNOptimizedPipelines/app/src/main/java/com/example/rnoptimizedpipelines/module/interpreter/internal/DelegatePool.kt
+  - RNOptimizedPipelines/app/src/main/java/com/example/rnoptimizedpipelines/module/interpreter/internal/GpuPolicy.kt
+  - RNOptimizedPipelines/app/src/main/java/com/example/rnoptimizedpipelines/module/interpreter/internal/GpuQuarantineStore.kt
+- FrutSmartP/modules/nano-rt ya tiene más negocio e integración real en:
+  - FrutSmartP/modules/nano-rt/android/src/main/java/expo/modules/nanort/NanoRTModule.kt
+  - FrutSmartP/modules/nano-rt/android/src/main/java/expo/modules/nanort/module/workflows/shared/base/AbstractClassificationPipeline.kt
+  - FrutSmartP/modules/nano-rt/android/src/main/java/expo/modules/nanort/module/workflows/shared/base/AbstractSegmentationPipeline.kt
+  - FrutSmartP/modules/nano-rt/android/src/main/java/expo/modules/nanort/module/interpreter/WorkspaceManager.kt
+- Gap principal:
+  - nano-rt todavía usa ModelManager con Mutex + shared NanoRTInterpreter + thread dedicado, no actor model.
+- Gap crítico adicional:
+  - nano-rt no tiene prácticamente suite local de tests Android/JVM.
+- Hallazgo importante nuevo:
+  - los workspaces no retienen ByteBuffer del intérprete; eso ayuda.
+  - pero la estrategia endurecida actual introduce copias extra de input/output, y eso puede afectar más a segmentación que a clasificación.
+  - por tanto, el plan debe incluir una fase explícita de validación de rendimiento y compatibilidad de workspaces.
+Principio de migración recomendado
+- No migrar todo el módulo.
+- Migrar primero el runtime core.
+- Dejar inicialmente intactos:
+  - workflows
+  - processors
+  - workspaces
+  - bridge Expo
+  - assets
+- Adaptar los pipelines a InterpreterSession.
+- Medir.
+- Solo si aparece regresión sensible, introducir una segunda iteración de API para reducir copias de buffers.
+Arquitectura objetivo
+- Mantener el módulo Expo como fachada y capa de negocio.
+- Reemplazar el core del intérprete dentro de FrutSmartP/modules/nano-rt/android/src/main/java/expo/modules/nanort/module/interpreter.
+- Introducir dentro del módulo:
+  - InterpreterSession
+  - internal/InterpreterActor
+  - internal/InterpreterProtocol
+  - internal/DelegatePool
+  - internal/GpuPolicy
+  - internal/GpuQuarantineStore
+  - internal/InferenceFlags
+  - internal/ModelManagerDebugHooks
+- Mantener WorkspaceManager actual al inicio.
+- Hacer que ModelManager.withInterpreter(...) exponga InterpreterSession, no el intérprete mutable crudo.
+Fase 0 — Congelar contratos externos
+- Documentar y congelar los contratos públicos del módulo:
+  - FrutSmartP/modules/nano-rt/src/NanoRTModule.ts
+  - FrutSmartP/modules/nano-rt/src/useNanoRT.ts
+  - FrutSmartP/modules/nano-rt/src/NanoRTClassifier.ts
+  - FrutSmartP/src/hooks/useRootBootstrap.ts
+- Confirmar que no cambian:
+  - nombre del módulo Expo NanoRT
+  - eventos onReady y onInitError
+  - resultado { items: [{ uri, confidences }] }
+  - constantes version, liteRT, engine
+- Revisar y dejar anotado el comportamiento actual de readiness:
+  - initializeModule() hace bootstrap real
+  - initialize() solo espera readyDeferred
+- Salida de fase:
+  - lista de invariantes externos que no se pueden romper.
+Fase 1 — Inventario y mapa de migración archivo por archivo
+- Clasificar cada archivo de nano-rt en:
+  - reemplazar
+  - adaptar
+  - mantener
+  - eliminar después
+- Reemplazar recomendados:
+  - FrutSmartP/modules/nano-rt/android/src/main/java/expo/modules/nanort/module/interpreter/ModelManager.kt
+  - FrutSmartP/modules/nano-rt/android/src/main/java/expo/modules/nanort/module/interpreter/NanoRTInterpreter.kt
+- Añadir recomendados:
+  - FrutSmartP/modules/nano-rt/android/src/main/java/expo/modules/nanort/module/interpreter/InterpreterSession.kt
+  - FrutSmartP/modules/nano-rt/android/src/main/java/expo/modules/nanort/module/interpreter/internal/InterpreterActor.kt
+  - FrutSmartP/modules/nano-rt/android/src/main/java/expo/modules/nanort/module/interpreter/internal/InterpreterProtocol.kt
+  - FrutSmartP/modules/nano-rt/android/src/main/java/expo/modules/nanort/module/interpreter/internal/DelegatePool.kt
+  - FrutSmartP/modules/nano-rt/android/src/main/java/expo/modules/nanort/module/interpreter/internal/GpuPolicy.kt
+  - FrutSmartP/modules/nano-rt/android/src/main/java/expo/modules/nanort/module/interpreter/internal/GpuQuarantineStore.kt
+  - FrutSmartP/modules/nano-rt/android/src/main/java/expo/modules/nanort/module/interpreter/internal/InferenceFlags.kt
+  - FrutSmartP/modules/nano-rt/android/src/main/java/expo/modules/nanort/module/interpreter/internal/ModelManagerDebugHooks.kt
+- Adaptar recomendados:
+  - FrutSmartP/modules/nano-rt/android/src/main/java/expo/modules/nanort/module/interpreter/InterpreterWarmer.kt
+  - FrutSmartP/modules/nano-rt/android/src/main/java/expo/modules/nanort/module/workflows/shared/base/AbstractClassificationPipeline.kt
+  - FrutSmartP/modules/nano-rt/android/src/main/java/expo/modules/nanort/module/workflows/shared/base/AbstractSegmentationPipeline.kt
+  - FrutSmartP/modules/nano-rt/android/src/main/java/expo/modules/nanort/NanoRTModule.kt
+- Mantener inicialmente:
+  - WorkspaceManager.kt
+  - ClassificationWorkspace.kt
+  - SegmentationWorkspace.kt
+  - ClassificationProcessor.kt
+  - SegmentationProcessor.kt
+  - workflows plant/field
+  - JS/TS API
+- Salida de fase:
+  - plan file-by-file definitivo antes de tocar código.
+Fase 2 — Port del runtime endurecido
+- Portar desde RNOptimizedPipelines al package expo.modules.nanort:
+  - InterpreterSession
+  - InterpreterProtocol
+  - InterpreterActor
+  - DelegatePool
+  - GpuPolicy
+  - GpuQuarantineStore
+  - InferenceFlags
+  - ModelManagerDebugHooks
+- Adaptar imports a:
+  - expo.modules.nanort.core.ModuleLogger
+  - expo.modules.nanort.core.AppAssets
+  - expo.modules.nanort.BuildConfig
+- Preservar:
+  - bounded mailbox
+  - startup rollback
+  - shutdown/startup serialization
+  - fatal vs recoverable semantics
+  - non-reentrant API
+  - cancellation propagation
+  - debug snapshot hooks
+- Salida de fase:
+  - runtime duro compilando dentro del módulo.
+Fase 3 — Port de NanoRTInterpreter endurecido
+- Sustituir la versión actual por la versión endurecida adaptada al módulo.
+- Mantener:
+  - LiteRT real
+  - InterpreterApi.create(...)
+  - TfLiteRuntime.FROM_APPLICATION_ONLY
+  - XNNPACK
+  - GPU delegate opcional
+- Portar:
+  - owner-thread checks
+  - lease management
+  - beginLease/endLease
+  - engineFactory inyectable para tests
+  - releaseCurrentResources()
+  - close()
+- Mantener ModelId actual de nano-rt si ya coincide.
+- Salida de fase:
+  - intérprete seguro y controlado por owner thread.
+Fase 4 — Reescritura de ModelManager sobre actor
+- Reemplazar la implementación Mutex + sharedInterpreter por la fachada actor-based.
+- Mantener API pública:
+  - withInterpreter(modelId, block)
+  - releaseCurrentSession()
+  - shutdown()
+  - shutdownBlocking()
+- Cambiar internamente:
+  - withInterpreter debe operar sobre InterpreterSession
+  - no sobre NanoRTInterpreter mutable
+- Añadir seams debug-only:
+  - install actor for tests
+  - clear actor for tests
+  - debug snapshot para soak
+- Salida de fase:
+  - ModelManager equivalente al del runtime endurecido.
+Fase 5 — Adaptación de pipelines al nuevo InterpreterSession
+- Actualizar:
+  - FrutSmartP/modules/nano-rt/android/src/main/java/expo/modules/nanort/module/workflows/shared/base/AbstractClassificationPipeline.kt
+  - FrutSmartP/modules/nano-rt/android/src/main/java/expo/modules/nanort/module/workflows/shared/base/AbstractSegmentationPipeline.kt
+- Verificar que solo usen:
+  - getInputBuffer()
+  - runInference()
+  - getOutputBuffers()
+  - getInputTensorShape()
+  - getOutputTensorShapes()
+- Confirmar que ninguna pipeline:
+  - guarde buffers para más tarde
+  - use output buffers fuera del lease
+  - lance trabajo en otro thread sobre esos buffers
+- Adaptar InterpreterWarmer.kt al nuevo contrato.
+- Salida de fase:
+  - workflows funcionando sobre sesión lease-bound.
+Fase 6 — Workspaces y estrategia de buffers
+Esta fase se agrega específicamente por tu observación.
+- Confirmación actual:
+  - los workspaces no retienen ByteBuffer
+  - trabajan con FloatArray y Mat
+  - por correctness, el cambio no debería romperlos
+- Riesgo real:
+  - sí puede haber regresión de rendimiento por las copias extra del actor/session
+  - especialmente en segmentación
+- Trabajo explícito:
+  - revisar classification path:
+    - input scratch copy
+    - output read-only/snapshot
+    - impacto esperado bajo
+  - revisar segmentation path:
+    - output tensor grande
+    - doble copia potencial hacia workspace.detTensor y workspace.protoTensor
+    - impacto esperado medio/alto
+- Decisión recomendada:
+  - v1 de migración usa la estrategia endurecida actual sin rediseño extra
+  - v2 opcional solo si las métricas lo exigen:
+    - introducir InputTensorWriter
+    - introducir OutputTensorReader
+    - introducir InterpreterLeaseSession más eficiente
+    - evitar deep-copy completo de outputs grandes sin volver a exponer buffers crudos
+- Validación obligatoria en esta fase:
+  - pruebas de clasificación real con workspace
+  - pruebas de segmentación real con workspace
+  - comparación de latencia baseline vs runtime nuevo
+  - observación de memoria/direct buffers
+- Salida de fase:
+  - decisión informada: “copias actuales aceptables” o “hay que optimizar API”.
+Fase 7 — Lifecycle Expo y readiness
+- Revisar FrutSmartP/modules/nano-rt/android/src/main/java/expo/modules/nanort/NanoRTModule.kt.
+- Corregir semántica de:
+  - OnCreate
+  - initializeModule()
+  - initialize()
+  - OnDestroy
+  - warmup
+- Tema crítico:
+  - cleanupModule() hoy llama ModelManager.shutdownBlocking()
+  - con el runtime nuevo, eso debe revisarse para no romper el guardrail de main thread
+- Recomendación:
+  - teardown con runBlocking(Dispatchers.Default) { ModelManager.shutdown() }
+  - no usar shutdownBlocking() desde un thread no controlado
+- Revisar warmup:
+  - definir si un warmup parcialmente fallido sigue marcando ready o no
+  - documentar esa política
+- Revisar eventos:
+  - onReady
+  - onInitError
+- Salida de fase:
+  - lifecycle Expo robusto y compatible con el nuevo runtime.
+Fase 8 — GPU policy, quarantine y delegate correctness
+- Portar la política completa desde RNOptimizedPipelines.
+- Sustituir el LRU simple del módulo por DelegatePool.
+- Portar persistencia de quarantine:
+  - SharedPreferences
+  - keys por Build.FINGERPRINT + ModelId
+- Mantener decisión de GPU por:
+  - flag
+  - blacklist
+  - compat list
+  - quarantine
+- Confirmar fallback CPU si GPU falla.
+- Confirmar que delegates pinned no se cierran incorrectamente.
+- Salida de fase:
+  - GPU path con la misma robustez que el runtime endurecido.
+Fase 9 — Infra de testing dentro de modules/nano-rt
+- Crear en el módulo:
+  - android/src/test
+  - android/src/androidTest
+- Añadir dependencias de test al android/build.gradle del módulo.
+- Portar/adaptar:
+  - harness
+  - test rule
+  - debug controls
+  - fake preferences
+  - introspection helpers
+  - timeout helpers
+  - gates
+  - thread introspection
+- Añadir seams debug-only en el runtime del módulo para soportar esos tests.
+- Salida de fase:
+  - módulo con test infra propia, no dependiente del app demo anterior.
+Fase 10 — Port del bloque crítico de pruebas
+Portar primero el núcleo que certifica correctness real.
+- Startup/lifecycle:
+  - recovery after startup failure
+  - shutdown during startup race
+- Fatal/recoverable:
+  - recoverable fatal restart
+  - sticky fatal termination
+- Borrower liveness:
+  - shutdown with blocked borrower
+  - release with blocked borrower
+  - borrower suspension policy
+- Ownership:
+  - input buffer lease escape
+  - foreign thread buffer use
+  - output buffer lease escape
+  - output buffer isolation
+- Delegate pool:
+  - capacity bound
+  - close all pinned
+  - concurrency
+  - LRU order
+  - token uniqueness
+- Leaks:
+  - actor child job leak
+  - thread leak
+- Pressure:
+  - long running queue pressure
+- Real engine:
+  - real engine shutdown stress
+- Salida de fase:
+  - baseline fuerte de pruebas del runtime dentro de nano-rt.
+Fase 11 — Pruebas específicas de workflows y workspaces
+Esto es obligatorio por el tema de buffers.
+- Añadir pruebas Android específicas del módulo para:
+  - AbstractClassificationPipeline sobre runtime nuevo
+  - AbstractSegmentationPipeline sobre runtime nuevo
+  - classification workspace reuse correcto
+  - segmentation workspace reuse correcto
+  - no aliasing dañino entre workspaces y buffers del actor
+- Añadir pruebas de regresión para:
+  - ClassificationProcessor.preprocess(...)
+  - SegmentationProcessor.preprocess/postprocess(...)
+  - lectura de outputs snapshot/read-only
+- Añadir validación de resultados mínimos:
+  - shape esperada
+  - no crashes
+  - no leaks visibles
+- Salida de fase:
+  - compatibilidad probada entre actor/session y object pools/workspaces.
+Fase 12 — Validación de rendimiento y memoria
+- Crear una batería separada de performance regression para el módulo.
+- Medir al menos:
+  - clasificación plant/field
+  - segmentación plant/field
+  - warmup
+  - shutdown/restart
+- Métricas mínimas:
+  - tiempo por inferencia
+  - tiempo total por workflow
+  - delta frente al baseline anterior
+  - crecimiento de direct buffers si se puede observar
+  - threads vivos
+  - child jobs
+- Criterio recomendado:
+  - no aprobar migración solo por correctness
+  - aprobar también por ausencia de regresión severa
+- Si aparece regresión sensible en segmentación:
+  - abrir subfase de optimización de outputs lease-bound sin deep-copy total
+- Salida de fase:
+  - decisión objetiva sobre si la estrategia actual de buffers es suficiente.
+Fase 13 — Port del soak manual al módulo Expo
+- Portar/adaptar el sistema manual de soak al entorno FrutSmartP/modules/nano-rt.
+- Añadir:
+  - debug-only service
+  - control actions
+  - status/report
+  - tasks Gradle manuales
+- Ajustar package names y paths.
+- Mantenerlo separado de la suite normal.
+- Añadir perfiles:
+  - mixed
+  - rotation
+  - shutdown
+  - opcionalmente workflow-classification
+  - opcionalmente workflow-segmentation
+- Este último punto es importante:
+  - en el módulo Expo conviene tener también soak de workflow completo, no solo de ModelManager
+- Salida de fase:
+  - módulo Expo con soak manual propio.
+Fase 14 — Integración host app real
+- Validar la app FrutSmartP real usando el módulo ya migrado.
+- Casos mínimos:
+  - boot de la app
+  - useNanoRTReady
+  - initializeModule()
+  - onReady / onInitError
+  - NanoRTClassifier.classifyPlantExternal(...)
+  - NanoRTClassifier.classifyPlantInternal(...)
+  - NanoRTClassifier.classifyFieldExternal(...)
+  - NanoRTClassifier.classifyFieldInternal(...)
+- Validar:
+  - URIs de salida
+  - payload JS
+  - tiempos razonables
+  - no regressions visibles en pantallas reales
+  - hot reload/dev client no deja estado corrupto
+- Salida de fase:
+  - integración extremo a extremo validada.
+Fase 15 — Limpieza final
+- Retirar el runtime viejo del módulo cuando todo lo nuevo esté verde.
+- Eliminar:
+  - LRU simple legacy de delegates
+  - Mutex-based runtime viejo
+  - cualquier compat shim temporal
+- Dejar documentación:
+  - arquitectura
+  - contract del lease/session
+  - cómo correr tests
+  - cómo correr soak
+  - thresholds sugeridos
+- Salida de fase:
+  - módulo limpio y endurecido.
+Matriz de archivos: copiar, adaptar, mantener
+- Copiar/adaptar desde RNOptimizedPipelines:
+  - ModelManager.kt
+  - InterpreterSession.kt
+  - NanoRTInterpreter.kt
+  - internal/InterpreterActor.kt
+  - internal/InterpreterProtocol.kt
+  - internal/DelegatePool.kt
+  - internal/GpuPolicy.kt
+  - internal/GpuQuarantineStore.kt
+  - internal/InferenceFlags.kt
+  - internal/ModelManagerDebugHooks.kt
+  - soak debug files
+  - test harness/utilities
+- Mantener inicialmente en nano-rt:
+  - WorkspaceManager.kt
+  - ClassificationWorkspace.kt
+  - SegmentationWorkspace.kt
+  - ClassificationProcessor.kt
+  - SegmentationProcessor.kt
+  - workflows plant/field
+  - Expo bridge y TS API
+- Adaptar localmente:
+  - NanoRTModule.kt
+  - InterpreterWarmer.kt
+  - base pipelines
+Riesgos principales
+- Riesgo alto:
+  - OnDestroy y shutdownBlocking() actual del módulo
+- Riesgo alto:
+  - regresión de rendimiento en segmentación por copias extra
+- Riesgo alto:
+  - ausencia de test suite actual en nano-rt
+- Riesgo medio:
+  - semántica de ready/warmup parcial
+- Riesgo medio:
+  - comportamiento GPU/quarantine al pasar al pool nuevo
+- Riesgo medio:
+  - interacción entre actor serialization y workspace mutexes
+- Riesgo bajo:
+  - assets/model enum/JS contracts
+Mitigaciones
+- Portar tests antes de declarar la migración terminada.
+- Añadir fase explícita de workflow/workspace performance validation.
+- Mantener API JS intacta hasta el final.
+- No rehacer workspaces al inicio.
+- No optimizar prematuramente la estrategia de buffers; primero medir.
+Criterios de aceptación
+- API Expo/JS intacta.
+- Workflows actuales funcionando igual.
+- Runtime actorizado dentro de nano-rt.
+- Tests críticos del actor verdes dentro del módulo.
+- Pruebas específicas de workflows/workspaces verdes.
+- Sin deadlocks, sin pending replies colgadas, sin fatales inesperados.
+- Sin leaks reproducibles de threads/jobs.
+- Soak manual del módulo funcionando.
+- Regresión de rendimiento aceptable o justificada con optimización posterior.
+Orden exacto recomendado de ejecución
+1. congelar contratos externos  
+2. mapa file-by-file  
+3. portar runtime actor-based  
+4. portar NanoRTInterpreter  
+5. rehacer ModelManager  
+6. adaptar pipelines a InterpreterSession  
+7. arreglar lifecycle Expo  
+8. portar GPU policy/quarantine/delegate pool  
+9. crear test infra del módulo  
+10. portar tests críticos  
+11. añadir pruebas workflow/workspace  
+12. medir rendimiento/memoria  
+13. portar soak manual  
+14. validar host app real  
+15. limpiar runtime viejo  
+16. sign-off
+Resultado esperado
+- FrutSmartP/modules/nano-rt queda con:
+  - el runtime endurecido del actor model
+  - la integración Expo actual preservada
+  - workflows y workspaces existentes funcionando
+  - una suite propia de pruebas críticas
+  - soak manual propio
+  - evidencia real de correctness y estabilidad
+- Y, muy importante, el tema de buffers/workspaces deja de ser una incógnita porque queda:
+  - probado a nivel funcional
+  - medido a nivel de rendimiento
+  - con ruta clara de optimización si hace falta
+Si quieres, el siguiente paso en planificación lo puedo aterrizar todavía más: te hago un plan de ejecución por milestones/commits, con listas exactas de archivos por milestone y orden recomendado de implementación.

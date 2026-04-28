@@ -1,0 +1,8 @@
+export const TOKENS = {
+	AZURE_BLOB_CLIENT: Symbol("AZURE_BLOB_CLIENT"),
+	KEY_VAULT_CLIENT: Symbol("KEY_VAULT_CLIENT"),
+	REQUEST_ID: Symbol("REQUEST_ID"),
+	LOGGER: Symbol("LOGGER"),
+	CONFIG: Symbol("CONFIG"),
+	CLOCK: Symbol("CLOCK"),
+};

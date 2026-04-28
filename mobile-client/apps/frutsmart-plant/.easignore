@@ -1,0 +1,56 @@
+# Ignore native directories (if you are using EAS Build)
+/android
+/ios
+
+# Ignore test coverage reports
+/coverage
+
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+.idea/
+.vscode/
+/.git
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.apk
+
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# local env files
+.env*.local
+
+# typescript
+*.tsbuildinfo
+
+# Custom
+docs/
+fonts/
+FRUTOSMART/
+native-modules/
+nmodules/
+scripts/
+trash/
+ts-models/

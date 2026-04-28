@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+option java_package = "com.skybolt.proto";
+option java_multiple_files = true;
+
+message ItemRecord {
+  string client_item_id = 1;
+  string blob_name = 2;
+  string local_uri = 3;
+  string content_type = 4;
+  int64  total_bytes = 5;
+  int64  uploaded_bytes = 6;
+  
+  // Item status matching the upload lifecycle
+  enum Status {
+    PENDING = 0;       // Item queued, not started
+    UPLOADING = 1;     // Currently uploading chunks
+    COMPLETED = 2;     // Upload finished successfully
+    FAILED = 3;        // Upload failed with error
+    CANCELED = 4;      // Upload was canceled by user
+  }
+  Status status = 7;
+  
+  int32  next_block_index = 8;
+  int32  total_blocks = 9;
+  int32  retry_count = 10;
+  string last_error_code = 11;
+  string md5_hex = 12;                 // MD5 del archivo en HEX (opcional)
+  repeated string block_md5_b64 = 13;  // MD5 por bloque en Base64 (opcional)
+  map<string, string> metadata = 14;
+}
+
+message Metrics {
+  double avg_block_ms = 1;
+  double p95_block_ms = 2;
+  double peak_bps = 3;
+  int32  total_retries = 4;
+  int64  started_at_ms = 5;
+  int64  ended_at_ms = 6;
+}
+
+message UploadSessionState {
+  string session_id = 1;
+  enum SessionStatus {
+    IDLE = 0;
+    PREPARING = 1;
+    UPLOADING = 2;
+    PAUSED = 3;
+    COMPLETED = 4;
+    FAILED = 5;
+    CANCELED = 6;
+  }
+  SessionStatus status = 2;
+
+  repeated ItemRecord items = 3;
+
+  int64 total_bytes = 4;
+  int64 uploaded_bytes = 5;
+
+  Metrics metrics = 6;
+
+  // Hints/tuning persistentes
+  int32 max_parallel_files = 7;
+  int32 max_parallel_chunks = 8;
+  int32 chunk_size_bytes = 9;
+  bool  requires_wifi = 10;
+  bool  allows_cellular = 11;
+  bool  low_power_mode_okay = 12;
+
+  int32 total_files     = 13;
+  int32 completed_files = 14;
+}

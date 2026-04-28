@@ -1,0 +1,437 @@
+2026-04-21 13:45:42.068  2048-2048  WindowOnBackDispatcher  com.anonymous.FrutSmartP             W  sendCancelIfRunning: isInProgress=false callback=android.view.ViewRootImpl$$ExternalSyntheticLambda11@53015a4
+2026-04-21 13:45:42.070  2048-2199  Surface                 com.anonymous.FrutSmartP             D  Surface::disconnect
+2026-04-21 13:45:42.070  2048-2199  BufferQueueProducer     com.anonymous.FrutSmartP             D  [com.anonymous.FrutSmartP/com.anonymous.FrutSmartP.MainActivity#280718(BLAST Consumer)pid:2048](id:80000000011,api:1,p:2048,c:2048) disconnect: api 1
+2026-04-21 13:45:42.158  2048-2048  Glide                   com.anonymous.FrutSmartP             D  Finished loading BitmapDrawable from DATA_DISK_CACHE for http://192.168.1.9:8081/assets/?unstable_path=.%2Fassets%2Fimages%2Fapp%2Fplant-work%2Fwork-flow%2Foverall-summary%2Fexternal-cluster-icon.webp&platform=android&hash=119d28941708834f1664e14b736e9a3f with size [115x106] in 32.330677 ms
+2026-04-21 13:45:42.160  2048-2048  Glide                   com.anonymous.FrutSmartP             D  Finished loading BitmapDrawable from DATA_DISK_CACHE for http://192.168.1.9:8081/assets/?unstable_path=.%2Fassets%2Fimages%2Fapp%2Fplant-work%2Fwork-flow%2Foverall-summary%2Finternal-cluster-icon.webp&platform=android&hash=465ac4d20eb4a28a088d54a82aa08f64 with size [82x121] in 28.971511 ms
+2026-04-21 13:45:44.173  2048-2276  ReactNativeJS           com.anonymous.FrutSmartP             I  { qualityClassifications: 
+                                                                                                       [ { external: 
+                                                                                                            { rawPhotoUri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/1776796994220-okmebwe.webp',
+                                                                                                              classifiedSegments: 
+                                                                                                               [ { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_3ee6ebbe-1ae3-4df7-9926-e9a99d61789d.webp',
+                                                                                                                   bestConfidence: 0.662109375,
+                                                                                                                   bestClassName: 'Clase 3',
+                                                                                                                   confidences: 
+                                                                                                                    [ 0.0050811767578125,
+                                                                                                                      0.072021484375,
+                                                                                                                      0.662109375,
+                                                                                                                      0.260986328125 ] },
+                                                                                                                 { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_75afce83-bfad-494a-bc87-863fb05acdcb.webp',
+                                                                                                                   bestConfidence: 0.9609375,
+                                                                                                                   bestClassName: 'Clase 1',
+                                                                                                                   confidences: [ 0.9609375, 0.039031982421875, 0, 0 ] },
+                                                                                                                 { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_a846c116-940c-4c6c-8fa2-6e4628f2efc7.webp',
+                                                                                                                   bestConfidence: 0.9765625,
+                                                                                                                   bestClassName: 'Clase 1',
+                                                                                                                   confidences: 
+                                                                                                                    [ 0.9765625,
+                                                                                                                      0.01959228515625,
+                                                                                                                      0.0024738311767578125,
+                                                                                                                      0.001323699951171875 ] },
+                                                                                                                 { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_081d7ffb-d547-4431-82b7-750c4fe5be4c.webp',
+                                                                                                                   bestConfidence: 0.759765625,
+                                                                                                                   bestClassName: 'Clase 1',
+                                                                                                                   confidences: 
+                                                                                                                    [ 0.759765625,
+                                                                                                                      0.0210113525390625,
+                                                                                                                      0.2069091796875,
+                                                                                                                      0.01239776611328125 ] },
+                                                                                                                 { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_1356bc4d-be7a-4677-ab83-e21f0ad1f668.webp',
+                                                                                                                   bestConfidence: 1,
+                                                                                                                   bestClassName: 'Clase 1',
+                                                                                                                   confidences: [ 1, 0.00013053417205810547, 0, 0 ] },
+                                                                                                                 { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_69b4e112-5926-430a-8f94-8975dd197f51.webp',
+                                                                                                                   bestConfidence: 0.59716796875,
+                                                                                                                   bestClassName: 'Clase 2',
+                                                                                                                   confidences: 
+                                                                                                                    [ 0.288818359375,
+                                                                                                                      0.59716796875,
+                                                                                                                      0.01419830322265625,
+                                                                                                                      0.099609375 ] },
+                                                                                                                 { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_858354f0-7509-4a78-ab4d-274f676b7010.webp',
+                                                                                                                   bestConfidence: 0.50244140625,
+                                                                                                                   bestClassName: 'Clase 2',
+                                                                                                                   confidences: 
+                                                                                                                    [ 0.404541015625,
+                                                                                                                      0.50244140625,
+                                                                                                                      0.04840087890625,
+                                                                                                                      0.044830322265625 ] },
+                                                                                                                 { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_52f72a0c-6f59-46d0-8ece-f0ffd6b15062.webp',
+                                                                                                                   bestConfidence: 0.5068359375,
+                                                                                                                   bestClassName: 'Clase 2',
+                                                                                                                   confidences: 
+                                                                                                                    [ 0.47802734375,
+                                                                                                                      0.5068359375,
+                                                                                                                      0.01360321044921875,
+                                                                                                                      0.0014476776123046875 ] },
+                                                                                                                 { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_15b9a122-a657-45a3-ad09-1e2ec2bb96a3.webp',
+                                                                                                                   bestConfidence: 0.88330078125,
+                                                                                                                   bestClassName: 'Clase 3',
+                                                                                                                   confidences: 
+                                                                                                                    [ 0.024505615234375,
+                                                                                                                      0.0230560302734375,
+                                                                                                                      0.88330078125,
+                                                                                                                      0.069091796875 ] },
+                                                                                                                 { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_472b9509-70a3-4be0-bbe2-d944455ebba6.webp',
+                                                                                                                   bestConfidence: 0.394775390625,
+                                                                                                                   bestClassName: 'Clase 1',
+                                                                                                                   confidences: 
+                                                                                                                    [ 0.394775390625,
+                                                                                                                      0.1805419921875,
+                                                                                                                      0.1927490234375,
+                                                                                                                      0.2318115234375 ] },
+2026-04-21 13:45:44.173  2048-2276  ReactNativeJS           com.anonymous.FrutSmartP             I               { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_774b01c1-40fe-40fe-bcb4-b7a3e4f5d959.webp',
+                                                                                                                   bestConfidence: 0.859375,
+                                                                                                                   bestClassName: 'Clase 2',
+                                                                                                                   confidences: 
+                                                                                                                    [ 0.132080078125,
+                                                                                                                      0.859375,
+                                                                                                                      0.00829315185546875,
+                                                                                                                      0.0002887248992919922 ] },
+                                                                                                                 { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_af05c409-c6e0-41fc-899c-d8f6b9d5a017.webp',
+                                                                                                                   bestConfidence: 0.91845703125,
+                                                                                                                   bestClassName: 'Clase 2',
+                                                                                                                   confidences: 
+                                                                                                                    [ 0.0732421875,
+                                                                                                                      0.91845703125,
+                                                                                                                      0.007350921630859375,
+                                                                                                                      0.0007276535034179688 ] },
+                                                                                                                 { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_c0ef76dd-c919-4f22-88f9-486e32712dff.webp',
+                                                                                                                   bestConfidence: 0.9375,
+                                                                                                                   bestClassName: 'Clase 4',
+                                                                                                                   confidences: 
+                                                                                                                    [ 0.005218505859375,
+                                                                                                                      0.042816162109375,
+                                                                                                                      0.0142364501953125,
+                                                                                                                      0.9375 ] },
+                                                                                                                 { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_81032b94-f218-49d8-901a-efefd1d38a1d.webp',
+                                                                                                                   bestConfidence: 0.8447265625,
+                                                                                                                   bestClassName: 'Clase 1',
+                                                                                                                   confidences: 
+                                                                                                                    [ 0.8447265625,
+                                                                                                                      0.1346435546875,
+                                                                                                                      0.005626678466796875,
+                                                                                                                      0.014984130859375 ] },
+                                                                                                                 { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_a365c79f-bf1c-4bc5-8094-3339e58c0521.webp',
+                                                                                                                   bestConfidence: 1,
+                                                                                                                   bestClassName: 'Clase 4',
+                                                                                                                   confidences: [ 0, 0.00019490718841552734, 0, 1 ] },
+                                                                                                                 { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_25295e30-73ff-4f21-ba67-2831a71fa9ff.webp',
+                                                                                                                   bestConfidence: 0.9677734375,
+                                                                                                                   bestClassName: 'Clase 1',
+                                                                                                                   confidences: 
+                                                                                                                    [ 0.9677734375,
+                                                                                                                      0.0269927978515625,
+                                                                                                                      0.002193450927734375,
+                                                                                                                      0.0028667449951171875 ] } ] },
+                                                                                                           internal: 
+                                                                                                            { rawPhotoUri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/1776797012960-9mqmv3l.webp',
+                                                                                                              segmentedPhotoUri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_a7578488-1ed8-4861-9f18-5dfd189567f8.webp',
+                                                                                                              aiPrediction: 
+                                                                                                               { className: 'Tipo D',
+                                                                                                                 confidence: 1,
+                                                                                                                 rawConfidences: [ 0, 0, 0, 1 ] },
+                                                                                                              humanFeedback: { isCorrect: true, correctedClassName: null, observation: '' } } },
+                                                                                                         { external: 
+                                                                                                            { rawPhotoUri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/1776797050163-gg3bh1h.webp',
+                                                                                                              classifiedSegments: 
+                                                                                                               [ { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_2706e807-45dc-4d50-8b3d-6116bf226388.webp',
+                                                                                                                   bestConfidence: 0.662109375,
+                                                                                                                   bestClassName: 'Clase 3',
+                                                                                                                   confidences: 
+                                                                                                                    [ 0.0050811767578125,
+                                                                                                                      0.072021484375,
+                                                                                                                      0.662109375,
+                                                                                                                      0.260986328125 ] },
+                                                                                                                 { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_a486f2e9-6ba8-4096-a917-e0b29e948d19.webp',
+                                                                                                                   bestConfidence: 0.9609375,
+                                                                                                                   bestClassName: 'Clase 1',
+                                                                                                                   confidences: [ 0.9609375, 0.039031982421875, 0, 0 ] },
+                                                                                                                 { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_1b4fd9bd-618d-459c-89e3-1654062d16ec.webp',
+                                                                                                                   bestConfidence: 0.9765625,
+                                                                                                                   bestClassName: 'Clase 1',
+                                                                                                                   confidences: 
+                                                                                                                    [ 0.9765625,
+                                                                                                                      0.01959228515625,
+2026-04-21 13:45:44.173  2048-2276  ReactNativeJS           com.anonymous.FrutSmartP             I                    0.0024738311767578125,
+                                                                                                                      0.001323699951171875 ] },
+                                                                                                                 { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_7dcce88b-a4ea-4d9e-8645-10ff15f5c8c0.webp',
+                                                                                                                   bestConfidence: 0.759765625,
+                                                                                                                   bestClassName: 'Clase 1',
+                                                                                                                   confidences: [TOO BIG formatValueCalls 201 exceeded limit of 200] },
+                                                                                                                 [TOO BIG formatValueCalls 202 exceeded limit of 200],
+                                                                                                                 [TOO BIG formatValueCalls 203 exceeded limit of 200],
+                                                                                                                 [TOO BIG formatValueCalls 204 exceeded limit of 200],
+                                                                                                                 [TOO BIG formatValueCalls 205 exceeded limit of 200],
+                                                                                                                 [TOO BIG formatValueCalls 206 exceeded limit of 200],
+                                                                                                                 [TOO BIG formatValueCalls 207 exceeded limit of 200],
+                                                                                                                 [TOO BIG formatValueCalls 208 exceeded limit of 200],
+                                                                                                                 [TOO BIG formatValueCalls 209 exceeded limit of 200],
+                                                                                                                 [TOO BIG formatValueCalls 210 exceeded limit of 200],
+                                                                                                                 [TOO BIG formatValueCalls 211 exceeded limit of 200],
+                                                                                                                 [TOO BIG formatValueCalls 212 exceeded limit of 200],
+                                                                                                                 [TOO BIG formatValueCalls 213 exceeded limit of 200] ] },
+                                                                                                           internal: [TOO BIG formatValueCalls 214 exceeded limit of 200] },
+                                                                                                         [TOO BIG formatValueCalls 215 exceeded limit of 200],
+                                                                                                         [TOO BIG formatValueCalls 216 exceeded limit of 200] ],
+                                                                                                      harvestCriteria: [TOO BIG formatValueCalls 217 exceeded limit of 200] }
+2026-04-21 13:45:44.237  2048-2048  WindowOnBackDispatcher  com.anonymous.FrutSmartP             W  OnBackInvokedCallback is not enabled for the application.
+                                                                                                    Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+2026-04-21 13:45:44.269  2048-2048  libc                    com.anonymous.FrutSmartP             W  Access denied finding property "vendor.display.enable_optimal_refresh_rate"
+2026-04-21 13:45:44.262  2048-2048  mous.FrutSmartP         com.anonymous.FrutSmartP             W  type=1400 audit(0.0:1268613): avc:  denied  { read } for  name="u:object_r:vendor_display_prop:s0" dev="tmpfs" ino=14537 scontext=u:r:untrusted_app:s0:c74,c258,c512,c768 tcontext=u:object_r:vendor_display_prop:s0 tclass=file permissive=0 app=com.anonymous.FrutSmartP
+2026-04-21 13:45:44.329  2048-2048  Glide                   com.anonymous.FrutSmartP             D  Finished loading BitmapDrawable from DATA_DISK_CACHE for http://192.168.1.9:8081/assets/?unstable_path=.%2Fassets%2Fimages%2Fpalm-oil-fruit.webp&platform=android&hash=92460c995ae543940c4424ac1cc921b2 with size [368x184] in 38.931354 ms
+2026-04-21 13:45:45.566  2048-2276  ReactNativeJS           com.anonymous.FrutSmartP             I  { qualityClassifications: 
+                                                                                                       [ { external: 
+                                                                                                            { rawPhotoUri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/1776796994220-okmebwe.webp',
+                                                                                                              classifiedSegments: 
+                                                                                                               [ { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_3ee6ebbe-1ae3-4df7-9926-e9a99d61789d.webp',
+                                                                                                                   bestConfidence: 0.662109375,
+                                                                                                                   bestClassName: 'Clase 3',
+                                                                                                                   confidences: 
+                                                                                                                    [ 0.0050811767578125,
+                                                                                                                      0.072021484375,
+                                                                                                                      0.662109375,
+                                                                                                                      0.260986328125 ] },
+                                                                                                                 { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_75afce83-bfad-494a-bc87-863fb05acdcb.webp',
+                                                                                                                   bestConfidence: 0.9609375,
+                                                                                                                   bestClassName: 'Clase 1',
+                                                                                                                   confidences: [ 0.9609375, 0.039031982421875, 0, 0 ] },
+                                                                                                                 { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_a846c116-940c-4c6c-8fa2-6e4628f2efc7.webp',
+                                                                                                                   bestConfidence: 0.9765625,
+                                                                                                                   bestClassName: 'Clase 1',
+                                                                                                                   confidences: 
+                                                                                                                    [ 0.9765625,
+                                                                                                                      0.01959228515625,
+                                                                                                                      0.0024738311767578125,
+                                                                                                                      0.001323699951171875 ] },
+                                                                                                                 { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_081d7ffb-d547-4431-82b7-750c4fe5be4c.webp',
+                                                                                                                   bestConfidence: 0.759765625,
+                                                                                                                   bestClassName: 'Clase 1',
+                                                                                                                   confidences: 
+                                                                                                                    [ 0.759765625,
+                                                                                                                      0.0210113525390625,
+                                                                                                                      0.2069091796875,
+                                                                                                                      0.01239776611328125 ] },
+                                                                                                                 { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_1356bc4d-be7a-4677-ab83-e21f0ad1f668.webp',
+                                                                                                                   bestConfidence: 1,
+                                                                                                                   bestClassName: 'Clase 1',
+                                                                                                                   confidences: [ 1, 0.00013053417205810547, 0, 0 ] },
+                                                                                                                 { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_69b4e112-5926-430a-8f94-8975dd197f51.webp',
+                                                                                                                   bestConfidence: 0.59716796875,
+                                                                                                                   bestClassName: 'Clase 2',
+                                                                                                                   confidences: 
+                                                                                                                    [ 0.288818359375,
+                                                                                                                      0.59716796875,
+                                                                                                                      0.01419830322265625,
+                                                                                                                      0.099609375 ] },
+                                                                                                                 { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_858354f0-7509-4a78-ab4d-274f676b7010.webp',
+                                                                                                                   bestConfidence: 0.50244140625,
+                                                                                                                   bestClassName: 'Clase 2',
+                                                                                                                   confidences: 
+                                                                                                                    [ 0.404541015625,
+                                                                                                                      0.50244140625,
+                                                                                                                      0.04840087890625,
+                                                                                                                      0.044830322265625 ] },
+                                                                                                                 { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_52f72a0c-6f59-46d0-8ece-f0ffd6b15062.webp',
+                                                                                                                   bestConfidence: 0.5068359375,
+                                                                                                                   bestClassName: 'Clase 2',
+                                                                                                                   confidences: 
+                                                                                                                    [ 0.47802734375,
+                                                                                                                      0.5068359375,
+                                                                                                                      0.01360321044921875,
+                                                                                                                      0.0014476776123046875 ] },
+                                                                                                                 { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_15b9a122-a657-45a3-ad09-1e2ec2bb96a3.webp',
+                                                                                                                   bestConfidence: 0.88330078125,
+                                                                                                                   bestClassName: 'Clase 3',
+                                                                                                                   confidences: 
+                                                                                                                    [ 0.024505615234375,
+                                                                                                                      0.0230560302734375,
+                                                                                                                      0.88330078125,
+                                                                                                                      0.069091796875 ] },
+                                                                                                                 { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_472b9509-70a3-4be0-bbe2-d944455ebba6.webp',
+                                                                                                                   bestConfidence: 0.394775390625,
+                                                                                                                   bestClassName: 'Clase 1',
+                                                                                                                   confidences: 
+                                                                                                                    [ 0.394775390625,
+                                                                                                                      0.1805419921875,
+                                                                                                                      0.1927490234375,
+                                                                                                                      0.2318115234375 ] },
+2026-04-21 13:45:45.566  2048-2276  ReactNativeJS           com.anonymous.FrutSmartP             I               { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_774b01c1-40fe-40fe-bcb4-b7a3e4f5d959.webp',
+                                                                                                                   bestConfidence: 0.859375,
+                                                                                                                   bestClassName: 'Clase 2',
+                                                                                                                   confidences: 
+                                                                                                                    [ 0.132080078125,
+                                                                                                                      0.859375,
+                                                                                                                      0.00829315185546875,
+                                                                                                                      0.0002887248992919922 ] },
+                                                                                                                 { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_af05c409-c6e0-41fc-899c-d8f6b9d5a017.webp',
+                                                                                                                   bestConfidence: 0.91845703125,
+                                                                                                                   bestClassName: 'Clase 2',
+                                                                                                                   confidences: 
+                                                                                                                    [ 0.0732421875,
+                                                                                                                      0.91845703125,
+                                                                                                                      0.007350921630859375,
+                                                                                                                      0.0007276535034179688 ] },
+                                                                                                                 { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_c0ef76dd-c919-4f22-88f9-486e32712dff.webp',
+                                                                                                                   bestConfidence: 0.9375,
+                                                                                                                   bestClassName: 'Clase 4',
+                                                                                                                   confidences: 
+                                                                                                                    [ 0.005218505859375,
+                                                                                                                      0.042816162109375,
+                                                                                                                      0.0142364501953125,
+                                                                                                                      0.9375 ] },
+                                                                                                                 { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_81032b94-f218-49d8-901a-efefd1d38a1d.webp',
+                                                                                                                   bestConfidence: 0.8447265625,
+                                                                                                                   bestClassName: 'Clase 1',
+                                                                                                                   confidences: 
+                                                                                                                    [ 0.8447265625,
+                                                                                                                      0.1346435546875,
+                                                                                                                      0.005626678466796875,
+                                                                                                                      0.014984130859375 ] },
+                                                                                                                 { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_a365c79f-bf1c-4bc5-8094-3339e58c0521.webp',
+                                                                                                                   bestConfidence: 1,
+                                                                                                                   bestClassName: 'Clase 4',
+                                                                                                                   confidences: [ 0, 0.00019490718841552734, 0, 1 ] },
+                                                                                                                 { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_25295e30-73ff-4f21-ba67-2831a71fa9ff.webp',
+                                                                                                                   bestConfidence: 0.9677734375,
+                                                                                                                   bestClassName: 'Clase 1',
+                                                                                                                   confidences: 
+                                                                                                                    [ 0.9677734375,
+                                                                                                                      0.0269927978515625,
+                                                                                                                      0.002193450927734375,
+                                                                                                                      0.0028667449951171875 ] } ] },
+                                                                                                           internal: 
+                                                                                                            { rawPhotoUri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/1776797012960-9mqmv3l.webp',
+                                                                                                              segmentedPhotoUri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_a7578488-1ed8-4861-9f18-5dfd189567f8.webp',
+                                                                                                              aiPrediction: 
+                                                                                                               { className: 'Tipo D',
+                                                                                                                 confidence: 1,
+                                                                                                                 rawConfidences: [ 0, 0, 0, 1 ] },
+                                                                                                              humanFeedback: { isCorrect: true, correctedClassName: null, observation: '' } } },
+                                                                                                         { external: 
+                                                                                                            { rawPhotoUri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/1776797050163-gg3bh1h.webp',
+                                                                                                              classifiedSegments: 
+                                                                                                               [ { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_2706e807-45dc-4d50-8b3d-6116bf226388.webp',
+                                                                                                                   bestConfidence: 0.662109375,
+                                                                                                                   bestClassName: 'Clase 3',
+                                                                                                                   confidences: 
+                                                                                                                    [ 0.0050811767578125,
+                                                                                                                      0.072021484375,
+                                                                                                                      0.662109375,
+                                                                                                                      0.260986328125 ] },
+                                                                                                                 { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_a486f2e9-6ba8-4096-a917-e0b29e948d19.webp',
+                                                                                                                   bestConfidence: 0.9609375,
+                                                                                                                   bestClassName: 'Clase 1',
+                                                                                                                   confidences: [ 0.9609375, 0.039031982421875, 0, 0 ] },
+                                                                                                                 { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_1b4fd9bd-618d-459c-89e3-1654062d16ec.webp',
+                                                                                                                   bestConfidence: 0.9765625,
+                                                                                                                   bestClassName: 'Clase 1',
+                                                                                                                   confidences: 
+                                                                                                                    [ 0.9765625,
+                                                                                                                      0.01959228515625,
+2026-04-21 13:45:45.566  2048-2276  ReactNativeJS           com.anonymous.FrutSmartP             I                    0.0024738311767578125,
+                                                                                                                      0.001323699951171875 ] },
+                                                                                                                 { uri: 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_7dcce88b-a4ea-4d9e-8645-10ff15f5c8c0.webp',
+                                                                                                                   bestConfidence: 0.759765625,
+                                                                                                                   bestClassName: 'Clase 1',
+                                                                                                                   confidences: [TOO BIG formatValueCalls 201 exceeded limit of 200] },
+                                                                                                                 [TOO BIG formatValueCalls 202 exceeded limit of 200],
+                                                                                                                 [TOO BIG formatValueCalls 203 exceeded limit of 200],
+                                                                                                                 [TOO BIG formatValueCalls 204 exceeded limit of 200],
+                                                                                                                 [TOO BIG formatValueCalls 205 exceeded limit of 200],
+                                                                                                                 [TOO BIG formatValueCalls 206 exceeded limit of 200],
+                                                                                                                 [TOO BIG formatValueCalls 207 exceeded limit of 200],
+                                                                                                                 [TOO BIG formatValueCalls 208 exceeded limit of 200],
+                                                                                                                 [TOO BIG formatValueCalls 209 exceeded limit of 200],
+                                                                                                                 [TOO BIG formatValueCalls 210 exceeded limit of 200],
+                                                                                                                 [TOO BIG formatValueCalls 211 exceeded limit of 200],
+                                                                                                                 [TOO BIG formatValueCalls 212 exceeded limit of 200],
+                                                                                                                 [TOO BIG formatValueCalls 213 exceeded limit of 200] ] },
+                                                                                                           internal: [TOO BIG formatValueCalls 214 exceeded limit of 200] },
+                                                                                                         [TOO BIG formatValueCalls 215 exceeded limit of 200],
+                                                                                                         [TOO BIG formatValueCalls 216 exceeded limit of 200] ],
+                                                                                                      harvestCriteria: [TOO BIG formatValueCalls 217 exceeded limit of 200] }
+2026-04-21 13:45:45.637  2048-2276  ReactNativeJS           com.anonymous.FrutSmartP             I  Rendering SavingClassificationScreen...
+2026-04-21 13:45:45.666  2048-2048  [RNScreens]             com.anonymous.FrutSmartP             W  backTitleFontFamily prop is not available on Android
+2026-04-21 13:45:45.666  2048-2048  [RNScreens]             com.anonymous.FrutSmartP             W  disableBackButtonMenu prop is not available on Android
+2026-04-21 13:45:45.666  2048-2048  [RNScreens]             com.anonymous.FrutSmartP             W  topInsetEnabled prop is not available on Android
+2026-04-21 13:45:45.666  2048-2048  [RNScreens]             com.anonymous.FrutSmartP             W  backTitleVisible prop is not available on Android
+2026-04-21 13:45:45.666  2048-2048  [RNScreens]             com.anonymous.FrutSmartP             W  largeTitleHideShadow prop is not available on Android
+2026-04-21 13:45:45.666  2048-2048  [RNScreens]             com.anonymous.FrutSmartP             W  largeTitleFontWeight prop is not available on Android
+2026-04-21 13:45:45.666  2048-2048  [RNScreens]             com.anonymous.FrutSmartP             W  userInterfaceStyle prop is not available on Android
+2026-04-21 13:45:45.666  2048-2048  [RNScreens]             com.anonymous.FrutSmartP             W  largeTitleFontFamily prop is not available on Android
+2026-04-21 13:45:45.686  2048-2276  ReactNativeJS           com.anonymous.FrutSmartP             I  'Clasificación a guardar:', '{\n  "traceability": {\n    "provider": "own",\n    "qrCode": "",\n    "truckPlate": "G",\n    "consecutiveNumber": "G",\n    "ownData": {\n      "program": {\n        "id": "88cd28b3-c8d1-47f7-9dee-fd5c9ee64275",\n        "name": "PR01"\n      },\n      "lots": [\n        {\n          "id": "eef1798e-bd19-4981-bddc-f49649f7dc46",\n          "name": "IS03"\n        },\n        {\n          "id": "1d5f61fd-2a58-417f-8b72-edb5e52c2892",\n          "name": "RI02"\n        }\n      ]\n    }\n  },\n  "metadata": {\n    "creationTimestamp": "2026-04-21T18:43:03.524Z",\n    "device": {\n      "timeOfDay": "day",\n      "weather": "Despejado",\n      "hasInternet": true\n    },\n    "geolocation": {\n      "latitude": 3.3605883,\n      "longitude": -76.5019948\n    }\n  },\n  "harvestCriteria": {\n    "rb": 100,\n    "rv": 0,\n    "rsm": 0,\n    "rmf": 0,\n    "rpl": 0,\n    "pas": 0,\n    "vac": 0\n  },\n  "qualityClassifications": [\n    {\n      "external": {\n        "rawPhotoUri": "file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/1776796994220-okmebwe.webp",\n        "classifiedSegments": [\n          {\n            "uri": "file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_3ee6ebbe-1ae3-4df7-9926-e9a99d61789d.webp",\n            "bestConfidence": 0.662109375,\n            "bestClassName": "Clase 3",\n            "confidences": [\n              0.0050811767578125,\n              0.072021484375,\n              0.662109375,\n              0.260986328125\n            ]\n          },\n          {\n            "uri": "file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_75afce83-bfad-494a-bc87-863fb05acdcb.webp",\n            "bestConfidence": 0.9609375,\n            "bestClassName": "Clase 1",\n            "confidences": [\n              0.9609375,\n              0.039031982421875,\n              0,\n              0\n            ]\n          },\n          {\n            "uri": "file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_a846c116-940c-4c6c-8fa2-6e4628f2efc7.webp",\n            "bestConfidence": 0.9765625,\n            "bestClassName": "Clase 1",\n            "confidences": [\n              0.9765625,\n              0.01959228515625,\n              0.0024738311767578125,\n              0.001323699951171875\n            ]\n          },\n          {\n            "uri": "file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_081d7ffb-d547-4431-82b7-750c4fe5be4c.webp",\n            "bestConfidence": 0.759765625,\n            "bestClassName": "Clase 1",\n            "confidences": [\n              0.759765625,\n              0.0210113525390625,\n              0.2069091796875,\n              0.01239776611328125\n            ]\n          },\n          {\n            "uri": "file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_1356bc4d-be7a-4677-ab83-e21f0ad1f668.webp",\n            "bestConfidence": 1,\n            "bestClassName": "Clase 1",\n            "confidences": [\n              1,\n              0.00013053417205810547,\n              0,\n              0\n            ]\n          },\n          {\n            "uri": "file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_69b4e112-5926-430a-8f94-8975dd197f51.webp",\n            "bestConfidence": 0.59716796875,\n            "bestClassName": "Clase 2",\n            "confidences": [\n              0.288818359375,\n              0.59716796875,\n              0.01419830322265625,\n              0.099609375\n            ]\n          },\n          {\n            "uri": "file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_858354f0-7509-4a78-ab4d-274f676b7010.webp",\n            "bestConfidence": 0.50244140625,\n            "bestClassName": "Clase 2",\n            "confidences": [\n              0.404541015625,\n              0.50244140625,\n              0.04840087890625,\n              0.044830322265625\n            ]\n   
+2026-04-21 13:45:45.689  2048-2276  ReactNativeJS           com.anonymous.FrutSmartP             I  [Persistence] Iniciando guardado para el análisis: 70417268-568d-432c-9d3d-1f5c5d2dbfaf
+2026-04-21 13:45:45.716  2048-2048  WindowOnBackDispatcher  com.anonymous.FrutSmartP             W  sendCancelIfRunning: isInProgress=false callback=android.view.ViewRootImpl$$ExternalSyntheticLambda11@ae4a840
+2026-04-21 13:45:45.718  2048-2199  Surface                 com.anonymous.FrutSmartP             D  Surface::disconnect
+2026-04-21 13:45:45.718  2048-2199  BufferQueueProducer     com.anonymous.FrutSmartP             D  [com.anonymous.FrutSmartP/com.anonymous.FrutSmartP.MainActivity#280727(BLAST Consumer)pid:2048](id:80000000012,api:1,p:2048,c:2048) disconnect: api 1
+2026-04-21 13:45:45.775  2048-2048  Glide                   com.anonymous.FrutSmartP             D  Finished loading BitmapDrawable from DATA_DISK_CACHE for http://192.168.1.9:8081/assets/?unstable_path=.%2Fassets%2Fimages%2Flogo.webp&platform=android&hash=d7f6ed2798a161fa24e91d5565d5b522 with size [416x500] in 61.980052 ms
+2026-04-21 13:45:45.896  2048-2276  ReactNativeJS           com.anonymous.FrutSmartP             I  { valuesLength: 48, expectedLength: 48 }
+2026-04-21 13:45:45.898  2048-2276  ReactNativeJS           com.anonymous.FrutSmartP             I  { values: 
+                                                                                                       [ 'mo8z582u-nm4w6wi',
+                                                                                                         '70417268-568d-432c-9d3d-1f5c5d2dbfaf',
+                                                                                                         0,
+                                                                                                         'file:///data/user/0/com.anonymous.FrutSmartP/files/frutosmart_plant_data/analyses/70417268-568d-432c-9d3d-1f5c5d2dbfaf/external_raw_0.webp',
+                                                                                                         'file:///data/user/0/com.anonymous.FrutSmartP/files/frutosmart_plant_data/analyses/70417268-568d-432c-9d3d-1f5c5d2dbfaf/internal_raw_0.webp',
+                                                                                                         'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_a7578488-1ed8-4861-9f18-5dfd189567f8.webp',
+                                                                                                         'Tipo D',
+                                                                                                         1,
+                                                                                                         '[0,0,0,1]',
+                                                                                                         true,
+                                                                                                         null,
+                                                                                                         '',
+                                                                                                         'mo8z582u-9zuzfzi',
+                                                                                                         '70417268-568d-432c-9d3d-1f5c5d2dbfaf',
+                                                                                                         1,
+                                                                                                         'file:///data/user/0/com.anonymous.FrutSmartP/files/frutosmart_plant_data/analyses/70417268-568d-432c-9d3d-1f5c5d2dbfaf/external_raw_1.webp',
+                                                                                                         'file:///data/user/0/com.anonymous.FrutSmartP/files/frutosmart_plant_data/analyses/70417268-568d-432c-9d3d-1f5c5d2dbfaf/internal_raw_1.webp',
+                                                                                                         'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_6fbf3130-3a55-4b3e-9935-75461c65f03b.webp',
+                                                                                                         'Tipo D',
+                                                                                                         1,
+                                                                                                         '[0,0,0,1]',
+                                                                                                         true,
+                                                                                                         null,
+                                                                                                         '',
+                                                                                                         'mo8z582u-uiswi8a',
+                                                                                                         '70417268-568d-432c-9d3d-1f5c5d2dbfaf',
+                                                                                                         2,
+                                                                                                         'file:///data/user/0/com.anonymous.FrutSmartP/files/frutosmart_plant_data/analyses/70417268-568d-432c-9d3d-1f5c5d2dbfaf/external_raw_2.webp',
+                                                                                                         'file:///data/user/0/com.anonymous.FrutSmartP/files/frutosmart_plant_data/analyses/70417268-568d-432c-9d3d-1f5c5d2dbfaf/internal_raw_2.webp',
+                                                                                                         'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/inference/nanort_0376ba5a-8bcf-4b96-b03c-ff5fdbc2ce20.webp',
+                                                                                                         'Tipo D',
+                                                                                                         1,
+                                                                                                         '[0,0,0,1]',
+                                                                                                         true,
+                                                                                                         null,
+                                                                                                         '',
+                                                                                                         'mo8z582u-g7ykn5u',
+                                                                                                         '70417268-568d-432c-9d3d-1f5c5d2dbfaf',
+                                                                                                         3,
+                                                                                                         'file:///data/user/0/com.anonymous.FrutSmartP/files/frutosmart_plant_data/analyses/70417268-568d-432c-9d3d-1f5c5d2dbfaf/external_raw_3.webp',
+                                                                                                         null,
+                                                                                                         null,
+                                                                                                         null,
+                                                                                                         null,
+                                                                                                         null,
+                                                                                                         null,
+                                                                                                         null,
+                                                                                                         null ] }
+2026-04-21 13:45:45.966  2048-2276  ReactNativeJS           com.anonymous.FrutSmartP             I  [Persistence] Análisis 70417268-568d-432c-9d3d-1f5c5d2dbfaf guardado exitosamente.
+2026-04-21 13:45:45.967  2048-2276  ReactNativeJS           com.anonymous.FrutSmartP             I  Clasificación guardada exitosamente con ID: 70417268-568d-432c-9d3d-1f5c5d2dbfaf
+2026-04-21 13:45:46.102  2048-2276  ReactNativeJS           com.anonymous.FrutSmartP             E  'No se pudo encolar upload del analisis', { analysisId: '70417268-568d-432c-9d3d-1f5c5d2dbfaf',
+                                                                                                      error: [ReferenceError: Property 'crypto' doesn't exist] }
+2026-04-21 13:45:46.133  2048-2048  [RNScreens]             com.anonymous.FrutSmartP             W  backTitleFontFamily prop is not available on Android
+2026-04-21 13:45:46.134  2048-2048  [RNScreens]             com.anonymous.FrutSmartP             W  disableBackButtonMenu prop is not available on Android
+2026-04-21 13:45:46.134  2048-2048  [RNScreens]             com.anonymous.FrutSmartP             W  topInsetEnabled prop is not available on Android
+2026-04-21 13:45:46.134  2048-2048  [RNScreens]             com.anonymous.FrutSmartP             W  backTitleVisible prop is not available on Android
+2026-04-21 13:45:46.134  2048-2048  [RNScreens]             com.anonymous.FrutSmartP             W  largeTitleHideShadow prop is not available on Android
+2026-04-21 13:45:46.134  2048-2048  [RNScreens]             com.anonymous.FrutSmartP             W  largeTitleFontWeight prop is not available on Android
+2026-04-21 13:45:46.134  2048-2048  [RNScreens]             com.anonymous.FrutSmartP             W  userInterfaceStyle prop is not available on Android
+2026-04-21 13:45:46.134  2048-2048  [RNScreens]             com.anonymous.FrutSmartP             W  largeTitleFontFamily prop is not available on Android
+2026-04-21 13:45:46.261  2048-2048  Glide                   com.anonymous.FrutSmartP             D  Finished loading BitmapDrawable from DATA_DISK_CACHE for http://192.168.1.9:8081/assets/?unstable_path=.%2Fassets%2Fimages%2Fapp%2Fplant-work%2Findex%2Fprofile.webp&platform=android&hash=2388dd54b51b5813bb7ee4ebf896c013 with size [200x200] in 110.348906 ms
+2026-04-21 13:45:46.264  2048-2048  Glide                   com.anonymous.FrutSmartP             D  Finished loading BitmapDrawable from DATA_DISK_CACHE for http://192.168.1.9:8081/assets/?unstable_path=.%2Fassets%2Fimages%2Fapp%2Fplant-work%2Findex%2Fquality-form-icon.png&platform=android&hash=66b93b1324cf10733e4f59abd13b4140 with size [172x172] in 111.226406 ms
+2026-04-21 13:45:46.267  2048-2048  Glide                   com.anonymous.FrutSmartP             D  Finished loading BitmapDrawable from DATA_DISK_CACHE for http://192.168.1.9:8081/assets/?unstable_path=.%2Fassets%2Fimages%2Fapp%2Fplant-work%2Findex%2Fregistration-summary-icon.png&platform=android&hash=983ca6bce2a0318165a8ce441d033191 with size [188x188] in 111.345677 ms
+2026-04-21 13:45:46.268  2048-2048  Glide                   com.anonymous.FrutSmartP             D  Finished loading BitmapDrawable from DATA_DISK_CACHE for http://192.168.1.9:8081/assets/?unstable_path=.%2Fassets%2Fimages%2Fapp%2Fplant-work%2Findex%2Fsettings-icon.png&platform=android&hash=3f2cdab0918ea5f0d506427b562309c5 with size [148x148] in 111.001458 ms
+2026-04-21 13:45:46.270  2048-2048  Glide                   com.anonymous.FrutSmartP             D  Finished loading BitmapDrawable from DATA_DISK_CACHE for http://192.168.1.9:8081/assets/?unstable_path=.%2Fassets%2Fimages%2Fapp%2Fplant-work%2Findex%2Fupload-icon.webp&platform=android&hash=736ade2ddefd009fd586f34ac7a16497 with size [148x150] in 110.97239499999999 ms
+2026-04-21 13:45:46.272  2048-2048  Glide                   com.anonymous.FrutSmartP             D  Finished loading BitmapDrawable from DATA_DISK_CACHE for http://192.168.1.9:8081/assets/?unstable_path=.%2Fassets%2Fimages%2Falert-triangle-icon.webp&platform=android&hash=5b4014d24ea6bec0da9fd4e0562ec1fc with size [200x200] in 110.09781199999999 ms
+2026-04-21 13:45:46.273  2048-2048  Glide                   com.anonymous.FrutSmartP             D  Finished loading BitmapDrawable from DATA_DISK_CACHE for http://192.168.1.9:8081/assets/?unstable_path=.%2Fassets%2Fimages%2Fdots-vertical-icon.webp&platform=android&hash=c44315f1db949c6447e6f650ac8ab96e with size [50x50] in 109.66890599999999 ms
+2026-04-21 13:45:46.275  2048-2048  Glide                   com.anonymous.FrutSmartP             D  Finished loading BitmapDrawable from DATA_DISK_CACHE for http://192.168.1.9:8081/assets/?unstable_path=.%2Fassets%2Fimages%2Fupload-icon.webp&platform=android&hash=aef8f312d13bc62371c474e9cf62378d with size [50x50] in 110.33317699999999 ms

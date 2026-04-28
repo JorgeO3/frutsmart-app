@@ -1,0 +1,14 @@
+{
+  "name": "frutsmart-mobile-client",
+  "private": true,
+  "packageManager": "bun@1.3.9",
+  "workspaces": [
+    "apps/frutsmart-plant",
+    "packages/skybolt",
+    "packages/nano-rt"
+  ],
+  "scripts": {
+    "install:all": "bun install",
+    "why": "bun pm why"
+  }
+}

@@ -1,0 +1,269 @@
+26-04-21 14:14:40.121 12620-12779 unknown:Vi...rtyUpdater com.anonymous.FrutSmartP             W  Could not find generated setter for class com.facebook.react.views.textinput.ReactTextInputShadowNode
+2026-04-21 14:14:40.128 12620-12779 unknown:Vi...rtyUpdater com.anonymous.FrutSmartP             W  Could not find generated setter for class com.swmansion.gesturehandler.react.RNGestureHandlerRootViewManager
+2026-04-21 14:14:40.147 12620-12779 dev.expo.updates        com.anonymous.FrutSmartP             I  {"timestamp":1776798880147,"message":"UpdatesModule: getConstants called","code":"None","level":"info"}
+2026-04-21 14:14:40.516 12620-12779 nativeloader            com.anonymous.FrutSmartP             D  Load /data/app/~~QugbuyJ_McWR0Mhlk_ogSw==/com.anonymous.FrutSmartP-UItYpcklHK7wHIv6D2jQJA==/base.apk!/lib/arm64-v8a/librnscreens.so using class loader ns clns-7 (caller=/data/app/~~QugbuyJ_McWR0Mhlk_ogSw==/com.anonymous.FrutSmartP-UItYpcklHK7wHIv6D2jQJA==/base.apk!classes2.dex): ok
+2026-04-21 14:14:40.616 12620-12753 Skybolt-Skybolt-Skybolt com.anonymous.FrutSmartP             D  Auto-resume triggered for reason: network
+2026-04-21 14:14:40.616 12620-12753 Skybolt-Skybolt-Skybolt com.anonymous.FrutSmartP             D  No sessions to auto-resume for reason: network
+2026-04-21 14:14:40.635 12620-12779 ReactNativeJS           com.anonymous.FrutSmartP             I  Running "main" with {"rootTag":1,"initialProps":{},"fabric":true}
+2026-04-21 14:14:41.336 12620-12779 nativeloader            com.anonymous.FrutSmartP             D  Load /data/app/~~QugbuyJ_McWR0Mhlk_ogSw==/com.anonymous.FrutSmartP-UItYpcklHK7wHIv6D2jQJA==/base.apk!/lib/arm64-v8a/libreanimated.so using class loader ns clns-7 (caller=/data/app/~~QugbuyJ_McWR0Mhlk_ogSw==/com.anonymous.FrutSmartP-UItYpcklHK7wHIv6D2jQJA==/base.apk!classes7.dex): ok
+2026-04-21 14:14:41.414 12620-12806 ProfileInstaller        com.anonymous.FrutSmartP             D  Installing profile for com.anonymous.FrutSmartP
+2026-04-21 14:14:42.930 12620-12779 ReactNativeJS           com.anonymous.FrutSmartP             I  '✅ Directorio temporal inicializado en:', 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/'
+2026-04-21 14:14:43.154 12620-12779 Typeface                com.anonymous.FrutSmartP             E  Build font failed=fonts/Montserrat_bold.ttf;e=java.io.IOException: Failed to read font contents
+2026-04-21 14:14:43.155 12620-12779 Typeface                com.anonymous.FrutSmartP             E  Build font failed=fonts/Montserrat_bold.otf;e=java.io.IOException: Failed to read font contents
+2026-04-21 14:14:43.158 12620-12779 Typeface                com.anonymous.FrutSmartP             E  Build font failed=fonts/Montserrat.ttf;e=java.io.IOException: Failed to read font contents
+2026-04-21 14:14:43.158 12620-12779 Typeface                com.anonymous.FrutSmartP             E  Build font failed=fonts/Montserrat.otf;e=java.io.IOException: Failed to read font contents
+2026-04-21 14:14:43.241 12620-12779 ReactNativeJS           com.anonymous.FrutSmartP             I  '[SkyboltUploadProvider] Configuring Skybolt with settings:', { version: '1.0',
+                                                                                                      environment: 'dev',
+                                                                                                      backend: 
+                                                                                                       { auth: 
+                                                                                                          { clientId: 'dev-mobile-client',
+                                                                                                            scope: 'openid offline_access api://dev-api/.default',
+                                                                                                            tokenEndpoint: 'http://192.168.1.5:4100/oidc/token',
+                                                                                                            clockSkewMs: 60000 },
+                                                                                                         baseUrl: 'http://192.168.1.5:3000/api/v1',
+                                                                                                         endpoints: 
+                                                                                                          { sasBatchPath: '/upload/sessions/{sessionId}/sas-batch',
+                                                                                                            sasRefreshPath: '/upload/sessions/{sessionId}/sas/refresh' } },
+                                                                                                      azure: 
+                                                                                                       { serviceVersion: '2023-11-03',
+                                                                                                         sendBlockMd5: true,
+                                                                                                         defaultChunkBytes: 4194304 },
+                                                                                                      concurrency: { maxParallelFiles: 3, maxParallelChunks: 4 },
+                                                                                                      retry: { maxRetries: 3, baseDelayMs: 1000, maxDelayMs: 30000 } }
+2026-04-21 14:14:43.245 12620-12779 ReactNativeJS           com.anonymous.FrutSmartP             I  ⏳ [Assets] Iniciando configuración de assets iniciales...
+2026-04-21 14:14:43.253 12620-12779 ReactNativeJS           com.anonymous.FrutSmartP             I  🧹 Limpiando directorio temporal...
+2026-04-21 14:14:43.342 12620-12783 ExpoNanoRT              com.anonymous.FrutSmartP             D  JS observers attached
+2026-04-21 14:14:43.343 12620-12783 ExpoNanoRT              com.anonymous.FrutSmartP             D  JS observers attached
+2026-04-21 14:14:43.344 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             D  First attempt to load libs
+2026-04-21 14:14:43.344 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             D  Trying to load library opencv_java4
+2026-04-21 14:14:43.344 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             D  Library opencv_java4 loaded
+2026-04-21 14:14:43.344 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             D  First attempt to load libs is OK
+2026-04-21 14:14:43.346 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I  
+2026-04-21 14:14:43.346 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I  General configuration for OpenCV 4.12.0 =====================================
+2026-04-21 14:14:43.346 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I    Version control:               4.12.0-dirty
+2026-04-21 14:14:43.346 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I  
+2026-04-21 14:14:43.346 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I    Platform:
+2026-04-21 14:14:43.346 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      Timestamp:                   2025-07-02T13:00:18Z
+2026-04-21 14:14:43.346 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      Host:                        Linux 5.4.0-200-generic x86_64
+2026-04-21 14:14:43.346 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      Target:                      Android 1 aarch64
+2026-04-21 14:14:43.346 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      CMake:                       3.22.1-g37088a8
+2026-04-21 14:14:43.346 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      CMake generator:             Ninja
+2026-04-21 14:14:43.346 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      CMake build tool:            /opt/android-sdk/cmake/3.22.1/bin/ninja
+2026-04-21 14:14:43.346 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      Configuration:               Release
+2026-04-21 14:14:43.346 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      Algorithm Hint:              ALGO_HINT_ACCURATE
+2026-04-21 14:14:43.346 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I  
+2026-04-21 14:14:43.346 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I    CPU/HW features:
+2026-04-21 14:14:43.346 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      Baseline:                    NEON FP16
+2026-04-21 14:14:43.346 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I        requested:                 DETECT
+2026-04-21 14:14:43.346 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      Dispatched code generation:  NEON_DOTPROD NEON_FP16 NEON_BF16
+2026-04-21 14:14:43.346 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I        requested:                 NEON_FP16 NEON_BF16 NEON_DOTPROD
+2026-04-21 14:14:43.346 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I        NEON_DOTPROD (2 files):    + NEON_DOTPROD
+2026-04-21 14:14:43.346 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I        NEON_FP16 (2 files):       + NEON_FP16
+2026-04-21 14:14:43.346 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I        NEON_BF16 (0 files):       + NEON_BF16
+2026-04-21 14:14:43.346 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I  
+2026-04-21 14:14:43.346 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I    C/C++:
+2026-04-21 14:14:43.346 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      Built as dynamic libs?:      NO
+2026-04-21 14:14:43.346 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      C++ standard:                11
+2026-04-21 14:14:43.346 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      C++ Compiler:                /opt/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++  (ver 18.0.3)
+2026-04-21 14:14:43.346 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      C++ flags (Release):         -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D__BIONIC_NO_PAGE_SIZE_MACRO -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security     -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments  -fvisibility=hidden -fvisibility-inlines-hidden  -O3 -DNDEBUG   -DNDEBUG
+2026-04-21 14:14:43.346 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      C++ flags (Debug):           -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D__BIONIC_NO_PAGE_SIZE_MACRO -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security     -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments  -fvisibility=hidden -fvisibility-inlines-hidden  -fno-limit-debug-info   -O0 -DDEBUG -D_DEBUG -g
+2026-04-21 14:14:43.346 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      C Compiler:                  /opt/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/clang
+2026-04-21 14:14:43.346 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      C flags (Release):           -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D__BIONIC_NO_PAGE_SIZE_MACRO -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments  -fvisibility=hidden -fvisibility-inlines-hidden  -O3 -DNDEBUG   -DNDEBUG
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      C flags (Debug):             -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D__BIONIC_NO_PAGE_SIZE_MACRO -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security    -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winconsistent-missing-override -Wno-delete-non-virtual-dtor -Wno-unnamed-type-template-args -Wno-comment -Wno-deprecated-enum-enum-conversion -Wno-deprecated-anon-enum-enum-conversion -fdiagnostics-show-option -Qunused-arguments  -fvisibility=hidden -fvisibility-inlines-hidden  -fno-limit-debug-info   -O0 -DDEBUG -D_DEBUG -g
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      Linker flags (Release):      -Wl,-z,max-page-size=16384 -Wl,--build-id=sha1 -Wl,--no-rosegment -Wl,--no-undefined-version -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments  -Wl,-z,max-page-size=16384  -Wl,--as-needed -Wl,--no-undefined -Wl,--gc-sections  
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      Linker flags (Debug):        -Wl,-z,max-page-size=16384 -Wl,--build-id=sha1 -Wl,--no-rosegment -Wl,--no-undefined-version -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments  -Wl,-z,max-page-size=16384  -Wl,--as-needed -Wl,--no-undefined  
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      ccache:                      YES
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      Precompiled headers:         NO
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      Extra dependencies:          z dl m log
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      3rdparty dependencies:       libcpufeatures libprotobuf ade tbb ittnotify libjpeg-turbo libwebp libpng libtiff libopenjp2 IlmImf tegra_hal kleidicv_hal kleidicv kleidicv_thread
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I  
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I    OpenCV modules:
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      To be built:                 calib3d core dnn features2d flann gapi highgui imgcodecs imgproc java ml objdetect photo stitching video videoio
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      Disabled:                    world
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      Disabled by dependency:      -
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      Unavailable:                 python2 python3 ts
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      Applications:                -
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      Documentation:               NO
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      Non-free algorithms:         NO
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I  
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I    Android NDK:                   /opt/android-sdk/ndk/27.2.12479018 (ver 27.2.12479018)
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      Android ABI:                 arm64-v8a
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      NDK toolchain:               aarch64-linux-android-clang
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      STL type:                    c++_shared
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      Native API level:            21
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I    Android SDK:                   /opt/android-sdk (tools:  build tools: 34.0.0)
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I  
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I    GUI:                           NONE
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I  
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I    Media I/O: 
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      ZLib:                        z (ver 1.3.0.1)
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      JPEG:                        build-libjpeg-turbo (ver 3.1.0-70)
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I        SIMD Support Request:      YES
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I        SIMD Support:              YES
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      WEBP:                        build (ver decoder: 0x0209, encoder: 0x020f, demux: 0x0107)
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      AVIF:                        NO
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      PNG:                         build (ver 1.6.43)
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I        SIMD Support Request:      YES
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I        SIMD Support:              YES (Arm NEON)
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      TIFF:                        build (ver 42 - 4.6.0)
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      JPEG 2000:                   build (ver 2.5.3)
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      OpenEXR:                     build (ver 2.3.0)
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      GIF:                         YES
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      HDR:                         YES
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      SUNRASTER:                   YES
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      PXM:                         YES
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      PFM:                         YES
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I  
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I    Video I/O:
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I     MEDIANDK:                     YES
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I     NDK Camera:                   NO
+2026-04-21 14:14:43.347 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I  
+2026-04-21 14:14:43.348 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I    Parallel framework:            TBB (ver 2022.1 interface 12150)
+2026-04-21 14:14:43.348 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I  
+2026-04-21 14:14:43.348 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I    Trace:                         YES (with Intel ITT(3.25.4))
+2026-04-21 14:14:43.348 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I  
+2026-04-21 14:14:43.348 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I    Other third-party libraries:
+2026-04-21 14:14:43.348 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      Custom HAL:                  YES (carotene (ver 0.0.1) KleidiCV (ver 0.5.0))
+2026-04-21 14:14:43.348 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      Protobuf:                    build (3.19.1)
+2026-04-21 14:14:43.348 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      Flatbuffers:                 builtin/3rdparty (23.5.9)
+2026-04-21 14:14:43.348 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I  
+2026-04-21 14:14:43.348 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I    Python (for build):            /usr/bin/python3
+2026-04-21 14:14:43.348 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I  
+2026-04-21 14:14:43.348 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I    Java:                          export all functions
+2026-04-21 14:14:43.348 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      ant:                         NO
+2026-04-21 14:14:43.348 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      Java wrappers:               YES ()
+2026-04-21 14:14:43.348 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I      Java tests:                  NO
+2026-04-21 14:14:43.348 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I  
+2026-04-21 14:14:43.348 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I    Install to:                    /home/ci/build/o4a/install
+2026-04-21 14:14:43.348 12620-12783 OpenCV/StaticHelper     com.anonymous.FrutSmartP             I  -----------------------------------------------------------------
+2026-04-21 14:14:43.348 12620-12783 Fruto-Config            com.anonymous.FrutSmartP             I  Logger configured: enabled=true, minLevel=3, prefix=Fruto, honorSystemProps=false
+2026-04-21 14:14:43.348 12620-12783 DeviceFingerprint       com.anonymous.FrutSmartP             I  fingerprint=motorola/bangkk_g/bangkk:15/V1TCS35H.88-16-3/0ab83-83eefb:user/release-keys
+2026-04-21 14:14:43.349 12620-12783 ExpoNanoRT              com.anonymous.FrutSmartP             D  full_module_initialized
+2026-04-21 14:14:43.350 12620-12783 Skybolt-Skybolt-Skybolt com.anonymous.FrutSmartP             D  configure() called with settings
+2026-04-21 14:14:43.354 12620-12724 Skybolt-Skybolt-Skybolt com.anonymous.FrutSmartP             I  Configuring Skybolt: env=dev, version=1.0
+2026-04-21 14:14:43.354 12620-12724 Skybolt-Skybolt-AppSett com.anonymous.FrutSmartP             I  Skybolt configured: env=dev, version=1.0
+2026-04-21 14:14:43.355 12620-12753 InterpreterWarmer       com.anonymous.FrutSmartP             I  warmup_begin count=5 thread=DefaultDispatcher-worker-5
+2026-04-21 14:14:43.356 12620-12753 InterpreterWarmer       com.anonymous.FrutSmartP             I  warmup_model_begin model=RS
+2026-04-21 14:14:43.375 12620-12752 Skybolt-Skybolt-AuthEnv com.anonymous.FrutSmartP             D  AuthEnvironment already initialized
+2026-04-21 14:14:43.375 12620-12752 Skybolt-Skybolt-Skybolt com.anonymous.FrutSmartP             I  Skybolt configuration complete
+2026-04-21 14:14:43.377 12620-12753 nativeloader            com.anonymous.FrutSmartP             D  Load /data/app/~~QugbuyJ_McWR0Mhlk_ogSw==/com.anonymous.FrutSmartP-UItYpcklHK7wHIv6D2jQJA==/base.apk!/lib/arm64-v8a/libtensorflowlite_gpu_jni.so using class loader ns clns-7 (caller=/data/app/~~QugbuyJ_McWR0Mhlk_ogSw==/com.anonymous.FrutSmartP-UItYpcklHK7wHIv6D2jQJA==/base.apk!classes10.dex): ok
+2026-04-21 14:14:43.394 12620-12629 mous.FrutSmartP         com.anonymous.FrutSmartP             I  NativeAlloc concurrent copying GC freed 14MB AllocSpace bytes, 19(840KB) LOS objects, 75% free, 16MB/67MB, paused 73us,242us total 204.481ms
+2026-04-21 14:14:43.398 12620-12783 mous.FrutSmartP         com.anonymous.FrutSmartP             I  hiddenapi: Accessing hidden method Ljava/io/ObjectStreamClass;->getConstructorId(Ljava/lang/Class;)J (runtime_flags=0, domain=core-platform, api=unsupported) from Lexpo/modules/kotlin/allocators/UnsafeAllocator$Companion; (domain=app, TargetSdkVersion=36) using reflection: allowed
+2026-04-21 14:14:43.408 12620-12810 Fruto-InterpreterActor  com.anonymous.FrutSmartP             I  actor_init_ok
+2026-04-21 14:14:43.435 12620-12810 Fruto-GpuPolicy         com.anonymous.FrutSmartP             W  gpu_blacklisted model=RS fingerprint=motorola/bangkk_g/bangkk:15/V1TCS35H.88-16-3/0ab83-83eefb:user/release-keys sig=motorola|moto g84 5g|bangkk|qcom
+2026-04-21 14:14:43.436 12620-12810 Fruto-InterpreterActor  com.anonymous.FrutSmartP             I  model_switch from=none to=RS gpu=false
+2026-04-21 14:14:43.436 12620-12810 Fruto-NanoRTInterpreter com.anonymous.FrutSmartP             I  resources_released
+2026-04-21 14:14:43.437 12620-12810 Fruto-NanoRTInterpreter com.anonymous.FrutSmartP             I  model_load_begin file=ring_segmentation.tflite sizeB=11677406
+2026-04-21 14:14:43.437 12620-12810 Fruto-NanoRTInterpreter com.anonymous.FrutSmartP             I  resources_released
+2026-04-21 14:14:43.457 12620-12810 Fruto-NanoRTInterpreter com.anonymous.FrutSmartP             I  delegate_apply kind=CPU threads=4 xnnpack=true
+2026-04-21 14:14:43.463 12620-12810 nativeloader            com.anonymous.FrutSmartP             D  Load /data/app/~~QugbuyJ_McWR0Mhlk_ogSw==/com.anonymous.FrutSmartP-UItYpcklHK7wHIv6D2jQJA==/base.apk!/lib/arm64-v8a/libtensorflowlite_jni.so using class loader ns clns-7 (caller=/data/app/~~QugbuyJ_McWR0Mhlk_ogSw==/com.anonymous.FrutSmartP-UItYpcklHK7wHIv6D2jQJA==/base.apk!classes10.dex): ok
+2026-04-21 14:14:43.464 12620-12810 TensorFlowLite          com.anonymous.FrutSmartP             I  Loaded native library: tensorflowlite_jni
+2026-04-21 14:14:43.464 12620-12783 Skybolt-Skybolt-Skybolt com.anonymous.FrutSmartP             I  Skybolt configured successfully
+2026-04-21 14:14:43.465 12620-12779 nativeloader            com.anonymous.FrutSmartP             D  Load /data/app/~~QugbuyJ_McWR0Mhlk_ogSw==/com.anonymous.FrutSmartP-UItYpcklHK7wHIv6D2jQJA==/base.apk!/lib/arm64-v8a/libexpo-sqlite.so using class loader ns clns-7 (caller=/data/app/~~QugbuyJ_McWR0Mhlk_ogSw==/com.anonymous.FrutSmartP-UItYpcklHK7wHIv6D2jQJA==/base.apk!classes9.dex): ok
+2026-04-21 14:14:43.469 12620-12810 nativeloader            com.anonymous.FrutSmartP             D  Load libtensorflowlite_jni_gms_client.so using class loader ns clns-7 (caller=/data/app/~~QugbuyJ_McWR0Mhlk_ogSw==/com.anonymous.FrutSmartP-UItYpcklHK7wHIv6D2jQJA==/base.apk!classes10.dex): dlopen failed: library "libtensorflowlite_jni_gms_client.so" not found
+2026-04-21 14:14:43.469 12620-12810 TensorFlowLite          com.anonymous.FrutSmartP             I  Didn't load native library: tensorflowlite_jni_gms_client
+2026-04-21 14:14:43.471 12620-12810 TensorFlowLite          com.anonymous.FrutSmartP             I  Found application TF Lite runtime client in org.tensorflow.lite
+2026-04-21 14:14:43.472 12620-12810 TensorFlowLite          com.anonymous.FrutSmartP             I  TfLiteRuntime.FROM_APPLICATION_ONLY: Using application TF Lite runtime client from org.tensorflow.lite
+2026-04-21 14:14:43.474 12620-12779 ReactNativeJS           com.anonymous.FrutSmartP             I  '✅ Directorio temporal inicializado en:', 'file:///data/user/0/com.anonymous.FrutSmartP/files/tmp_media/'
+2026-04-21 14:14:43.474 12620-12779 ReactNativeJS           com.anonymous.FrutSmartP             I  🗑️ Directorio temporal limpiado y recreado.
+2026-04-21 14:14:43.475 12620-12779 ReactNativeJS           com.anonymous.FrutSmartP             I  [SkyboltUploadProvider] Skybolt configured OK
+2026-04-21 14:14:43.484 12620-12810 tflite                  com.anonymous.FrutSmartP             I  Initialized TensorFlow Lite runtime.
+2026-04-21 14:14:43.488 12620-12810 libc                    com.anonymous.FrutSmartP             W  Access denied finding property "ro.hardware.chipname"
+2026-04-21 14:14:43.493 12620-12779 ReactNativeJS           com.anonymous.FrutSmartP             I  👍 [Assets] Fuentes cargadas.
+2026-04-21 14:14:43.497 12620-12779 ReactNativeJS           com.anonymous.FrutSmartP             I  - Pre-descargando 'schema' de Base de Datos...
+2026-04-21 14:14:43.502 12620-12779 ReactNativeJS           com.anonymous.FrutSmartP             I  👍 [Assets] Base de Datos lista.
+2026-04-21 14:14:43.502 12620-12779 ReactNativeJS           com.anonymous.FrutSmartP             I  ✅ [Assets] Configuración de assets iniciales completada.
+2026-04-21 14:14:43.512 12620-12810 tflite                  com.anonymous.FrutSmartP             I  Created TensorFlow Lite XNNPACK delegate for CPU.
+2026-04-21 14:14:43.516 12620-12810 tflite                  com.anonymous.FrutSmartP             I  Replacing 524 out of 534 node(s) with delegate (TfLiteXNNPackDelegate) node, yielding 9 partitions for subgraph 0.
+2026-04-21 14:14:43.533 12620-12779 ReactNativeJS           com.anonymous.FrutSmartP             I  Ejecutando esquema SQL para sincronizar tablas...
+2026-04-21 14:14:43.596 12620-12811 nativeloader            com.anonymous.FrutSmartP             D  Load /data/app/~~QugbuyJ_McWR0Mhlk_ogSw==/com.anonymous.FrutSmartP-UItYpcklHK7wHIv6D2jQJA==/base.apk!/lib/arm64-v8a/libavif_android.so using class loader ns clns-7 (caller=/data/app/~~QugbuyJ_McWR0Mhlk_ogSw==/com.anonymous.FrutSmartP-UItYpcklHK7wHIv6D2jQJA==/base.apk!classes9.dex): ok
+2026-04-21 14:14:43.601 12620-12779 ReactNativeJS           com.anonymous.FrutSmartP             I  ✅ Database schema executed successfully.
+2026-04-21 14:14:43.607 12620-12810 Fruto-NanoRTInterpreter com.anonymous.FrutSmartP             I  buffers_alloc_begin
+2026-04-21 14:14:43.608 12620-12779 ReactNativeJS           com.anonymous.FrutSmartP             I  ✅ Database frutosmart_planta.db initialized successfully.
+2026-04-21 14:14:43.617 12620-12810 Fruto-NanoRTInterpreter com.anonymous.FrutSmartP             I  buffers_alloc_ok in.bytes=4915200 outs=2 outs.bytes=4520000
+2026-04-21 14:14:43.617 12620-12810 Fruto-NanoRTInterpreter com.anonymous.FrutSmartP             I  model_load_ok file=ring_segmentation.tflite
+2026-04-21 14:14:43.617 12620-12810 Fruto-InterpreterActor  com.anonymous.FrutSmartP             I  model_ready model=RS gpu=false epoch=1
+2026-04-21 14:14:43.618 12620-12810 Fruto-InterpreterActor  com.anonymous.FrutSmartP             I  actor_run_ok model=RS queueWaitMs=3.431 holdMs=209.638 epoch=1 gpu=false
+2026-04-21 14:14:43.620 12620-12724 InterpreterWarmer       com.anonymous.FrutSmartP             I  warmup_model_ok model=RS ms=263.692
+2026-04-21 14:14:43.620 12620-12724 InterpreterWarmer       com.anonymous.FrutSmartP             I  warmup_model_begin model=BS
+2026-04-21 14:14:43.632 12620-12779 ReactNativeJS           com.anonymous.FrutSmartP             I  [UploadScheduler] runTick(): no hay jobs elegibles.
+2026-04-21 14:14:43.642 12620-12620 Glide                   com.anonymous.FrutSmartP             D  Finished loading BitmapDrawable from DATA_DISK_CACHE for http://192.168.1.9:8081/assets/?unstable_path=.%2Fassets%2Fimages%2Flogo.webp&platform=android&hash=d7f6ed2798a161fa24e91d5565d5b522 with size [416x500] in 193.188594 ms
+2026-04-21 14:14:43.683 12620-12810 Fruto-InterpreterActor  com.anonymous.FrutSmartP             I  model_switch from=RS to=BS gpu=true
+2026-04-21 14:14:43.695 12620-12810 Fruto-NanoRTInterpreter com.anonymous.FrutSmartP             I  resources_released
+2026-04-21 14:14:43.698 12620-12810 tflite                  com.anonymous.FrutSmartP             I  Created TensorFlow Lite delegate for GPU.
+2026-04-21 14:14:43.699 12620-12810 Fruto-DelegatePool      com.anonymous.FrutSmartP             I  gpu_delegate_create model=BS token=d12742bc cacheDir=/data/user/0/com.anonymous.FrutSmartP/code_cache/tflite_gpu_cache
+2026-04-21 14:14:43.699 12620-12810 Fruto-NanoRTInterpreter com.anonymous.FrutSmartP             I  model_load_begin file=bunch_segmentation.tflite sizeB=11682440
+2026-04-21 14:14:43.699 12620-12810 Fruto-NanoRTInterpreter com.anonymous.FrutSmartP             I  resources_released
+2026-04-21 14:14:43.712 12620-12810 Fruto-NanoRTInterpreter com.anonymous.FrutSmartP             I  delegate_apply kind=GPU external=true
+2026-04-21 14:14:43.716 12620-12810 tflite                  com.anonymous.FrutSmartP             I  Loaded OpenCL library with dlopen.
+2026-04-21 14:14:43.718 12620-12810 tflite                  com.anonymous.FrutSmartP             I  Replacing 748 out of 748 node(s) with delegate (TfLiteGpuDelegateV2) node, yielding 1 partitions for subgraph 0.
+2026-04-21 14:14:43.745 12620-12810 libc                    com.anonymous.FrutSmartP             W  Access denied finding property "ro.vendor.gfx.32bit.target"
+2026-04-21 14:14:48.044 12620-12620 Choreographer           com.anonymous.FrutSmartP             I  Skipped 36 frames!  The application may be doing too much work on its main thread.
+2026-04-21 14:14:48.051 12620-12634 HWUI                    com.anonymous.FrutSmartP             I  Davey! duration=707ms; Flags=0, FrameTimelineVsyncId=431475816, IntendedVsync=1639911333541263, Vsync=1639911333541263, InputEventId=0, HandleInputStart=1639911334593689, AnimationStart=1639911334599054, PerformTraversalsStart=1639911385495200, DrawStart=1639911385988377, FrameDeadline=1639911347207929, FrameInterval=1639911334579991, FrameStartTime=16658127, SyncQueued=1639911399989210, SyncStart=1639911400446398, IssueDrawCommandsStart=1639911400819523, SwapBuffers=1639911406236919, FrameCompleted=1639912041776970, DequeueBufferDuration=76355, QueueBufferDuration=1329375, GpuCompleted=1639912041776970, SwapBuffersCompleted=1639911408848429, DisplayPresentTime=0, CommandSubmissionCompleted=1639911406236919, 
+2026-04-21 14:14:48.101 12620-12634 HWUI                    com.anonymous.FrutSmartP             I  Davey! duration=732ms; Flags=0, FrameTimelineVsyncId=431475823, IntendedVsync=1639911350199390, Vsync=1639911400173771, InputEventId=0, HandleInputStart=1639911401418689, AnimationStart=1639911401421085, PerformTraversalsStart=1639911411614419, DrawStart=1639911412189731, FrameDeadline=1639912063507390, FrameInterval=1639911401410200, FrameStartTime=16658127, SyncQueued=1639911414911137, SyncStart=1639911415096554, IssueDrawCommandsStart=1639911415472908, SwapBuffers=1639911418298325, FrameCompleted=1639912082816814, DequeueBufferDuration=63489, QueueBufferDuration=621769844, GpuCompleted=1639912082816814, SwapBuffersCompleted=1639912042359887, DisplayPresentTime=0, CommandSubmissionCompleted=1639911418298325, 
+2026-04-21 14:15:07.164 12620-12810 tflite                  com.anonymous.FrutSmartP             I  Initialized OpenCL-based API.
+2026-04-21 14:15:07.292 12620-12810 tflite                  com.anonymous.FrutSmartP             I  Created 1 GPU delegate kernels.
+2026-04-21 14:15:07.293 12620-12810 Fruto-NanoRTInterpreter com.anonymous.FrutSmartP             I  buffers_alloc_begin
+2026-04-21 14:15:07.293 12620-12810 Fruto-NanoRTInterpreter com.anonymous.FrutSmartP             I  buffers_alloc_ok in.bytes=4915200 outs=2 outs.bytes=4520000
+2026-04-21 14:15:07.293 12620-12810 Fruto-NanoRTInterpreter com.anonymous.FrutSmartP             I  model_load_ok file=bunch_segmentation.tflite
+2026-04-21 14:15:07.294 12620-12810 Fruto-InterpreterActor  com.anonymous.FrutSmartP             I  model_ready model=BS gpu=true epoch=2
+2026-04-21 14:15:07.294 12620-12810 Fruto-InterpreterActor  com.anonymous.FrutSmartP             I  actor_run_ok model=BS queueWaitMs=1.223 holdMs=23672.240 epoch=2 gpu=true
+2026-04-21 14:15:07.295 12620-12724 InterpreterWarmer       com.anonymous.FrutSmartP             I  warmup_model_ok model=BS ms=23674.928
+2026-04-21 14:15:07.295 12620-12724 InterpreterWarmer       com.anonymous.FrutSmartP             I  warmup_model_begin model=SS
+2026-04-21 14:15:07.323 12620-12810 Fruto-InterpreterActor  com.anonymous.FrutSmartP             I  model_switch from=BS to=SS gpu=true
+2026-04-21 14:15:07.431 12620-12810 Fruto-NanoRTInterpreter com.anonymous.FrutSmartP             I  resources_released
+2026-04-21 14:15:07.431 12620-12810 Fruto-DelegatePool      com.anonymous.FrutSmartP             I  gpu_delegate_release model=BS ref=0
+2026-04-21 14:15:07.432 12620-12810 Fruto-DelegatePool      com.anonymous.FrutSmartP             I  gpu_delegate_create model=SS token=13e04e2b cacheDir=/data/user/0/com.anonymous.FrutSmartP/code_cache/tflite_gpu_cache
+2026-04-21 14:15:07.432 12620-12810 Fruto-NanoRTInterpreter com.anonymous.FrutSmartP             I  model_load_begin file=single_segmentation.tflite sizeB=11682445
+2026-04-21 14:15:07.432 12620-12810 Fruto-NanoRTInterpreter com.anonymous.FrutSmartP             I  resources_released
+2026-04-21 14:15:07.443 12620-12810 Fruto-NanoRTInterpreter com.anonymous.FrutSmartP             I  delegate_apply kind=GPU external=true
+2026-04-21 14:15:07.449 12620-12810 tflite                  com.anonymous.FrutSmartP             I  Replacing 748 out of 748 node(s) with delegate (TfLiteGpuDelegateV2) node, yielding 1 partitions for subgraph 0.
+2026-04-21 14:15:07.463 12620-12632 System                  com.anonymous.FrutSmartP             W  A resource failed to call close. 
+2026-04-21 14:15:30.515 12620-12810 tflite                  com.anonymous.FrutSmartP             I  Created 1 GPU delegate kernels.
+2026-04-21 14:15:30.516 12620-12810 Fruto-NanoRTInterpreter com.anonymous.FrutSmartP             I  buffers_alloc_begin
+2026-04-21 14:15:30.516 12620-12810 Fruto-NanoRTInterpreter com.anonymous.FrutSmartP             I  buffers_alloc_ok in.bytes=4915200 outs=2 outs.bytes=4520000
+2026-04-21 14:15:30.516 12620-12810 Fruto-NanoRTInterpreter com.anonymous.FrutSmartP             I  model_load_ok file=single_segmentation.tflite
+2026-04-21 14:15:30.516 12620-12810 Fruto-InterpreterActor  com.anonymous.FrutSmartP             I  model_ready model=SS gpu=true epoch=3
+2026-04-21 14:15:30.517 12620-12810 Fruto-InterpreterActor  com.anonymous.FrutSmartP             I  actor_run_ok model=SS queueWaitMs=0.664 holdMs=23220.724 epoch=3 gpu=true
+2026-04-21 14:15:30.518 12620-12724 InterpreterWarmer       com.anonymous.FrutSmartP             I  warmup_model_ok model=SS ms=23222.910
+2026-04-21 14:15:30.518 12620-12724 InterpreterWarmer       com.anonymous.FrutSmartP             I  warmup_model_begin model=EC
+2026-04-21 14:15:30.538 12620-12810 Fruto-InterpreterActor  com.anonymous.FrutSmartP             I  model_switch from=SS to=EC gpu=true
+2026-04-21 14:15:30.651 12620-12810 Fruto-NanoRTInterpreter com.anonymous.FrutSmartP             I  resources_released
+2026-04-21 14:15:30.651 12620-12810 Fruto-DelegatePool      com.anonymous.FrutSmartP             I  gpu_delegate_release model=SS ref=0
+2026-04-21 14:15:30.652 12620-12810 Fruto-DelegatePool      com.anonymous.FrutSmartP             I  gpu_delegate_create model=EC token=cbb61d5e cacheDir=/data/user/0/com.anonymous.FrutSmartP/code_cache/tflite_gpu_cache
+2026-04-21 14:15:30.652 12620-12810 Fruto-NanoRTInterpreter com.anonymous.FrutSmartP             I  model_load_begin file=external_classification.tflite sizeB=6185974
+2026-04-21 14:15:30.652 12620-12810 Fruto-NanoRTInterpreter com.anonymous.FrutSmartP             I  resources_released
+2026-04-21 14:15:30.661 12620-12810 Fruto-NanoRTInterpreter com.anonymous.FrutSmartP             I  delegate_apply kind=GPU external=true
+2026-04-21 14:15:30.664 12620-12810 tflite                  com.anonymous.FrutSmartP             I  Replacing 320 out of 320 node(s) with delegate (TfLiteGpuDelegateV2) node, yielding 1 partitions for subgraph 0.
+2026-04-21 14:15:33.573 12620-12810 tflite                  com.anonymous.FrutSmartP             I  Created 1 GPU delegate kernels.
+2026-04-21 14:15:33.574 12620-12810 Fruto-NanoRTInterpreter com.anonymous.FrutSmartP             I  buffers_alloc_begin
+2026-04-21 14:15:33.574 12620-12810 Fruto-NanoRTInterpreter com.anonymous.FrutSmartP             I  buffers_alloc_ok in.bytes=602112 outs=1 outs.bytes=16
+2026-04-21 14:15:33.574 12620-12810 Fruto-NanoRTInterpreter com.anonymous.FrutSmartP             I  model_load_ok file=external_classification.tflite
+2026-04-21 14:15:33.574 12620-12810 Fruto-InterpreterActor  com.anonymous.FrutSmartP             I  model_ready model=EC gpu=true epoch=4
+2026-04-21 14:15:33.574 12620-12810 Fruto-InterpreterActor  com.anonymous.FrutSmartP             I  actor_run_ok model=EC queueWaitMs=0.899 holdMs=3054.637 epoch=4 gpu=true
+2026-04-21 14:15:33.575 12620-12724 InterpreterWarmer       com.anonymous.FrutSmartP             I  warmup_model_ok model=EC ms=3056.914
+2026-04-21 14:15:33.576 12620-12724 InterpreterWarmer       com.anonymous.FrutSmartP             I  warmup_model_begin model=IC
+2026-04-21 14:15:33.591 12620-12810 Fruto-InterpreterActor  com.anonymous.FrutSmartP             I  model_switch from=EC to=IC gpu=true
+2026-04-21 14:15:33.642 12620-12810 Fruto-NanoRTInterpreter com.anonymous.FrutSmartP             I  resources_released
+2026-04-21 14:15:33.642 12620-12810 Fruto-DelegatePool      com.anonymous.FrutSmartP             I  gpu_delegate_release model=EC ref=0
+2026-04-21 14:15:33.643 12620-12810 Fruto-DelegatePool      com.anonymous.FrutSmartP             I  gpu_delegate_create model=IC token=608c3bab cacheDir=/data/user/0/com.anonymous.FrutSmartP/code_cache/tflite_gpu_cache
+2026-04-21 14:15:33.645 12620-12810 Fruto-DelegatePool      com.anonymous.FrutSmartP             I  gpu_delegate_evict model=BS
+2026-04-21 14:15:33.645 12620-12810 Fruto-NanoRTInterpreter com.anonymous.FrutSmartP             I  model_load_begin file=internal_classification.tflite sizeB=6185975
+2026-04-21 14:15:33.645 12620-12810 Fruto-NanoRTInterpreter com.anonymous.FrutSmartP             I  resources_released
+2026-04-21 14:15:33.654 12620-12810 Fruto-NanoRTInterpreter com.anonymous.FrutSmartP             I  delegate_apply kind=GPU external=true
+2026-04-21 14:15:33.658 12620-12810 tflite                  com.anonymous.FrutSmartP             I  Replacing 320 out of 320 node(s) with delegate (TfLiteGpuDelegateV2) node, yielding 1 partitions for subgraph 0.
+2026-04-21 14:15:36.700 12620-12810 tflite                  com.anonymous.FrutSmartP             I  Created 1 GPU delegate kernels.
+2026-04-21 14:15:36.701 12620-12810 Fruto-NanoRTInterpreter com.anonymous.FrutSmartP             I  buffers_alloc_begin
+2026-04-21 14:15:36.701 12620-12810 Fruto-NanoRTInterpreter com.anonymous.FrutSmartP             I  buffers_alloc_ok in.bytes=602112 outs=1 outs.bytes=16
+2026-04-21 14:15:36.701 12620-12810 Fruto-NanoRTInterpreter com.anonymous.FrutSmartP             I  model_load_ok file=internal_classification.tflite
+2026-04-21 14:15:36.701 12620-12810 Fruto-InterpreterActor  com.anonymous.FrutSmartP             I  model_ready model=IC gpu=true epoch=5
+2026-04-21 14:15:36.702 12620-12810 Fruto-InterpreterActor  com.anonymous.FrutSmartP             I  actor_run_ok model=IC queueWaitMs=0.144 holdMs=3125.622 epoch=5 gpu=true
+2026-04-21 14:15:36.702 12620-12724 InterpreterWarmer       com.anonymous.FrutSmartP             I  warmup_model_ok model=IC ms=3126.758
+2026-04-21 14:15:36.752 12620-12810 Fruto-NanoRTInterpreter com.anonymous.FrutSmartP             I  resources_released
+2026-04-21 14:15:36.752 12620-12810 Fruto-DelegatePool      com.anonymous.FrutSmartP             I  gpu_delegate_release model=IC ref=0
+2026-04-21 14:15:36.752 12620-12810 Fruto-InterpreterActor  com.anonymous.FrutSmartP             I  actor_release_ok queueWaitMs=0.918 holdMs=47.811 epoch=6
+2026-04-21 14:15:36.753 12620-12724 InterpreterWarmer       com.anonymous.FrutSmartP             I  warmup_end ok=5 fail=0 ms=53397.886
+2026-04-21 14:15:36.754 12620-12724 ExpoNanoRT              com.anonymous.FrutSmartP             D  warmup_completed
+2026-04-21 14:15:36.755 12620-12620 ExpoNanoRT              com.anonymous.FrutSmartP             I  Emitting init event: onReady payload={}
+2026-04-21 14:15:37.540 12620-12620 libc                    com.anonymous.FrutSmartP             A  /home/jorgeo/.gradle/caches/8.13/transforms/ca0530d19960afffbb5d508c695af3ca/transformed/react-android-0.83.6-debug/prefab/modules/jsi/include/jsi/jsi.h:1395: HostFunctionType &facebook::jsi::Function::getHostFunction(Runtime &) const: assertion "isHostFunction(runtime)" failed
+2026-04-21 14:15:37.540 12620-12620 libc                    com.anonymous.FrutSmartP             A  Fatal signal 6 (SIGABRT), code -1 (SI_QUEUE) in tid 12620 (mous.FrutSmartP), pid 12620 (mous.FrutSmartP)

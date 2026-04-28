@@ -1,0 +1,9 @@
+{
+  "platforms": ["apple", "android", "web"],
+  "apple": {
+    "modules": ["ChartGeneratorModule"]
+  },
+  "android": {
+    "modules": ["expo.modules.chartgenerator.ChartGeneratorModule"]
+  }
+}

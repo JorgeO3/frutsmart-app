@@ -1,0 +1,134 @@
+# -----------------------------------
+# Node & JavaScript
+# -----------------------------------
+/node_modules/
+/npm-debug.log*
+/yarn-debug.log*
+/yarn-error.log*
+__generated__/               # código generado (Relay, GraphQL, etc.)
+
+# Bloque PnP (Yarn v2+)
+/.pnp
+.pnp.js
+
+# lockfiles que no usas (si trabajas sólo con Yarn)
+/package-lock.json
+/bun.lock
+
+# -----------------------------------
+# Expo / React Native (Managed & Prebuild/CNG)
+# -----------------------------------
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+/android
+/ios
+
+# Ejemplos de apps que no subes
+/app-example/
+
+# -----------------------------------
+# Cobertura y builds de producción
+# -----------------------------------
+/coverage/
+/build/
+
+# -----------------------------------
+# Archivos de debug y paquetes
+# -----------------------------------
+**/*.log
+**/*.trace
+**/*.zip
+**/*.tar.gz
+**/*.tgz
+*.hprof
+*.apk
+ReactAndroid-temp.aar
+
+# -----------------------------------
+# Metro & bundler cache
+# -----------------------------------
+.metro-health-check*
+
+# -----------------------------------
+# Entornos y claves sensibles
+# -----------------------------------
+.env
+.env.*.local
+.envrc.local
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.pem
+
+# -----------------------------------
+# Android / Kotlin
+# -----------------------------------
+.gradle/                       # caché global de Gradle
+local.properties
+.kotlin/
+
+# -----------------------------------
+# Módulos nativos (cualquiera)
+# -----------------------------------
+modules/*/android/build/
+modules/*/android/.gradle/
+!modules/*/android/build.gradle
+!modules/*/android/local.properties
+!modules/*/android/src/
+!modules/*/android/src/**
+modules/*/android/**
+!modules/*/android/build.gradle
+!modules/*/android/local.properties
+!modules/*/android/src/
+!modules/*/android/src/**
+
+modules/*/ios/*
+!modules/*/ios/*.swift
+modules/*/ios/Pods/
+modules/*/ios/build/
+modules/*/ios/*.xcodeproj
+modules/*/ios/*.xcworkspace
+
+native-modules/
+trash/
+# -----------------------------------
+# VS Code
+# -----------------------------------
+.vscode/*
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/
+
+# -----------------------------------
+# JetBrains (IntelliJ / Android Studio)
+# -----------------------------------
+.idea/
+!.idea/misc.xml
+!.idea/modules.xml
+!.idea/vcs.xml
+!.idea/workspace.xml
+
+# -----------------------------------
+# Editores y swaps
+# -----------------------------------
+*~             # Emacs
+.*.swp         # Vim swap
+.*.swo
+.*.swn
+.*.swm
+
+# -----------------------------------
+# CI logs
+# -----------------------------------
+/android/logcat.txt
+
+# -----------------------------------
+# Otros
+# -----------------------------------
+fonts/
+.env.local

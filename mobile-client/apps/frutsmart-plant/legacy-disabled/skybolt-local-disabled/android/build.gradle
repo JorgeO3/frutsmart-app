@@ -1,0 +1,118 @@
+plugins {
+  id 'com.android.library'
+  // Mantener version compatible con Kotlin del host app (Expo SDK 53)
+  id 'org.jetbrains.kotlin.plugin.serialization' version '2.0.21'
+  // Protobuf (la versión se resuelve desde settings.gradle del host)
+  id 'com.google.protobuf' version '0.9.5'
+}
+
+group = 'expo.modules.skybolt'
+version = '0.7.6'
+
+def expoModulesCorePlugin = new File(project(":expo-modules-core").projectDir.absolutePath, "ExpoModulesCorePlugin.gradle")
+apply from: expoModulesCorePlugin
+applyKotlinExpoModulesCorePlugin()
+useCoreDependencies()
+useExpoPublishing()
+
+def useManagedAndroidSdkVersions = false
+if (useManagedAndroidSdkVersions) {
+  useDefaultAndroidSdkVersions()
+} else {
+  // Helper para tomar valores del rootProject si existen
+  ext.safeExtGet = { prop, fallback ->
+    rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+  }
+
+  android {
+    compileSdkVersion safeExtGet("compileSdkVersion", 36)
+    defaultConfig {
+      minSdkVersion safeExtGet("minSdkVersion", 24)
+      targetSdkVersion safeExtGet("targetSdkVersion", 36)
+    }
+  }
+}
+
+android {
+  namespace "expo.modules.skybolt"
+
+  defaultConfig {
+    versionCode 1
+    versionName "0.7.6"
+    testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+  }
+
+  buildTypes {
+    debug {
+      buildConfigField "boolean", "ALLOW_HTTP_IN_DEV", "true"
+    }
+    release {
+      minifyEnabled false
+      buildConfigField "boolean", "ALLOW_HTTP_IN_DEV", "false"
+    }
+  }
+
+  packaging {
+    resources {
+      excludes += "META-INF/versions/9/OSGI-INF/MANIFEST.MF"
+    }
+  }
+
+  // (AGP 8+: 'lint' es lo nuevo; mantenemos lintOptions si tu AGP lo permite)
+  lintOptions {
+    abortOnError false
+  }
+
+}
+
+dependencies {
+  // WorkManager
+  implementation 'androidx.work:work-runtime-ktx:2.11.0'
+  // DataStore
+  implementation 'androidx.datastore:datastore-preferences:1.1.7'
+
+  // OkHttp + logging - versiones compatibles con Kotlin 2.0
+  implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+  implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'
+
+  // Protobuf Lite (Java y Kotlin)
+  implementation 'com.google.protobuf:protobuf-javalite:4.33.0'
+  implementation 'com.google.protobuf:protobuf-kotlin-lite:4.33.0'
+
+  // Coroutines / Serialization - versiones compatibles con Kotlin 2.0
+  implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1'
+  implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3'
+
+  // Tink
+  implementation 'com.google.crypto.tink:tink-android:1.19.0'
+
+  // JVM unit tests
+  testImplementation 'junit:junit:4.13.2'
+  testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1'
+  testImplementation 'com.squareup.okhttp3:mockwebserver:4.12.0'
+  testImplementation 'org.robolectric:robolectric:4.13'
+  testImplementation 'androidx.test:core:1.6.1'
+
+  // Android integration tests
+  androidTestImplementation 'androidx.test.ext:junit:1.2.1'
+  androidTestImplementation 'androidx.test:runner:1.6.2'
+  androidTestImplementation 'androidx.test:core:1.6.1'
+  androidTestImplementation 'androidx.work:work-testing:2.11.0'
+  androidTestImplementation 'com.squareup.okhttp3:mockwebserver:4.12.0'
+}
+
+protobuf {
+  // Version exacta de protoc que estás usando en tu app
+  protoc {
+    artifact = "com.google.protobuf:protoc:4.32.1"
+  }
+  // Genera código lite para Java y Kotlin
+  generateProtoTasks {
+    all().configureEach { task ->
+      builtins {
+        java { option "lite" }
+        kotlin { option "lite" }
+      }
+    }
+  }
+}

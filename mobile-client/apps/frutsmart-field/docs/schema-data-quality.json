@@ -1,0 +1,199 @@
+[
+  {
+    "session_id": "session_123",
+    "classifications": [
+      {
+        "classification_id": "eval_7a6b3c2d-1e9f-4b8a-9c4d-0e1f7a2b3c4d",
+        "traceability": {
+          "production_center_id": "pc_123",
+          "lot_id": "lot_456",
+          "verifier_id": "user_abc"
+        },
+        "metadata": {
+          "creation_timestamp": "2025-06-13T15:26:00.000-05:00",
+          "device": {
+            "time_of_day": "day",
+            "weather": "sunny"
+          },
+          "geolocation": {
+            "latitude": 3.25,
+            "longitude": -76.228
+          },
+          "model_versions": {
+            "detection": "v1.1-yolo",
+            "external_classification": "v1.1-yolo-classifier",
+            "internal_classification": "v1.1-yolo-classifier"
+          }
+        },
+        "external_classification": {
+          "photos": {
+            "raw_uris": [
+              "file:///data/ext_crop_1.jpg",
+              "file:///data/ext_crop_2.jpg",
+              "file:///data/ext_crop_3.jpg"
+            ],
+            "segmentation_results": [
+              "file:///data/ext_seg_1.jpg",
+              "file:///data/ext_seg_2.jpg",
+              "file:///data/ext_seg_3.jpg"
+            ]
+          },
+          "result": {
+            "ai_prediction": {
+              "class_name": "Clase 1",
+              "confidence": 0.95,
+              "raw_inference_outputs": [
+                {
+                  "Clase1": 0.95,
+                  "Clase2": 0.05,
+                  "Clase3": 0.0,
+                  "Clase4": 0.0
+                },
+                {
+                  "Clase1": 0.95,
+                  "Clase2": 0.05,
+                  "Clase3": 0.0,
+                  "Clase4": 0.0
+                },
+                {
+                  "Clase1": 0.95,
+                  "Clase2": 0.05,
+                  "Clase3": 0.0,
+                  "Clase4": 0.0
+                }
+              ]
+            },
+            "human_feedback": {
+              "is_prediction_correct": false,
+              "corrected_class_name": "Clase 2",
+              "observation": "La IA confundió la sombra con un defecto."
+            }
+          }
+        },
+        "internal_classification": {
+          "photos": {
+            "raw_uris": ["file:///data/int_raw_1.jpg"],
+            "segmentation_results": ["file:///data/int_seg_1.jpg"]
+          },
+          "result": {
+            "ai_prediction": {
+              "class_name": "Tipo A",
+              "confidence": 0.95,
+              "raw_inference_output": {
+                "TipoA": 0.95,
+                "TipoB": 0.05,
+                "TipoC": 0.0,
+                "TipoD": 0.0
+              }
+            },
+            "human_feedback": {
+              "is_prediction_correct": true,
+              "corrected_class_name": null,
+              "observation": ""
+            }
+          }
+        },
+        "harvest_criteria": {
+          "assigned_criterion": "RB",
+          "number_of_applications": 3
+        }
+      },
+      {
+        "classification_id": "eval_7a6b3c2d-1e9f-4b8a-9c4d-0e1f7a2b3c4d",
+        "traceability": {
+          "production_center_id": "pc_123",
+          "lot_id": "lot_456",
+          "verifier_id": "user_abc"
+        },
+        "metadata": {
+          "creation_timestamp": "2025-06-13T15:26:00.000-05:00",
+          "device": {
+            "time_of_day": "day",
+            "weather": "sunny"
+          },
+          "geolocation": {
+            "latitude": 3.25,
+            "longitude": -76.228
+          },
+          "model_versions": {
+            "detection": "v1.1-yolo",
+            "external_classification": "v1.1-yolo-classifier",
+            "internal_classification": "v1.1-yolo-classifier"
+          }
+        },
+        "external_classification": {
+          "photos": {
+            "raw_uris": [
+              "file:///data/ext_crop_1.jpg",
+              "file:///data/ext_crop_2.jpg",
+              "file:///data/ext_crop_3.jpg"
+            ],
+            "segmentation_results": [
+              "file:///data/ext_seg_1.jpg",
+              "file:///data/ext_seg_2.jpg",
+              "file:///data/ext_seg_3.jpg"
+            ]
+          },
+          "result": {
+            "ai_prediction": {
+              "class_name": "Clase 1",
+              "confidence": 0.95,
+              "raw_inference_outputs": [
+                {
+                  "Clase1": 0.95,
+                  "Clase2": 0.05,
+                  "Clase3": 0.0,
+                  "Clase4": 0.0
+                },
+                {
+                  "Clase1": 0.95,
+                  "Clase2": 0.05,
+                  "Clase3": 0.0,
+                  "Clase4": 0.0
+                },
+                {
+                  "Clase1": 0.95,
+                  "Clase2": 0.05,
+                  "Clase3": 0.0,
+                  "Clase4": 0.0
+                }
+              ]
+            },
+            "human_feedback": {
+              "is_prediction_correct": false,
+              "corrected_class_name": "Clase 2",
+              "observation": "La IA confundió la sombra con un defecto."
+            }
+          }
+        },
+        "internal_classification": {
+          "photos": {
+            "raw_uris": ["file:///data/int_raw_1.jpg"],
+            "segmentation_results": ["file:///data/int_seg_1.jpg"]
+          },
+          "result": {
+            "ai_prediction": {
+              "class_name": "Tipo A",
+              "confidence": 0.95,
+              "raw_inference_output": {
+                "TipoA": 0.95,
+                "TipoB": 0.05,
+                "TipoC": 0.0,
+                "TipoD": 0.0
+              }
+            },
+            "human_feedback": {
+              "is_prediction_correct": true,
+              "corrected_class_name": null,
+              "observation": ""
+            }
+          }
+        },
+        "harvest_criteria": {
+          "assigned_criterion": "RB",
+          "number_of_applications": 3
+        }
+      }
+    ]
+  }
+]

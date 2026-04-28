@@ -1,0 +1,71 @@
+{
+  "name": "nano-rt",
+  "version": "0.1.0",
+  "packageManager": "bun@1.3.9",
+  "description": " ",
+  "main": "./src/index.tsx",
+  "types": "./src/index.tsx",
+  "react-native": "./src/index.tsx",
+  "exports": {
+    ".": {
+      "source": "./src/index.tsx",
+      "types": "./src/index.tsx",
+      "default": "./src/index.tsx"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src",
+    "android",
+    "react-native.config.js",
+    "!android/build",
+    "!android/gradle",
+    "!android/gradlew",
+    "!android/gradlew.bat",
+    "!android/local.properties",
+    "!**/__tests__",
+    "!**/__fixtures__",
+    "!**/__mocks__",
+    "!**/.*"
+  ],
+  "scripts": {
+    "clean": "rm -rf lib",
+    "typecheck": "tsc"
+  },
+  "keywords": [
+    "react-native",
+    "android"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JorgeO3/nano-rt.git"
+  },
+  "author": "Jorge Osorio <joheosmo@gmail.com> (https://github.com/JorgeO3)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JorgeO3/nano-rt/issues"
+  },
+  "homepage": "https://github.com/JorgeO3/nano-rt#readme",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "devDependencies": {
+    "@react-native/babel-preset": "0.85.0",
+    "@types/react": "^19.2.0",
+    "react": "19.2.0",
+    "react-native": "0.83.6",
+    "typescript": "^6.0.2"
+  },
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*"
+  },
+  "codegenConfig": {
+    "name": "NativeNanoRTSpec",
+    "type": "modules",
+    "jsSrcsDir": "src",
+    "android": {
+      "javaPackageName": "com.nanort"
+    }
+  }
+}

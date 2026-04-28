@@ -1,0 +1,218 @@
+set export
+set shell := ["fish", "-c"]
+set dotenv-filename := ".env.local"
+
+# Justfile for FrutSmart Backend
+PACKAGE_MANAGER := "bun"
+PACKAGE_MANAGER_EXEC := "bunx"
+ENV_FILE := ".env.local"
+DOCKER_EXEC := "docker compose"
+
+# Default recipe to display help
+default:
+  @just --list
+
+# ===========================================
+# SETUP COMMANDS
+# ===========================================
+
+# Install dependencies
+install:
+  {{ PACKAGE_MANAGER }} install
+
+# Setup development environment (copy env file if not exists)
+setup: install
+    @if [ ! -f .env.local ]; then \
+        echo "📋 Creating .env.local from example..."; \
+        cp .env.local.example .env.local; \
+        echo "✅ Please review and update .env.local with your settings"; \
+    else \
+        echo "✅ .env.local already exists"; \
+    fi
+
+# ===========================================
+# DEVELOPMENT COMMANDS
+# ===========================================
+
+# Start development server
+dev:
+  {{ PACKAGE_MANAGER }} run start:dev
+
+# Build the application
+build:
+  {{ PACKAGE_MANAGER }} run build
+
+# Start production server
+start:
+  {{ PACKAGE_MANAGER }} run start:prod
+
+# Watch mode development
+watch:
+  {{ PACKAGE_MANAGER }} run start:dev
+
+# ===========================================
+# DATABASE COMMANDS
+# ===========================================
+
+# Start database services
+db-up:
+  {{ DOCKER_EXEC }} up -d postgres redis
+
+# Stop database services
+db-down:
+  {{ DOCKER_EXEC }} down
+
+# View database logs
+db-logs:
+  {{ DOCKER_EXEC }} logs -f postgres
+
+# Reset database (WARNING: This will delete all data)
+db-reset:
+  {{ DOCKER_EXEC }} down -v
+  {{ DOCKER_EXEC }} up -d postgres redis
+
+# Connect to database with psql
+db-connect:
+  {{ DOCKER_EXEC }} exec postgres psql -U $DATABASE_USERNAME -d $DATABASE_NAME
+
+# Backup database
+db-backup:
+  {{ DOCKER_EXEC }} exec postgres pg_dump -U $DATABASE_USERNAME $DATABASE_NAME > backup_$(date +%Y%m%d_%H%M%S).sql
+
+# Restore database from backup file
+db-restore file:
+  {{ DOCKER_EXEC }} exec -T postgres psql -U $DATABASE_USERNAME -d $DATABASE_NAME < {{file}}
+
+# ===========================================
+# MIGRATION COMMANDS
+# ===========================================
+
+# Generate a new migration
+migration-generate name:
+  {{ PACKAGE_MANAGER }} run migration:generate src/platform/database/migrations/{{name}}
+
+# Create a blank migration
+migration-create name:
+  {{ PACKAGE_MANAGER }} run migration:create src/platform/database/migrations/{{name}}
+
+# Run migrations
+migration-run:
+  {{ PACKAGE_MANAGER }} run migration:run
+
+# Revert last migration
+migration-revert:
+  {{ PACKAGE_MANAGER }} run migration:revert
+
+# Show migration status
+migration-show:
+  {{ PACKAGE_MANAGER }} run migration:show
+
+# ===========================================
+# TESTING COMMANDS
+# ===========================================
+
+# Run unit tests
+test:
+  {{ PACKAGE_MANAGER }} run test
+
+# Run tests in watch mode
+test-watch:
+  {{ PACKAGE_MANAGER }} run test:watch
+
+# Run end-to-end tests
+test-e2e:
+  {{ PACKAGE_MANAGER }} run test:e2e
+
+# Run tests with coverage
+test-cov:
+  {{ PACKAGE_MANAGER }} run test:cov
+
+# ===========================================
+# CODE QUALITY COMMANDS
+# ===========================================
+
+# Lint code
+lint:
+  {{ PACKAGE_MANAGER }} run lint
+
+# Fix linting issues
+lint-fix:
+  {{ PACKAGE_MANAGER }} run lint --fix
+
+# Format code
+format:
+  {{ PACKAGE_MANAGER_EXEC }} prettier --write "src/**/*.ts" "test/**/*.ts"
+
+# Type check
+type-check:
+  {{ PACKAGE_MANAGER }} tsc --noEmit
+
+# Run all quality checks
+check: lint type-check test
+
+# ===========================================
+# DOCKER COMMANDS
+# ===========================================
+
+# Start all services (app + database)
+up:
+    {{ DOCKER_EXEC }} up -d
+
+# Stop all services
+down:
+    {{ DOCKER_EXEC }} down
+
+# View all service logs
+logs:
+    {{ DOCKER_EXEC }} logs -f
+
+# Rebuild and start services
+restart:
+    {{ DOCKER_EXEC }} down
+    {{ DOCKER_EXEC }} up -d --build
+
+# ===========================================
+# UTILITY COMMANDS
+# ===========================================
+
+# Clean build artifacts and node_modules
+clean:
+    rm -rf dist node_modules .turbo
+    {{ PACKAGE_MANAGER }} install
+
+# Generate API documentation
+docs:
+  echo "📚 API docs available at $BACKEND_DOMAIN/$SWAGGER_PATH when server is running"
+
+# Health check
+health:
+  curl -f "$BACKEND_DOMAIN/health" || echo "❌ Server is not running"
+
+# Show environment info
+env-info:
+    @echo "📊 Environment Information:"
+    @echo "Node.js: $(node --version)"
+    @echo "Bun: $(bun --version)"
+    @echo "Environment: $(cat .env.local 2>/dev/null | grep NODE_ENV || echo 'NODE_ENV not set')"
+
+# ===========================================
+# PRODUCTION COMMANDS
+# ===========================================
+
+# Build for production
+build-prod:
+    NODE_ENV=production {{ PACKAGE_MANAGER }} run build
+
+# Start production (for Azure App Service/Container Apps, this is handled automatically)
+start-prod:
+    NODE_ENV=production node dist/main.js
+
+# ===========================================
+# ALIASES
+# ===========================================
+
+# Short aliases for common commands
+alias d := dev
+alias b := build  
+alias t := test
+alias l := lint

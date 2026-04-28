@@ -1,0 +1,3 @@
+1 - El conteo total de clasificaciones
+2 - Conteo total clasificaciones por participacion llegando a 100
+3 - Feedback del conteo total de clasificaciones extrapolado

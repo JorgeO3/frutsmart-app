@@ -1,0 +1,69 @@
+1 - Primero el cliente utiliza la url de "https://frutsmart-back.com/upload-sessions" con el metodo POST para mandar
+{
+  "domain": "plant",
+  "client_batch_id": "batch-20250925-1045-device-ABC",
+  "device_id": "motorola-g100-XYZ123",
+  "client_created_at": "2025-09-25T15:45:10.123Z",
+  "files": [
+    {
+      "client_item_id": "e8a1b2c3-1234-4a5b-8c6d-000000000001",
+      "file_name": "IMG_20250925_103005.jpg",
+      "content_type": "image/jpeg",
+      "file_size_bytes": 8388608,
+      "sha256": "c1c0c0b70e7c5e0d2c2b3a39b3a39b3a39b3a39b3a39b3a39b3a39b3a39b3a39",
+      "flow": "external",
+      "photo_type": "raw",
+      "root": "planta"
+    },
+    {
+      "client_item_id": "f9b2c3d4-5678-4b6c-9d7e-000000000002",
+      "file_name": "IMG_20250925_103015.jpg",
+      "content_type": "image/jpeg",
+      "file_size_bytes": 7340032,
+      "sha256": "a83bbf10df9f5e0d2c2b3a39b3a39b3a39b3a39b3a39b3a39b3a39b3a39b3a39",
+      "flow": "internal",
+      "photo_type": "raw",
+      "root": "planta"
+    },
+    {
+      "client_item_id": "a0c3d4e5-9012-4c7d-8e8f-000000000003",
+      "file_name": "seg_1a2b3c.png",
+      "content_type": "image/png",
+      "file_size_bytes": 1258291,
+      "sha256": "b74ccf21ef0f6e1d3c3c4b4a4b4a4b4a4b4a4b4a4b4a4b4a4b4a4b4a4b4a4b4a",
+      "flow": "internal",
+      "photo_type": "segmented",
+      "root": "planta"
+    },
+    {
+      "client_item_id": "b1d4e5f6-3456-4d8e-9f9a-000000000004",
+      "file_name": "seg_4d5e6f.png",
+      "content_type": "image/png",
+      "file_size_bytes": 983040,
+      "sha256": "d65ddg32fg1g7f2e4d4d5c5b5c5b5c5b5c5b5c5b5c5b5c5b5c5b5c5b5c5b5c5b",
+      "flow": "internal",
+      "photo_type": "segmented",
+      "root": "planta"
+    },
+    {
+      "client_item_id": "c2e5f6g7-7890-4e9f-a0a1-000000000005",
+      "file_name": "IMG_20250925_103102.jpg",
+      "content_type": "image/jpeg",
+      "file_size_bytes": 9437184,
+      "sha256": "e56eeh43gh2h8h3f5e5e6d6c6d6c6d6c6d6c6d6c6d6c6d6c6d6c6d6c6d6c6d6c",
+      "flow": "external",
+      "photo_type": "raw",
+      "root": "planta"
+    },
+    {
+      "client_item_id": "d3f6g7h8-1122-4fa0-b1b2-000000000006",
+      "file_name": "IMG_20250925_103108.jpg",
+      "content_type": "image/jpeg",
+      "file_size_bytes": 6815744,
+      "sha256": "f47ffj54ji3j9j4g6f6f7e7d7d7d7d7d7d7d7d7d7d7d7d7d7d7d7d7d7d7d7d7d",
+      "flow": "internal",
+      "photo_type": "raw",
+      "root": "planta"
+    }
+  ]
+}

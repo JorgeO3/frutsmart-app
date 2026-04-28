@@ -1,0 +1,299 @@
+# Settings
+set shell := ["fish", "-c"]
+
+# Variables
+ANDROID_DEVICE := "moto_g84_5G"
+
+LINT := "biome lint"
+FORMAT := "biome format"
+PACKAGE_MANAGER := "bun"
+PACKAGE_MANAGER_EXEC := "bunx"
+
+# Private Recipes
+_ensure_bun:
+    #!/usr/bin/env fish
+    if not type -q bun
+        printf '%s⛔ Error: Bun no está instalado o no se encuentra en el PATH.%s\n' '{{RED}}' '{{NORMAL}}'
+        printf '%s   Por favor, instálalo desde https://bun.sh/%s\n'    '{{YELLOW}}' '{{NORMAL}}'
+        exit 1
+    end
+
+_install_deps: _ensure_bun
+    @echo -e "{{GREEN}}📦 Instalando dependencias del proyecto con Bun...{{NORMAL}}"
+    @bun install --silent
+    @echo -e "{{GREEN}}✅ Dependencias instaladas.{{NORMAL}}"
+
+_prebuild_android:
+    @echo -e "{{YELLOW}}🏗️  Generando proyecto nativo Android (Expo Prebuild)...{{NORMAL}}"
+    @bunx expo prebuild --platform android --no-install --clean || true
+    @echo -e "{{GREEN}}✅ Prebuild de Android completado.{{NORMAL}}"
+
+_clean_caches:
+    @echo -e "{{YELLOW}}🧹 Limpiando cachés (Watchman, Metro, NPM/Bun)...{{NORMAL}}"
+    @watchman watch-del-all || true
+    @rm -rf '/tmp/metro-*' 'node_modules/.cache/metro' || true
+    @npm cache clean --force --silent || true
+    @echo -e "{{GREEN}}✅ Cachés limpiados.{{NORMAL}}"
+
+_clean_android_build:
+    @echo -e "{{YELLOW}}🧹 Limpiando artefactos de build de Android...{{NORMAL}}"
+    @rm -rf android/app/build android/.gradle
+    @echo -e "{{GREEN}}✅ Artefactos de build de Android eliminados.{{NORMAL}}"
+
+_clean_gradle_daemon:
+    @echo "{{YELLOW}}🛑 Deteniendo el daemon de Gradle...{{NORMAL}}"
+    @if test -d android; and test -f android/gradlew; cd android; and ./gradlew --stop; or printf "%sℹ️ Directorio 'android' o 'gradlew' no encontrado, omitiendo detención del daemon.%s\n" $YELLOW $NORMAL; end
+    @killall -q -9 java || true
+    @echo '{{GREEN}}✅ Intento de detener el daemon de Gradle finalizado.{{NORMAL}}'
+
+_run_android_expo *args:
+    @echo -e "{{CYAN}}🚀 Iniciando app con Expo Go en Android (localhost)...{{NORMAL}}"
+    @bun run expo start --localhost --android {{args}}
+
+_run_android_expo_prod:
+    @echo -e "{{CYAN}}🚀 Iniciando app nativa en producción (no-dev, minify, release)...{{NORMAL}}"
+    @bunx expo start --no-dev --minify --host localhost
+
+_run_android_native *args='':
+    @echo -e "{{CYAN}}🚀 Iniciando app nativa en dispositivo Android '{{ args }}'...{{NORMAL}}"
+    @bun run expo run:android --device {{ args }}
+
+_run_android_native_prod:
+    @echo -e "{{CYAN}}🚀 Iniciando app nativa en producción (no-dev, minify, release)...{{NORMAL}}"
+    @bun run expo run:android --device {{ANDROID_DEVICE}} --variant release
+
+_build_android_local *args='':
+    @echo -e "{{BLUE}}🏗️  Construyendo app Android para producción con EAS Build (local)...{{NORMAL}}"
+    @eas build --platform android --profile production --local {{args}}
+
+_build_android_eas *args='':
+    @echo -e "{{BLUE}}🏗️  Construyendo app Android para producción con EAS Build (local)...{{NORMAL}}"
+    @eas build --platform android --profile production {{args}}
+
+# Public Recipes
+[doc('List all available recipes.')]
+default:
+    @just --list
+
+[doc('Perform initial setup: install dependencies.')]
+setup: _install_deps
+    @echo -e "{{GREEN}}✅ Configuración inicial completada.{{NORMAL}}"
+
+[doc('Run expo customize command to add a config file.')]
+customize: _ensure_bun
+    @echo -e "{{MAGENTA}}🛠️  Ejecutando 'expo customize'...{{NORMAL}}"
+    @bunx expo customize
+
+[doc('Run Expo prebuild workflow.')]
+prebuild_android: setup _prebuild_android
+    @echo -e "{{GREEN}}✅ Proyecto Android nativo generado en ./android/.{{NORMAL}}"
+
+[doc('Start app in Expo Go (localhost).')]
+start_expo *args='': setup
+    @just _run_android_expo {{args}}
+
+[doc('Start app in native production mode.')]
+start_expo_prod: setup
+    @just _run_android_expo_prod
+    @echo -e "{{GREEN}}✅ Lanzamiento producción iniciado.{{NORMAL}}"
+
+[doc('Start app in native mode.')]
+start_native *args='moto_g84_5G': setup
+    @just _run_android_native {{args}}
+    @echo -e "{{GREEN}}✅ Lanzamiento iniciado.{{NORMAL}}"
+
+[doc('Start app in native production mode.')]
+start_native_prod: setup
+    @just _run_android_native_prod
+    @echo -e "{{GREEN}}✅ Lanzamiento producción iniciado.{{NORMAL}}"
+    
+[doc('Clean build and production build for Android.')]
+build_android_prod *args='': setup _clean_android_build
+    @just _build_android_local {{args}}
+    @echo -e "{{GREEN}}✅ Build prod completado.{{NORMAL}}"
+
+[doc('Clean build and production build for Android.')]
+build_android_prod_eas *args='': setup _clean_android_build
+    @just _build_android_eas {{args}}
+    @echo -e "{{GREEN}}✅ Build prod completado.{{NORMAL}}"
+
+[doc('Clean caches only.')]
+clean_cache: _clean_caches
+
+[doc('Clean Android build artifacts and stop Gradle daemon.')]
+[confirm("This will remove build artifacts and stop the Gradle daemon. [y/N]")]
+clean_android: _clean_android_build _clean_gradle_daemon
+
+[doc('Remove node_modules and lockfiles.')]
+[confirm("This will delete node_modules and all lockfiles. [y/N]")]
+clean_node_modules:
+    @echo -e "{{YELLOW}}🧹 Eliminando node_modules y lockfiles...{{NORMAL}}"
+    @rm -rf node_modules bun.lockb package-lock.json yarn.lock
+    @echo -e "{{GREEN}}✅ node_modules y lockfiles eliminados.{{NORMAL}}"
+
+[doc('Perform full clean including caches, Android build, node_modules, and android directory.')]
+[confirm("This will perform a full clean (caches, build artifacts, node_modules, and android/). [y/N]")]
+clean_full: clean_cache clean_android clean_node_modules
+    @echo -e "{{YELLOW}}🧹 Eliminando directorio 'android'...{{NORMAL}}"
+    @rm -rf android
+    @echo -e "{{GREEN}}✅ Limpieza completa finalizada.{{NORMAL}}"
+
+[doc('Soft reset: remove android/ and regenerate.')]
+[confirm("This will delete android/ and re-run prebuild. [y/N]")]
+reset_soft: setup
+    @echo -e "{{YELLOW}}🔄 Soft reset: eliminando 'android/' y regenerando...{{NORMAL}}"
+    @rm -rf android
+    @just prebuild_android
+    @echo -e "{{GREEN}}✅ Soft reset completado.{{NORMAL}}"
+
+[doc('Hard reset: perform full clean, setup, and prebuild.')]
+[confirm("This will perform a hard reset and regenerate everything. [y/N]")]
+reset_hard: clean_full setup prebuild_android
+    @echo -e "{{RED}}{{BOLD}}☢️ HARD RESET COMPLETADO ☢️{{NORMAL}}"
+
+[doc('Run linter.')]
+lint path='src': setup
+    @echo -e "{{MAGENTA}}✨ Ejecutando Linter...{{NORMAL}}"
+    {{PACKAGE_MANAGER_EXEC}} {{LINT}} {{path}}
+    @echo -e "{{GREEN}}✅ Linter completado.{{NORMAL}}"
+
+[doc('Run TypeScript check.')]
+ts_check: setup
+    @echo -e "{{MAGENTA}}✨ Ejecutando TypeScript Check...{{NORMAL}}"
+    {{PACKAGE_MANAGER_EXEC}} tsgo --noEmit --incremental --pretty --skipLibCheck --preserveWatchOutput --isolatedModules
+    @echo -e "{{GREEN}}✅ TypeScript Check completado.{{NORMAL}}"
+
+[doc('Format code.')]
+format path='src': setup
+    @echo -e "{{MAGENTA}}💅 Formateando código...{{NORMAL}}"
+    {{PACKAGE_MANAGER_EXEC}} {{FORMAT}} {{path}}
+    @echo -e "{{GREEN}}✅ Formateo completado.{{NORMAL}}"
+
+[doc('Run tests.')]
+test: setup
+    @echo -e "{{MAGENTA}}🧪 Ejecutando pruebas...{{NORMAL}}"
+    @just skybolt_test_js
+    @just skybolt_test_jvm
+
+[doc('Run Skybolt JS/TS adapter tests.')]
+skybolt_test_js: setup
+    @echo -e "{{MAGENTA}}🧪 Ejecutando Skybolt JS tests...{{NORMAL}}"
+    @bun test ../../packages/skybolt/src/skybolt/__tests__
+    @echo -e "{{GREEN}}✅ Skybolt JS tests completados.{{NORMAL}}"
+
+[doc('Run Skybolt JVM unit tests.')]
+skybolt_test_jvm: setup
+    @echo -e "{{MAGENTA}}🧪 Ejecutando Skybolt JVM tests...{{NORMAL}}"
+    @cd android; and env JAVA_HOME=/usr/lib/jvm/java-21-openjdk ./gradlew :skybolt:testDebugUnitTest
+    @echo -e "{{GREEN}}✅ Skybolt JVM tests completados.{{NORMAL}}"
+
+[doc('Run Skybolt Android integration tests (requires emulator/device).')]
+skybolt_test_android: setup
+    @echo -e "{{MAGENTA}}🧪 Ejecutando Skybolt Android integration tests...{{NORMAL}}"
+    @cd android; and env JAVA_HOME=/usr/lib/jvm/java-21-openjdk ./gradlew :skybolt:connectedDebugAndroidTest
+    @echo -e "{{GREEN}}✅ Skybolt Android integration tests completados.{{NORMAL}}"
+
+[doc('Run Skybolt uploader-focused JVM tests.')]
+skybolt_test_uploader: setup
+    @echo -e "{{MAGENTA}}🧪 Ejecutando Skybolt uploader tests...{{NORMAL}}"
+    @cd android; and env JAVA_HOME=/usr/lib/jvm/java-21-openjdk ./gradlew :skybolt:testDebugUnitTest --tests "*Upload*" --tests "*Blob*"
+    @echo -e "{{GREEN}}✅ Skybolt uploader tests completados.{{NORMAL}}"
+
+[doc('Run Skybolt benchmark placeholder.')]
+skybolt_benchmark: setup
+    @echo -e "{{MAGENTA}}📈 Ejecutando Skybolt benchmark suite...{{NORMAL}}"
+    @cd android; and env JAVA_HOME=/usr/lib/jvm/java-21-openjdk ./gradlew :skybolt:testDebugUnitTest --tests "*SkyboltPerformanceTest"
+    @echo -e "{{GREEN}}✅ Skybolt benchmark suite completada.{{NORMAL}}"
+
+[doc('Run Skybolt Android performance instrumentation tests.')]
+skybolt_perf_android: setup
+    @echo -e "{{MAGENTA}}📈 Ejecutando Skybolt Android perf tests...{{NORMAL}}"
+    @cd android; and env JAVA_HOME=/usr/lib/jvm/java-21-openjdk ./gradlew :skybolt:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=expo.modules.skybolt.core.perf.SkyboltPerformanceInstrumentationTest
+    @echo -e "{{GREEN}}✅ Skybolt Android perf tests completados.{{NORMAL}}"
+
+[doc('Run Skybolt soak instrumentation tests.')]
+skybolt_soak: setup
+    @echo -e "{{MAGENTA}}🧪 Ejecutando Skybolt soak tests...{{NORMAL}}"
+    @cd android; and env JAVA_HOME=/usr/lib/jvm/java-21-openjdk ./gradlew :skybolt:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=expo.modules.skybolt.core.soak.SkyboltSoakInstrumentationTest
+    @echo -e "{{GREEN}}✅ Skybolt soak tests completados.{{NORMAL}}"
+
+[doc('Run Skybolt Android stability instrumentation tests.')]
+skybolt_stability_android: setup
+    @echo -e "{{MAGENTA}}🧪 Ejecutando Skybolt stability tests...{{NORMAL}}"
+    @cd android; and env JAVA_HOME=/usr/lib/jvm/java-21-openjdk ./gradlew :skybolt:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=expo.modules.skybolt.core.perf.SkyboltStabilityInstrumentationTest
+    @echo -e "{{GREEN}}✅ Skybolt stability tests completados.{{NORMAL}}"
+
+[doc('Run Skybolt contract-test placeholder.')]
+skybolt_contract_test: setup
+    @echo -e "{{MAGENTA}}🧪 Ejecutando Skybolt contract tests...{{NORMAL}}"
+    @cd android; and env JAVA_HOME=/usr/lib/jvm/java-21-openjdk ./gradlew :skybolt:testDebugUnitTest --tests "*BackendApiContractTest" --tests "*BackendSasProviderContractTest"
+    @echo -e "{{GREEN}}✅ Skybolt contract tests completados.{{NORMAL}}"
+
+[doc('Run Skybolt smoke-test placeholder.')]
+skybolt_smoke: setup
+    @echo -e "{{MAGENTA}}🔥 Ejecutando smoke suite Skybolt...{{NORMAL}}"
+    @just skybolt_test_js
+    @just skybolt_test_jvm
+    @just skybolt_test_uploader
+    @just skybolt_contract_test
+    @cd android; and env JAVA_HOME=/usr/lib/jvm/java-21-openjdk ./gradlew :skybolt:assembleDebug :skybolt:assembleDebugAndroidTest
+    @echo -e "{{GREEN}}✅ Smoke suite Skybolt completada.{{NORMAL}}"
+
+[doc('Run full local-only Skybolt validation gate.')]
+skybolt_local_gate: setup
+    @echo -e "{{CYAN}}🏁 Ejecutando gate local Skybolt (sin nube)...{{NORMAL}}"
+    @just ts_check
+    @just skybolt_test_js
+    @just skybolt_test_jvm
+    @just skybolt_test_uploader
+    @just skybolt_contract_test
+    @just skybolt_benchmark
+    @just skybolt_perf_android
+    @just skybolt_soak
+    @just skybolt_stability_android
+    @just skybolt_test_android
+    @echo -e "{{GREEN}}✅ Gate local Skybolt completado.{{NORMAL}}"
+
+[doc('Prepare and run app-side manual smoke prerequisites.')]
+skybolt_smoke_app_prep: setup
+    @echo -e "{{MAGENTA}}📱 Preparando smoke manual app-side...{{NORMAL}}"
+    @cd android; and env JAVA_HOME=/usr/lib/jvm/java-21-openjdk ./gradlew :app:assembleDebug
+    @echo -e "{{YELLOW}}📝 Sigue el runbook en docs/skybolt_smoke_app_manual.md{{NORMAL}}"
+
+[doc('Run app-side smoke gate (build/install/launch/log sanity).')]
+skybolt_smoke_app_gate: setup
+    @echo -e "{{MAGENTA}}📱 Ejecutando smoke gate app-side...{{NORMAL}}"
+    @cd android; and env JAVA_HOME=/usr/lib/jvm/java-21-openjdk ./gradlew :app:assembleDebug :app:assembleRelease
+    @./scripts/skybolt_smoke_app_gate.sh
+    @echo -e "{{GREEN}}✅ Smoke gate app-side completado.{{NORMAL}}"
+
+[doc('Try release assemble for visibility (non-blocking).')]
+skybolt_smoke_app_release_try: setup
+    @echo -e "{{MAGENTA}}📦 Intentando assembleRelease (diagnostico)...{{NORMAL}}"
+    @cd android; and env JAVA_HOME=/usr/lib/jvm/java-21-openjdk ./gradlew :app:assembleRelease; or true
+    @echo -e "{{YELLOW}}ℹ️  Si falla release, revisar output R8; no bloquea gate local smoke.{{NORMAL}}"
+
+[doc('Start local smoke evidence capture (logcat + final screenshot).')]
+skybolt_smoke_capture_start:
+    @./scripts/skybolt_smoke_capture.sh start
+
+[doc('Stop local smoke evidence capture and persist artifacts.')]
+skybolt_smoke_capture_stop:
+    @./scripts/skybolt_smoke_capture.sh stop
+
+[doc('Show local smoke evidence capture status.')]
+skybolt_smoke_capture_status:
+    @./scripts/skybolt_smoke_capture.sh status
+
+[doc('Run NanoRT Phase 14 startup gate and collect evidence.')]
+nanort_phase14_gate: setup
+    @echo -e "{{MAGENTA}}📱 Ejecutando gate NanoRT Fase 14...{{NORMAL}}"
+    @./scripts/nanort_phase14_gate.sh
+    @echo -e "{{GREEN}}✅ Gate NanoRT Fase 14 completado.{{NORMAL}}"
+
+[doc('Run NanoRT Phase 12 focused perf/correctness gate.')]
+nanort_phase12_gate: setup
+    @echo -e "{{MAGENTA}}📈 Ejecutando gate NanoRT Fase 12...{{NORMAL}}"
+    @cd android; and env JAVA_HOME=/usr/lib/jvm/java-21-openjdk ./gradlew :nano-rt:compileDebugAndroidTestKotlin
+    @cd android; and env JAVA_HOME=/usr/lib/jvm/java-21-openjdk ./gradlew :nano-rt:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=expo.modules.nanort.module.workflows.WorkflowPerformanceRegressionAndroidTest,expo.modules.nanort.module.workflows.WarmupBenchmarkAndroidTest,expo.modules.nanort.module.workflows.WorkflowRestartMatrixAndroidTest,expo.modules.nanort.module.workflows.DirectMemoryObservationAndroidTest,expo.modules.nanort.module.workflows.ClassificationProcessorRegressionAndroidTest
+    @echo -e "{{GREEN}}✅ Gate NanoRT Fase 12 completado.{{NORMAL}}"

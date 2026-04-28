@@ -1,0 +1,175 @@
+# Settings
+set shell := ["fish", "-c"]
+
+# Variables
+ANDROID_DEVICE := "moto_g84_5G"
+
+LINT := "biome lint"
+FORMAT := "biome format"
+PACKAGE_MANAGER := "bun"
+PACKAGE_MANAGER_EXEC := "bunx"
+
+# Private Recipes
+_ensure_bun:
+    #!/usr/bin/env fish
+    if not type -q bun
+        printf '%s⛔ Error: Bun no está instalado o no se encuentra en el PATH.%s\n' '{{RED}}' '{{NORMAL}}'
+        printf '%s   Por favor, instálalo desde https://bun.sh/%s\n'    '{{YELLOW}}' '{{NORMAL}}'
+        exit 1
+    end
+
+_install_deps: _ensure_bun
+    @echo -e "{{GREEN}}📦 Instalando dependencias del proyecto con Bun...{{NORMAL}}"
+    @bun install --silent
+    @echo -e "{{GREEN}}✅ Dependencias instaladas.{{NORMAL}}"
+
+_prebuild_android:
+    @echo -e "{{YELLOW}}🏗️  Generando proyecto nativo Android (Expo Prebuild)...{{NORMAL}}"
+    @bunx expo prebuild --platform android --no-install --clean || true
+    @echo -e "{{GREEN}}✅ Prebuild de Android completado.{{NORMAL}}"
+
+_clean_caches:
+    @echo -e "{{YELLOW}}🧹 Limpiando cachés (Watchman, Metro, NPM/Bun)...{{NORMAL}}"
+    @watchman watch-del-all || true
+    @rm -rf '/tmp/metro-*' 'node_modules/.cache/metro' || true
+    @npm cache clean --force --silent || true
+    @echo -e "{{GREEN}}✅ Cachés limpiados.{{NORMAL}}"
+
+_clean_android_build:
+    @echo -e "{{YELLOW}}🧹 Limpiando artefactos de build de Android...{{NORMAL}}"
+    @rm -rf android/app/build android/.gradle
+    @echo -e "{{GREEN}}✅ Artefactos de build de Android eliminados.{{NORMAL}}"
+
+_clean_gradle_daemon:
+    @echo "{{YELLOW}}🛑 Deteniendo el daemon de Gradle...{{NORMAL}}"
+    @if test -d android; and test -f android/gradlew; cd android; and ./gradlew --stop; or printf "%sℹ️ Directorio 'android' o 'gradlew' no encontrado, omitiendo detención del daemon.%s\n" $YELLOW $NORMAL; end
+    @killall -q -9 java || true
+    @echo '{{GREEN}}✅ Intento de detener el daemon de Gradle finalizado.{{NORMAL}}'
+
+_run_android_expo *args:
+    @echo -e "{{CYAN}}🚀 Iniciando app con Expo Go en Android (localhost)...{{NORMAL}}"
+    @bun run expo start --localhost --android {{args}}
+
+_run_android_expo_prod:
+    @echo -e "{{CYAN}}🚀 Iniciando app nativa en producción (no-dev, minify, release)...{{NORMAL}}"
+    @bunx expo start --no-dev --minify --host localhost
+
+_run_android_native *args='':
+    @echo -e "{{CYAN}}🚀 Iniciando app nativa en dispositivo Android '{{ args }}'...{{NORMAL}}"
+    @bun run expo run:android --device {{ args }}
+
+_run_android_native_prod:
+    @echo -e "{{CYAN}}🚀 Iniciando app nativa en producción (no-dev, minify, release)...{{NORMAL}}"
+    @bun run expo run:android --device {{ANDROID_DEVICE}} --variant release
+
+_build_android_local *args='':
+    @echo -e "{{BLUE}}🏗️  Construyendo app Android para producción con EAS Build (local)...{{NORMAL}}"
+    @eas build --platform android --profile production --local {{args}}
+
+_build_android_eas *args='':
+    @echo -e "{{BLUE}}🏗️  Construyendo app Android para producción con EAS Build (local)...{{NORMAL}}"
+    @eas build --platform android --profile production {{args}}
+
+# Public Recipes
+[doc('List all available recipes.')]
+default:
+    @just --list
+
+[doc('Perform initial setup: install dependencies.')]
+setup: _install_deps
+    @echo -e "{{GREEN}}✅ Configuración inicial completada.{{NORMAL}}"
+
+[doc('Run expo customize command to add a config file.')]
+customize: _ensure_bun
+    @echo -e "{{MAGENTA}}🛠️  Ejecutando 'expo customize'...{{NORMAL}}"
+    @bunx expo customize
+
+[doc('Run Expo prebuild workflow.')]
+prebuild_android: setup _prebuild_android
+    @echo -e "{{GREEN}}✅ Proyecto Android nativo generado en ./android/.{{NORMAL}}"
+
+[doc('Start app in Expo Go (localhost).')]
+start_expo *args='': setup
+    @just _run_android_expo {{args}}
+
+[doc('Start app in native production mode.')]
+start_expo_prod: setup
+    @just _run_android_expo_prod
+    @echo -e "{{GREEN}}✅ Lanzamiento producción iniciado.{{NORMAL}}"
+
+[doc('Start app in native mode.')]
+start_native *args='moto_g84_5G': setup
+    @just _run_android_native {{args}}
+    @echo -e "{{GREEN}}✅ Lanzamiento iniciado.{{NORMAL}}"
+
+[doc('Start app in native production mode.')]
+start_native_prod: setup
+    @just _run_android_native_prod
+    @echo -e "{{GREEN}}✅ Lanzamiento producción iniciado.{{NORMAL}}"
+    
+[doc('Clean build and production build for Android.')]
+build_android_prod *args='': setup _clean_android_build
+    @just _build_android_local {{args}}
+    @echo -e "{{GREEN}}✅ Build prod completado.{{NORMAL}}"
+
+[doc('Clean build and production build for Android.')]
+build_android_prod_eas *args='': setup _clean_android_build
+    @just _build_android_eas {{args}}
+    @echo -e "{{GREEN}}✅ Build prod completado.{{NORMAL}}"
+
+[doc('Clean caches only.')]
+clean_cache: _clean_caches
+
+[doc('Clean Android build artifacts and stop Gradle daemon.')]
+[confirm("This will remove build artifacts and stop the Gradle daemon. [y/N]")]
+clean_android: _clean_android_build _clean_gradle_daemon
+
+[doc('Remove node_modules and lockfiles.')]
+[confirm("This will delete node_modules and all lockfiles. [y/N]")]
+clean_node_modules:
+    @echo -e "{{YELLOW}}🧹 Eliminando node_modules y lockfiles...{{NORMAL}}"
+    @rm -rf node_modules bun.lockb package-lock.json yarn.lock
+    @echo -e "{{GREEN}}✅ node_modules y lockfiles eliminados.{{NORMAL}}"
+
+[doc('Perform full clean including caches, Android build, node_modules, and android directory.')]
+[confirm("This will perform a full clean (caches, build artifacts, node_modules, and android/). [y/N]")]
+clean_full: clean_cache clean_android clean_node_modules
+    @echo -e "{{YELLOW}}🧹 Eliminando directorio 'android'...{{NORMAL}}"
+    @rm -rf android
+    @echo -e "{{GREEN}}✅ Limpieza completa finalizada.{{NORMAL}}"
+
+[doc('Soft reset: remove android/ and regenerate.')]
+[confirm("This will delete android/ and re-run prebuild. [y/N]")]
+reset_soft: setup
+    @echo -e "{{YELLOW}}🔄 Soft reset: eliminando 'android/' y regenerando...{{NORMAL}}"
+    @rm -rf android
+    @just prebuild_android
+    @echo -e "{{GREEN}}✅ Soft reset completado.{{NORMAL}}"
+
+[doc('Hard reset: perform full clean, setup, and prebuild.')]
+[confirm("This will perform a hard reset and regenerate everything. [y/N]")]
+reset_hard: clean_full setup prebuild_android
+    @echo -e "{{RED}}{{BOLD}}☢️ HARD RESET COMPLETADO ☢️{{NORMAL}}"
+
+[doc('Run linter.')]
+lint path='src': setup
+    @echo -e "{{MAGENTA}}✨ Ejecutando Linter...{{NORMAL}}"
+    {{PACKAGE_MANAGER_EXEC}} {{LINT}} {{path}}
+    @echo -e "{{GREEN}}✅ Linter completado.{{NORMAL}}"
+
+[doc('Run TypeScript check.')]
+ts_check: setup
+    @echo -e "{{MAGENTA}}✨ Ejecutando TypeScript Check...{{NORMAL}}"
+    {{PACKAGE_MANAGER_EXEC}} tsgo --noEmit --incremental --pretty --skipLibCheck --preserveWatchOutput --isolatedModules
+    @echo -e "{{GREEN}}✅ TypeScript Check completado.{{NORMAL}}"
+
+[doc('Format code.')]
+format path='src': setup
+    @echo -e "{{MAGENTA}}💅 Formateando código...{{NORMAL}}"
+    {{PACKAGE_MANAGER_EXEC}} {{FORMAT}} {{path}}
+    @echo -e "{{GREEN}}✅ Formateo completado.{{NORMAL}}"
+
+[doc('Run tests.')]
+test: setup
+    @echo -e "{{MAGENTA}}🧪 Ejecutando pruebas...{{NORMAL}}"
+    @echo -e "{{YELLOW}}ℹ️  Configura tu comando de test.{{NORMAL}}"

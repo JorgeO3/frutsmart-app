@@ -1,0 +1,228 @@
+import java.io.ByteArrayOutputStream
+
+apply plugin: 'com.android.library'
+
+group = 'expo.modules.nanort'
+version = '0.7.2'
+
+def expoModulesCorePlugin = new File(project(":expo-modules-core").projectDir.absolutePath, "ExpoModulesCorePlugin.gradle")
+apply from: expoModulesCorePlugin
+applyKotlinExpoModulesCorePlugin()
+useCoreDependencies()
+useExpoPublishing()
+
+// If you want to use the managed Android SDK versions from expo-modules-core, set this to true.
+// The Android SDK versions will be bumped from time to time in SDK releases and may introduce breaking changes in your module code.
+// Most of the time, you may like to manage the Android SDK versions yourself.
+def useManagedAndroidSdkVersions = false
+if (useManagedAndroidSdkVersions) {
+  useDefaultAndroidSdkVersions()
+} else {
+  buildscript {
+    // Simple helper that allows the root project to override versions declared by this library.
+    ext.safeExtGet = { prop, fallback ->
+      rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+    }
+  }
+  project.android {
+    compileSdkVersion safeExtGet("compileSdkVersion", 34)
+    defaultConfig {
+      minSdkVersion safeExtGet("minSdkVersion", 21)
+      targetSdkVersion safeExtGet("targetSdkVersion", 34)
+    }
+  }
+}
+
+android {
+  namespace "expo.modules.nanort"
+  defaultConfig {
+    versionCode 1
+    versionName "0.7.2"
+    testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+  }
+  lintOptions {
+    abortOnError false
+  }
+  androidResources {
+    noCompress += ['tflite', 'lite']
+  }
+  packagingOptions {
+    jniLibs {
+      pickFirsts += ['**/libc++_shared.so']
+    }
+  }
+}
+
+dependencies {
+  implementation "com.google.ai.edge.litert:litert:1.4.0"
+  implementation "com.google.ai.edge.litert:litert-gpu:1.4.0"
+  implementation "com.google.ai.edge.litert:litert-gpu-api:1.4.0"
+  implementation "org.opencv:opencv:4.12.0"
+
+  testImplementation "junit:junit:4.13.2"
+
+  androidTestImplementation "androidx.test:runner:1.6.2"
+  androidTestImplementation "androidx.test:rules:1.6.1"
+  androidTestImplementation "androidx.test.ext:junit:1.2.1"
+}
+
+def soakProp = { String name, String fallback ->
+  def value = project.findProperty(name)?.toString()?.trim()
+  return value ? value : fallback
+}
+
+def soakAppId = soakProp("soak.appId", "com.anonymous.FrutSmartP")
+def soakServiceClass = "expo.modules.nanort.module.interpreter.soak.SoakRunnerService"
+def soakService = "${soakAppId}/${soakServiceClass}"
+def soakReceiverClass = "expo.modules.nanort.module.interpreter.soak.SoakControlReceiver"
+def soakReceiver = "${soakAppId}/${soakReceiverClass}"
+def soakStartAction = "expo.modules.nanort.soak.START"
+def soakStopAction = "expo.modules.nanort.soak.STOP"
+
+tasks.register("soakStart") {
+  group = "verification"
+  description = "Starts manual nano-rt soak runner"
+  dependsOn(":app:installDebug")
+  doLast {
+    def profile = soakProp("soak.profile", "mixed")
+    def duration = soakProp("soak.durationMinutes", "0")
+    def gpu = soakProp("soak.gpu", "false")
+    def failFast = soakProp("soak.failFast", "true")
+    def maxThreadDelta = soakProp("soak.maxThreadDelta", "1")
+    def maxChildDelta = soakProp("soak.maxChildJobDelta", "4")
+    def queueP99 = soakProp("soak.queueWaitP99Ms", "5000")
+    def holdP99 = soakProp("soak.holdP99Ms", "5000")
+    def maxPending = soakProp("soak.maxPendingReplies", "128")
+
+    exec {
+      commandLine("adb", "shell", "run-as", soakAppId, "rm", "-f", "files/soak/status.json")
+      ignoreExitValue = true
+    }
+
+    exec {
+      commandLine("adb", "shell", "run-as", soakAppId, "rm", "-f", "files/soak/report.json")
+      ignoreExitValue = true
+    }
+
+    exec {
+      commandLine(
+        "adb", "shell", "am", "broadcast",
+        "-a", soakStartAction,
+        "-n", soakReceiver,
+        "--es", "profile", profile,
+        "--ei", "durationMinutes", duration,
+        "--ez", "gpuEnabled", gpu,
+        "--ez", "failFast", failFast,
+        "--ei", "maxThreadDelta", maxThreadDelta,
+        "--ei", "maxChildJobDelta", maxChildDelta,
+        "--ef", "queueWaitP99Ms", queueP99,
+        "--ef", "holdP99Ms", holdP99,
+        "--ei", "maxPendingReplies", maxPending,
+      )
+    }
+
+    println("soak started appId=${soakAppId} profile=${profile} durationMinutes=${duration}")
+  }
+}
+
+tasks.register("soakStop") {
+  group = "verification"
+  description = "Stops manual nano-rt soak runner"
+  doLast {
+    exec {
+      commandLine(
+        "adb", "shell", "am", "broadcast",
+        "-a", soakStopAction,
+        "-n", soakReceiver,
+      )
+    }
+    println("soak stop requested appId=${soakAppId}")
+  }
+}
+
+tasks.register("soakStatus") {
+  group = "verification"
+  description = "Prints current nano-rt soak status JSON"
+  doLast {
+    def out = new ByteArrayOutputStream()
+    def result = exec {
+      commandLine("adb", "shell", "run-as", soakAppId, "cat", "files/soak/status.json")
+      ignoreExitValue = true
+      standardOutput = out
+      errorOutput = out
+    }
+    if (result.exitValue != 0) {
+      println("No soak status available yet for ${soakAppId}.")
+    }
+    println(out.toString("UTF-8"))
+  }
+}
+
+tasks.register("soakReport") {
+  group = "verification"
+  description = "Prints latest nano-rt soak report JSON"
+  doLast {
+    def out = new ByteArrayOutputStream()
+    def result = exec {
+      commandLine("adb", "shell", "run-as", soakAppId, "cat", "files/soak/report.json")
+      ignoreExitValue = true
+      standardOutput = out
+      errorOutput = out
+    }
+    if (result.exitValue != 0) {
+      println("No soak report available yet for ${soakAppId}.")
+    }
+    println(out.toString("UTF-8"))
+  }
+}
+
+tasks.register("soakRun") {
+  group = "verification"
+  description = "Starts soak and polls status until completion"
+  dependsOn("soakStart")
+  doLast {
+    def duration = 0
+    try {
+      duration = soakProp("soak.durationMinutes", "0").toInteger()
+    } catch (ignored) {
+      duration = 0
+    }
+
+    if (duration <= 0) {
+      println("soakRun requires finite duration. Use -Psoak.durationMinutes=<minutes>.")
+      println("For indefinite mode use soakStart / soakStop manually.")
+      return
+    }
+
+    long timeoutMs = duration * 60_000L + 120_000L
+    long start = System.currentTimeMillis()
+
+    while (System.currentTimeMillis() - start < timeoutMs) {
+      def out = new ByteArrayOutputStream()
+      def result = exec {
+        commandLine("adb", "shell", "run-as", soakAppId, "cat", "files/soak/status.json")
+        ignoreExitValue = true
+        standardOutput = out
+        errorOutput = out
+      }
+      def status = out.toString("UTF-8")
+      if (result.exitValue == 0) {
+        println(status)
+        if (status.contains('"state": "completed"') || status.contains('"state": "failed"')) {
+          break
+        }
+      }
+      sleep(5000)
+    }
+
+    println("Final soak report:")
+    def out = new ByteArrayOutputStream()
+    exec {
+      commandLine("adb", "shell", "run-as", soakAppId, "cat", "files/soak/report.json")
+      ignoreExitValue = true
+      standardOutput = out
+      errorOutput = out
+    }
+    println(out.toString("UTF-8"))
+  }
+}

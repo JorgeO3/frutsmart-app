@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools">
+
+  <!-- Permisos del módulo -->
+  <uses-permission android:name="android.permission.INTERNET" />
+  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+  <!-- Si NO lees paths legacy, puedes quitar esto; para 33+ usa READ_MEDIA_* o SAF -->
+  <uses-permission
+      android:name="android.permission.READ_EXTERNAL_STORAGE"
+      android:maxSdkVersion="32" />
+
+  <!-- Foreground service (Data Sync) -->
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+  <uses-permission
+      android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"
+      tools:targetApi="34" />
+
+  <!-- Notificaciones (permiso runtime en 33+) -->
+  <uses-permission
+      android:name="android.permission.POST_NOTIFICATIONS"
+      tools:targetApi="33" />
+
+  <application>
+    <service
+        android:name="androidx.work.impl.foreground.SystemForegroundService"
+        android:foregroundServiceType="dataSync"
+        tools:node="merge" />
+
+    <!-- Receiver para cancelar desde notificación (usar FQCN del módulo) -->
+    <receiver
+        android:name="expo.modules.skybolt.core.bg.UploadCancelReceiver"
+        android:enabled="true"
+        android:exported="false">
+      <intent-filter>
+        <action android:name="com.jorgeo3.cloudupload.ACTION_CANCEL_SESSION" />
+      </intent-filter>
+    </receiver>
+  </application>
+</manifest>

@@ -1,0 +1,59 @@
+# Multi-stage build for production
+FROM oven/bun:1-alpine AS base
+
+# Install dependencies only when needed
+FROM base AS deps
+WORKDIR /app
+
+# Copy package files
+COPY package.json bun.lockb ./
+
+# Install dependencies
+RUN bun install --frozen-lockfile --production
+
+# Build the application
+FROM base AS builder
+WORKDIR /app
+
+# Copy source code and package files
+COPY package.json bun.lockb ./
+COPY . .
+
+# Install all dependencies (including dev dependencies)
+RUN bun install --frozen-lockfile
+
+# Build application
+RUN bun run build
+
+# Production image
+FROM base AS runner
+WORKDIR /app
+
+# Create a non-root user
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nestjs
+
+# Copy built application
+COPY --from=builder --chown=nestjs:nodejs /app/dist ./dist
+COPY --from=builder --chown=nestjs:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=nestjs:nodejs /app/package.json ./package.json
+
+# Create logs directory
+RUN mkdir -p logs && chown nestjs:nodejs logs
+
+# Switch to non-root user
+USER nestjs
+
+# Expose port
+EXPOSE 3000
+
+# Set environment
+ENV NODE_ENV=production
+ENV PORT=3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD bun --version && curl -f http://localhost:3000/health || exit 1
+
+# Start the application
+CMD ["bun", "run", "start:prod"]

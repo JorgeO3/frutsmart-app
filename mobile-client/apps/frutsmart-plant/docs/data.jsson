@@ -1,0 +1,91 @@
+{
+  "traceability": {
+    "provider": "own",
+    "qrCode": "qr-abc-123",
+    "truckPlate": "XYZ-987",
+    "consecutiveNumber": "001",
+    "thirdPartyData": {
+      "vendor": "vender_123",
+      "subVendor": "subvender_123"
+    },
+    "ownData": {
+      "lots": [
+        {
+          "id": "lot_456",
+          "name": "Lote Manzanas"
+        }
+      ]
+    }
+  },
+  "qualityClassifications": [
+    {
+      "external": {
+        "rawPhotoUri": "file:///data/ext_raw_1.jpg",
+        "classifiedSegments": [
+          {
+            "uri": "file:///data/ext_seg_1.jpg",
+            "bestConfidence": 0.95,
+            "bestClassName": "Clase 1",
+            "confidences": [0.95, 0.03, 0.02, 0.01]
+          },
+          {
+            "uri": "file:///data/ext_seg_2.jpg",
+            "bestConfidence": 0.85,
+            "bestClassName": "Clase 2",
+            "confidences": [0.95, 0.03, 0.02, 0.01]
+          },
+          {
+            "uri": "file:///data/ext_seg_3.jpg",
+            "bestConfidence": 0.8,
+            "bestClassName": "Clase 3",
+            "confidences": [0.95, 0.03, 0.02, 0.01]
+          }
+        ]
+      },
+      "internal": {
+        "rawPhotoUri": "file:///data/int_raw_1.jpg",
+        "classifiedSegment": {
+          "uri": "file:///data/int_seg_1.jpg",
+          "aiPrediction": {
+            "className": "Tipo A",
+            "confidence": 0.98,
+            "rawConfidences": [0.98, 0.01, 0.01]
+          },
+          "humanFeedback": {
+            "isCorrect": true,
+            "correctedClassName": null,
+            "observation": ""
+          }
+        }
+      }
+    }
+  ],
+  "harvestCriteria": {
+    "rb": 3,
+    "rv": 0,
+    "rsm": 0,
+    "rmf": 0,
+    "rpl": 0,
+    "pas": 0,
+    "vac": 0,
+    "rs": 0
+  },
+  "metadata": {
+    "creationTimestamp": "2025-06-13T15:26:00.000-05:00",
+    "device": {
+      "timeOfDay": "day",
+      "weather": "sunny",
+      "hasInternet": true
+    },
+    "geolocation": {
+      "latitude": 3.25,
+      "longitude": -76.228
+    },
+    "modelVersions": {
+      "detection": "v1.1-yolo",
+      "externalClassification": "v1.1-yolo-classifier",
+      "internalClassification": "v1.1-yolo-classifier"
+    }
+  },
+  "isCompleted": false
+}

@@ -1,0 +1,32 @@
+# Monorepo-wide ignores
+
+# Dependencies
+**/node_modules/
+
+# Environment files
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.*.example
+
+# Build caches and incremental metadata
+**/*.tsbuildinfo
+**/.cache/
+**/.tmp/
+**/.temp/
+
+# Test/framework local state
+**/.hypothesis/
+
+# Runtime database sidecars
+**/*.db-wal
+**/*.db-shm
+
+# Local test outputs
+**/test_output*.txt
+
+# OS/editor noise
+**/.DS_Store
+**/Thumbs.db
+**/.idea/
+**/.vscode/

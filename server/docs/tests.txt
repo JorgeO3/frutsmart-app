@@ -1,0 +1,611 @@
+📚 Plan de Pruebas Maestro — Módulo de Upload (NestJS + Clean Architecture)
+
+Fecha: 09-Oct-2025 (America/Bogotá) • Versión del plan: 1.0 • SDET responsable: Principal SDET (15+ años)
+
+Objetivo: Garantizar corrección funcional, seguridad, resiliencia e histogramas de rendimiento del Módulo de Upload para habilitar su despliegue confiable en producción. El plan sigue la pirámide de pruebas, cubre todas las capas de la arquitectura limpia y aplica técnicas avanzadas (property-based, fuzzing y mutación).
+
+0) Resumen Ejecutivo
+
+Pilares:
+
+Correctitud (reglas de dominio y casos de uso),
+
+Contrato API (DTOs, validaciones, respuestas, errores),
+
+Integración real (PostgreSQL + Azurite/Azure),
+
+Seguridad (API key, validaciones defensivas),
+
+Rendimiento (P95/P99, throughput, costo DB),
+
+Resiliencia (fallos intermitentes de Azure/DB/Transacciones).
+
+Entornos:
+
+Unit: aislado (sin IO).
+
+Integration: Testcontainers (PostgreSQL), Azurite (o cuenta de prueba Azure).
+
+E2E: Nest e2e app + Validación exhaustiva de HTTP.
+
+Performance: k6/Artillery.
+
+Security: fuzz de DTOs + pruebas de validadores personalizados.
+
+Cobertura objetivo:
+
+Domain: ≥ 95% líneas / 100% reglas críticas.
+
+Application (use cases): ≥ 90%.
+
+Infra adapters: ≥ 80% (límites por IO).
+
+HTTP/E2E (contratos): ≥ 90% (rutas y variantes).
+
+Mutación (StrykerJS): Mutation Score ≥ 75% global; ≥ 90% en entidades de dominio.
+
+1) Pirámide de Pruebas y Capas (estrategia)
+1.1 Pirámide (distribución sugerida)
+Nivel	% aprox	Propósito	Herramientas
+Unit (Dominio + Aplicación)	60–65%	Validar invariantes/órdenes, estados y orquestación sin IO	Jest, fast-check, test doubles
+Integración (Infra + Use cases con dependencias reales)	20–25%	Verificar adaptadores (TypeORM, Azure), mapeos ORM y transacciones	Jest, Testcontainers (Postgres), Azurite/Azure SDK
+E2E (HTTP)	10–15%	Contrato API, validación DTOs, mapeos, filtros, errores	@nestjs/testing, supertest
+No funcional	—	Seguridad, performance, resiliencia	k6/Artillery, Stryker, fuzzing
+1.2 Enfoque por Capas
+
+Dominio (rápido, puro): entidades, value objects, errores, state machine de UploadItem, reglas de completar/fallar sesión.
+
+Aplicación (isolado con mocks): use cases orquestan puertos (repos, blob, tx, logger) y mappers.
+
+Infraestructura (integración real): repositorios TypeORM ↔ DB, mappers ORM, Azure adapter (SAS, metadata) usando Azul real o Azurite.
+
+Interfaz (HTTP): validaciones DTO (class-validator), ApiKeyGuard, filtros de excepciones, estandarización del formato de error.
+
+2) Trazabilidad (Requisitos → Casos de Prueba)
+
+IDs: DOM-* (dominio), APP-* (use cases), INF-* (infra), E2E-* (HTTP), SEC-* (seguridad), PERF-* (rendimiento), RES-* (resiliencia)
+
+Requisito clave	Capa	Caso(s)
+Reutilizar sesión abierta por clientBatchId (idempotencia)	App/Repo	APP-CRS-IDEM-001, E2E-POST-SESS-IDEM-001
+Generar blob name {domain}/{timestamp}/{clientItemId}/{fileName}	App/Dominio	DOM-BN-FMT-001, APP-CRS-BLOB-001
+Guard “OPEN” para SAS y Complete	Dominio/App	DOM-SES-OPEN-001, APP-SAS-OPEN-001, APP-COM-OPEN-001
+State machine de UploadItem	Dominio	DOM-ITM-FSM-001..008
+Verificación MD5/size (complete)	Dominio/App	DOM-MD5-001..002, APP-COM-VRF-001..004, E2E-COM-VRF-001
+Flags failOnIncomplete, verifyAndPromote, subset onlyClientItemIds	App/E2E	APP-COM-FLG-001..004, E2E-COM-FLG-001..003
+Validaciones DTO/seguridad entradas	HTTP	E2E-VAL-001..010, SEC-FUZ-DTO-001..
+API Key requerida	HTTP	E2E-AUTH-KEY-001..004
+Manejo de errores (404/400/401)	HTTP/App	E2E-ERR-404-001.., E2E-ERR-400-001..
+Índice único (sesión abierta)	Infra/DB	INF-DB-IDX-001, RES-RACE-CRS-001
+Rendimiento objetivo (SLA)	No funcional	PERF-SLA-001..006
+3) Estrategia de Datos y Mocks
+
+Factories/Fixtures (reutilizables):
+
+makeUploadSession(props?), makeUploadItem(props?), makeClientIdentifier(), makeStorageLocation(), makeFileProps({sizeBytes, md5Hash})
+
+DTO fixtures: válidos/ inválidos (CreateUploadSessionDto, SasBatchRequestDto, RefreshSasBatchDto, CompleteSessionDto)
+
+MD5: helper md5HexFrom(buffer); set predecible para tests.
+
+Timestamps: fijar Date.now() con jest.spyOn(Date, 'now') o inyectar TimeProvider (si se agrega).
+
+Mocking por nivel:
+
+Aplicación: mock puertos: UPLOAD_SESSIONS_REPOSITORY, UPLOAD_ITEMS_REPOSITORY, TRANSACTION_MANAGER, BLOB_STORAGE, LOGGER, UUID_GENERATOR.
+
+Dominio: sin mocks.
+
+Infra: sin mocks de DB/Azure; se mockea solo upstream remoto si se prueba un adapter aislado.
+
+HTTP/E2E: sin mocks; usar Azul/Azurite y Postgres reales (test).
+
+4) Unit Tests — por capa
+4.1 Dominio (Ejemplos representativos)
+
+Entidad UploadSession
+
+ID	Descripción	Precondiciones	Pasos	Resultado esperado
+DOM-SES-CRT-001	Crear sesión válida	props válidos	UploadSession.create	status=OPEN, items vacíos, timestamps seteados
+DOM-SES-ADD-001	Agregar item en OPEN	sesión OPEN	addItem(item)	item añadido; error si duplicado por clientItemId (si aplica)
+DOM-SES-CMP-001	Completar con todos VERIFIED (estricto)	sesión con items VERIFIED	complete()	sesión COMPLETED
+DOM-SES-CMP-002	Completar vacía	sesión sin items	complete()	lanza SessionEmptyError
+DOM-SES-CMP-003	Completar con pendientes (estricto)	items no VERIFIED	complete()	SessionHasPendingItemsError
+DOM-SES-OPEN-001	Guard para SAS/complete	sesión FAILED/COMPLETED	guardCanGenerateSas()	lanza SessionNotOpenError
+
+Entidad UploadItem (FSM)
+
+ID	Transición	Precondiciones	Pasos	Esperado
+DOM-ITM-FSM-001	PENDING→IN_PROGRESS	estado PENDING	markAsInProgress()	estado IN_PROGRESS
+DOM-ITM-FSM-002	IN_PROGRESS→UPLOADED	IN_PROGRESS	markAsUploaded()	UPLOADED
+DOM-ITM-FSM-003	UPLOADED→VERIFIED (MD5 ok)	MD5 coincide	verify(md5Server)	VERIFIED
+DOM-ITM-FSM-004	UPLOADED→VERIFIED (MD5 mismatch)	no coincide	verify()	ItemMD5MismatchError
+DOM-ITM-FSM-005	PENDING→VERIFIED inválido	PENDING	verify()	ItemInvalidStatusTransitionError
+DOM-ITM-FSM-006	Terminal no cambia	VERIFIED/FAILED	cualquier transición	ItemInvalidStatusTransitionError
+
+Value Objects
+
+ID	VO	Caso	Esperado
+DOM-VO-CID-001	ClientIdentifier	vacío → error	ArgumentInvalidError
+DOM-VO-LOC-001	StorageLocation	container/blob vacíos	error
+DOM-VO-PRP-001	FileProperties	size<0 o md5 inválido	error
+Property-Based (fast-check) — Dominio
+
+Objetivo: explorar espacios de entrada grandes validando invariantes.
+
+Ej. FileProperties.sizeInBytes >= 0, md5Hash null | 32-hex.
+
+Ej. UploadItem nunca llega a VERIFIED si no pasa por UPLOADED.
+
+Ejemplo (pseudo-código):
+
+import * as fc from 'fast-check';
+
+it('UploadItem no puede saltar directamente a VERIFIED', () => {
+  fc.assert(
+    fc.property(fc.record({
+      // generar combinaciones de estados previos
+    }), (rec) => {
+      const item = makeUploadItem({ status: rec.start });
+      // intentar verify() en estados ≠ UPLOADED -> siempre lanza
+      if (rec.start !== 'UPLOADED') {
+        expect(() => item.verify('a'.repeat(32))).toThrow();
+      }
+    })
+  );
+});
+
+4.2 Aplicación (Use Cases con mocks)
+
+CreateUploadSessionUseCase
+
+ID	Descripción	Precondiciones	Pasos	Esperado
+APP-CRS-HPY-001	Crea nueva sesión	no existe sesión OPEN	execute(input)	guarda sesión+items en tx; blob paths correctos; salida ok
+APP-CRS-IDEM-001	Idempotencia por clientBatchId	ya existe OPEN	execute(input igual)	retorna sesión existente; no crea nada
+APP-CRS-DBF-001	Falla DB	repo.save lanza error	execute	rollback; error propagado
+
+GetSasBatchUseCase
+
+ID	Caso	Precondiciones	Pasos	Esperado
+APP-SAS-HPY-001	Genera SAS	sesión OPEN; items válidos	execute	URLs con expiresOn≈now+TTL; mapeo ok
+APP-SAS-OPEN-001	Sesión no OPEN	estado ≠ OPEN	execute	SessionNotOpenError
+APP-SAS-ITM-404-001	Item no existe	blobName ajeno	execute	ItemNotFoundError
+APP-SAS-AZR-001	Azure falla	adapter lanza	execute	error traducido/propagado
+
+RefreshSasBatchUseCase (análogos a SAS)
+
+CompleteSessionUseCase
+
+ID	Caso	Precondiciones	Pasos	Esperado
+APP-COM-VRF-001	Verifica y COMPLETA	verifyAndPromote=true; items OK	execute	items VERIFIED, sesión COMPLETED
+APP-COM-VRF-002	MD5 mismatch	uno falla	execute	ese FAILED; finalStatus depende de failOnIncomplete
+APP-COM-FLG-001	failOnIncomplete=true	hay no-VERIFIED	execute	sesión FAILED
+APP-COM-FLG-002	failOnIncomplete=false	mezcla de estados	execute	sesión COMPLETED + conteos summary
+APP-COM-SUB-001	Subset onlyClientItemIds	algunos ítems	execute	solo procesa subset; otros sin cambios
+APP-COM-AZR-001	Azure unreachable	getObjectMetadata falla	execute	items marcados FAILED (estrategia definida), finalStatus según flag
+
+Property-Based (fast-check) — Aplicación
+
+Generar batches con 1..N archivos (N grande) y comprobar idempotencia y conteos de summary bajo diferentes seeds, con puertos mock que introducen fallos aleatorios (p-fail).
+
+Mutación (StrykerJS) — foco
+
+UploadItem.verify, UploadSession.complete, branching de flags verifyAndPromote y failOnIncomplete.
+
+5) Integration Tests
+5.1 Persistencia: Repos + ORM Mappers
+
+Entorno: Testcontainers PostgreSQL; migraciones aplicadas.
+
+ID	Caso	Pasos	Esperado
+INF-DB-MAP-001	Guardar/Rehidratar sesión+items	save() → findById()	dominio == reconstituido (propiedades + estados)
+INF-DB-IDX-001	Único OPEN por clientBatchId+domain	crear 2 en paralelo	segunda falla por uq_open_session_by_client_batch_open
+INF-DB-QRY-001	Índices efectivos	EXPLAIN consultas	planes usan índices (smoke automated o manual spot)
+5.2 Azure Adapter (Azurite o Azure real)
+
+Entorno: Azurite (preferido en CI) o cuenta sandbox.
+
+ID	Caso	Pasos	Esperado
+INF-AZ-SAS-001	Generar SAS válido	generateUploadUrls	URL con permisos write, create, se≈TTL
+INF-AZ-MD-001	Metadata existente	cargar blob → getObjectMetadata	size/md5 retornados correctos
+INF-AZ-404-001	Blob inexistente	getObjectMetadata	error traducido (404/NoSuchKey equivalente)
+INF-AZ-TLS-001	Manejo de timeouts	simular timeout	error capturado y mapeado a infra error
+6) E2E (HTTP) — Contrato API
+
+App creada con @nestjs/testing, ValidationPipe global, ApiKeyGuard habilitado, AllExceptionsFilter activo. Headers: x-internal-secret.
+
+6.1 POST /api/upload/sessions
+
+Happy Path (E2E-POST-SESS-001)
+
+Precondiciones: DB limpia; header API key válido.
+
+Body: CreateUploadSessionDto válido con 1..N files.
+
+Pasos: POST.
+
+Esperado: 201; JSON con sessionId, status=OPEN, items PENDING, blobName formato correcto.
+
+Validaciones (400)
+
+domain fuera de enum → 400 (E2E-VAL-DOM-001)
+
+clientBatchId no UUID → 400 (E2E-VAL-UUID-001)
+
+files vacío → 400 (E2E-VAL-MIN-001)
+
+fileName con ../ o \ o non-ASCII → 400 (E2E-VAL-FN-001..003)
+
+fileSizeBytes <= 0 → 400 (E2E-VAL-SIZE-001)
+
+contentType fuera de whitelist → 400 (E2E-VAL-MIME-001)
+
+md5 no 32-hex → 400 (E2E-VAL-MD5-001)
+
+Auth
+
+Falta header → 401 (E2E-AUTH-KEY-001)
+
+Header incorrecto / valor inválido → 401 (E2E-AUTH-KEY-002/003)
+
+Idempotencia
+
+Misma clientBatchId + domain con sesión OPEN previa → 201 con misma sessionId (E2E-POST-SESS-IDEM-001).
+
+6.2 POST /api/upload/sessions/:sessionId/sas-batch
+
+200 con sas[] y expiresOn (E2E-SAS-001).
+
+404 si sesión no existe (E2E-SAS-404-SES-001).
+
+404 si blobName ajeno (E2E-SAS-404-ITM-001).
+
+400 si DTO inválido (E2E-SAS-400-001).
+
+401 sin/erróneo API key.
+
+6.3 POST /api/upload/sessions/:sessionId/sas/refresh
+
+Igual a /sas-batch (E2E-SAS-REF-001..).
+
+6.4 POST /api/upload/sessions/:sessionId/complete
+
+Happy Path (verify=true, failOnIncomplete=false)
+
+Simulación: subir blobs a Azurite con size/md5 correctos → 200; finalStatus=COMPLETED; conteos ok (E2E-COM-HPY-001).
+
+Escenarios
+
+verifyAndPromote=false → no consulta metadata; completa (E2E-COM-NV-001).
+
+failOnIncomplete=true con un fallo → finalStatus=FAILED (E2E-COM-FLG-001).
+
+onlyClientItems → procesa subset, el resto sin cambios (E2E-COM-SUB-001).
+
+MD5 mismatch / blob inexistente → item FAILED; resumen coherente (E2E-COM-MD5-001 / E2E-COM-404-BLOB-001).
+
+Formato de error en 400/404 conserva {status, code, message, details, traceId, timestamp, path, method} (E2E-ERR-FMT-001).
+
+7) Seguridad
+7.1 Fuzzing (DTOs y validadores)
+
+Objetivo: descubrir bypasses de validación, DoS por payloads grandes, codificaciones inesperadas.
+
+Superficies:
+
+fileName (path traversal ../, UTF-8 malformado, null bytes, overlong, emojis, homoglyphs).
+
+blobName (segmentos excesivos, longitud > 1024).
+
+contentType (MIME extraño image/jpég, image/../../jpeg).
+
+md5 (longitudes variadas, no hex, mayúsculas/minúsculas inconsistentes).
+
+Arrays items muy grandes (límite razonable + 10%).
+
+Ejecución:
+
+Fuzzer ligero con fast-check generando payloads y esperando 400 consistente.
+
+Inyección de null bytes y overlong UTF-8 (usa buffers y toString('utf8') controlado).
+
+Casos:
+
+SEC-FUZ-DTO-001..020 (varias permutaciones por campo).
+
+SEC-PATH-TRAV-001: ../../../etc/passwd en fileName → 400.
+
+SEC-ENC-001: Unicode confusables (\u202E, bidi) → 400.
+
+SEC-SIZE-ARR-001: items con 10k entradas → 400 o 413 (si configurado a nivel gateway).
+
+7.2 Autenticación (API Key)
+
+Variantes: header ausente, header alterno, valor vacío, valor incorrecto → 401 (E2E-AUTH-KEY-001..004).
+
+7.3 Otras (estáticas/dinámicas)
+
+SAST/Dependencias: npm audit, eslint-plugin-security (no bloqueantes pero informativas).
+
+Headers de seguridad delegados a gateway (documentado en scope).
+
+8) Rendimiento y Resiliencia
+8.1 Metas (SLA objetivo, HW de CI)
+
+Create Session: P95 < 200 ms, P99 < 350 ms (N ≤ 20 files).
+
+SAS Batch (≤100 items): P95 < 150 ms (Azul/Azurite local).
+
+Complete (N≤100, verify=true): P95 < 500 ms (metadata en cache Azurite).
+
+8.2 Cargas (k6/Artillery)
+
+Escenarios:
+
+100 usuarios concurrentes: ciclo crear sesión → sas-batch (10 items).
+
+40 rps sostenidos sobre /sas-batch (TTLs cortos).
+
+/complete con 100 items (50 correctos, 50 fallos MD5).
+
+KPIs: latencias P50/P95/P99, rps, errores, CPU/Heap (Node), tiempos de transacción DB.
+
+Reglas de fail (thresholds): si P95 supera SLA por 5 min → fail.
+
+Nota: para complete realista, pre-seed blobs en Azurite con MD5 calculado.
+
+8.3 Resiliencia / Fault Injection
+
+Azure fallos transitorios: simular ECONNRESET, timeouts → APP-COM-AZR-001; E2E-COM-AZR-TMO-001.
+
+DB contention: crear sesiones en paralelo con mismo clientBatchId → INF-DB-IDX-001 y RES-RACE-CRS-001 (sólo una insert).
+
+Transacción fallida: forzar excepción a mitad (inserta sesión, falla al insertar items) → rollback consistente.
+
+9) Infra de Test y CI/CD
+9.1 Herramientas & Config
+
+Test runner: Jest (coverage per-file thresholds por capa).
+
+Property-based: fast-check.
+
+Mutación: StrykerJS (incluir carpetas domain/** y application/use-cases/**).
+
+E2E: supertest + INTERNAL_API_SECRET inyectado.
+
+DB: Testcontainers (PostgreSQL 15+).
+
+Storage: Azurite (Docker) o Azure sandbox.
+
+Seeds: scripts para generar blobs de prueba y calcular MD5.
+
+9.2 Pipelines (matriz)
+
+Node: 20.x (LTS) + 22.x.
+
+Jobs:
+
+lint+typecheck,
+
+unit+property,
+
+integration (levanta Testcontainers + Azurite),
+
+e2e,
+
+stryker (no bloqueante pero con min mutation score informado),
+
+performance smoke (corto; carga extendida en nightly).
+
+9.3 Métricas de salida
+
+Cobertura por paquete/capa.
+
+Mutation score por carpeta.
+
+Reportes de tiempos (promedio y P95/P99) de E2E críticos.
+
+Matriz de trazabilidad actualizada (IDs cubiertos).
+
+10) Casos de Prueba Detallados (muestrario ampliado)
+
+A continuación, especificaciones concretas (Descripción / Precondiciones / Pasos / Resultado) para los flujos principales.
+Nota: las variantes y combinaciones se amplían en suites dedicadas.
+
+10.1 Create Upload Session — Happy Path (E2E-POST-SESS-001)
+
+Descripción: Crea sesión con un archivo válido.
+
+Precondiciones: DB limpia; INTERNAL_API_SECRET correcto; Azurite corriendo (no requerido para este endpoint).
+
+Pasos:
+
+POST /api/upload/sessions con body válido (domain=plant, clientBatchId v4, files[0] con fileName seguro, fileSizeBytes>0, contentType whitelisted, md5 válido opcional).
+
+Esperado:
+
+HTTP 201.
+
+status=OPEN, items[].status=PENDING.
+
+blobName con patrón {domain}/{timestamp}/{clientItemId}/{fileName}.
+
+Campos obligatorios presentes (fechas ISO), sin null indebidos.
+
+10.2 Create Upload Session — Idempotencia (E2E-POST-SESS-IDEM-001)
+
+Precondiciones: Sesión OPEN existente para clientBatchId+domain.
+
+Pasos: repetir POST con mismo clientBatchId y mismo set de files.
+
+Esperado: 201 con misma sessionId; no duplica ni items ni sesiones.
+
+10.3 SAS Batch — item inexistente (E2E-SAS-404-ITM-001)
+
+Precondiciones: Sesión creada con un blobName A; pedir SAS para blobName B.
+
+Pasos: POST /sas-batch con item B.
+
+Esperado: 404 con code acorde (ej. ITEM_NOT_FOUND) y formato de error estándar.
+
+10.4 Complete Session — Verify OK (E2E-COM-HPY-001)
+
+Precondiciones:
+
+Sesión con N items; en Azurite existen blobs correspondientes con size/md5 correctos.
+
+verifyAndPromote=true (por defecto). failOnIncomplete=false.
+
+Pasos: POST /complete.
+
+Esperado:
+
+200; cada item en VERIFIED; finalStatus=COMPLETED.
+
+summary.verified=N, incomplete=0, failed=0, total=N.
+
+10.5 Complete Session — MD5 mismatch + failOnIncomplete=true (E2E-COM-FLG-001)
+
+Precondiciones: Al menos un blob con MD5 no coincidente.
+
+Pasos: POST /complete con failOnIncomplete=true.
+
+Esperado: items fallidos FAILED; finalStatus=FAILED; summary.failed>=1.
+
+10.6 Complete Session — Subset (E2E-COM-SUB-001)
+
+Precondiciones: N items; proveer onlyClientItems con subset.
+
+Pasos: POST /complete con subset.
+
+Esperado: solo esos items cambian; el resto mantiene su estado inicial.
+
+11) Property-Based & Fuzz — especificación
+
+DTO Generators (fast-check):
+
+secureUuidArb (v4), secureFileNameArb (ASCII, sin separadores), secureBlobPathArb (sin .., sin \, longitud ≤1024), mimeWhitelistArb (dominio), md5HexArb (32-hex).
+
+Fuzz: unsafeFileNameArb con inyecciones (traversal, null bytes), unicodeWeirdArb (bidi), oversizeStringArb(n=10_000), arrays items 0..10_000.
+
+Asserts:
+
+DTOs seguros → 201/200; DTOs no conformes → 400 con details por campo.
+
+12) Mutación (StrykerJS)
+
+Scope prioritario:
+
+domain/entities/**,
+
+application/use-cases/**,
+
+validadores personalizados (IsSecure*).
+
+Mutadores críticos: condicionales (if), límites (>=, <=), retornos tempranos, defaults de flags.
+
+Criterio de aprobación: Mutation Score ≥ 75% global; ≥ 90% en dominio.
+
+13) Riesgos y Mitigaciones
+Riesgo	Impacto	Mitigación
+Condiciones de carrera al crear sesión	Duplicados/consistencia	Índice único + prueba de concurrencia + reintentos idempotentes
+Azure intermitente (timeouts)	Falsos fallos en complete	Retries con backoff (si se define), marcar FAILED y respetar failOnIncomplete
+Payloads masivos (DoS)	Latencias / memoria	Límites de ValidationPipe/body-parser, fuzz tests de tamaño
+Variaciones de codificación	Bypass validaciones	Fuzz con Unicode/confusables, validadores ASCII-only estrictos
+14) Plantillas / Snippets útiles
+14.1 Jest (config esencial por capa)
+{
+  "collectCoverageFrom": [
+    "src/modules/upload/domain/**/*.ts",
+    "src/modules/upload/application/**/*.ts",
+    "src/modules/upload/infrastructure/**/*.ts",
+    "src/modules/upload/interface/**/*.ts"
+  ],
+  "coverageThreshold": {
+    "global": { "branches": 85, "functions": 90, "lines": 90, "statements": 90 },
+    "./src/modules/upload/domain/**": { "branches": 95, "functions": 98, "lines": 98, "statements": 98 }
+  }
+}
+
+14.2 Stryker (mutación mínima)
+{
+  "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "mutate": [
+    "src/modules/upload/domain/**/*.ts",
+    "src/modules/upload/application/use-cases/**/*.ts"
+  ],
+  "testRunner": "jest",
+  "thresholds": { "high": 90, "low": 75, "break": 70 }
+}
+
+14.3 Testcontainers (Postgres) & Azurite (docker-compose de test)
+version: "3.8"
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: frutsmart_back
+    ports: ["5433:5432"]
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    command: "azurite-blob --blobHost 0.0.0.0 --loose"
+    ports: ["10000:10000"]
+
+14.4 Artillery (performance smoke)
+config:
+  target: "http://localhost:3000"
+  phases:
+    - duration: 60
+      arrivalRate: 10
+  defaults:
+    headers:
+      x-internal-secret: "test-secret"
+scenarios:
+  - name: create-session-and-sas
+    flow:
+      - post:
+          url: "/api/upload/sessions"
+          json:
+            domain: "plant"
+            clientBatchId: "ed7346f6-2a25-4c9b-9f7d-8f0b2e1e6a01"
+            files:
+              - clientItemId: "9c0d2e80-8d4a-4f8a-8d1f-6f8c3c9a9b31"
+                fileName: "image.jpg"
+                fileSizeBytes: 1024
+                contentType: "image/jpeg"
+      - post:
+          url: "/api/upload/sessions/{{ $prev.sessionId }}/sas-batch"
+          json:
+            items:
+              - blobName: "plant/2025-01-15T10-30-00-000Z/9c0d.../image.jpg"
+
+
+(nota: en test real, usa variables de respuesta / funciones para blobName)
+
+15) Criterios de Salida (Go/No-Go)
+
+Funcional: 100% de casos “Happy Path” y “Errores previstos” verdes.
+
+Cobertura: metas por capa alcanzadas.
+
+Mutación: thresholds cumplidos.
+
+E2E contrato: 100% rutas y variantes validadas.
+
+Rendimiento: P95/P99 ≤ SLA en escenarios definidos.
+
+Seguridad/Fuzz: sin hallazgos críticos abiertos (o mitigación documentada).
+
+16) Backlog de Mejora Continua
+
+Inyectar TimeProvider para congelar timestamps en pruebas y facilitar aserciones de blobName.
+
+Añadir reintentos con exponential backoff en Azure adapter (según política de producto).
+
+OpenAPI contract testing (jest-openapi) para validar esquema Swagger en E2E.
+
+Observabilidad: correlación por traceId en logs y E2E asserts de formato.
+
+✅ Conclusión
+
+Este Plan de Pruebas Maestro establece una cobertura integral del Módulo de Upload, alinea pruebas con la arquitectura limpia, valida reglas de negocio e invariantes, y fortalece la superficie de seguridad y rendimiento. Con su ejecución disciplinada en CI y ambientes controlados (DB/Azurite), proporciona la evidencia objetiva necesaria para un despliegue confiable a producción.

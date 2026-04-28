@@ -1,0 +1,136 @@
+name: CI/CD (frutsmart-back)
+
+on:
+  # CI continuo en develop y build/deploy en main
+  push:
+    branches: [develop, main]
+  pull_request:
+    branches: [develop, main]
+  # Manual (re-despliegue)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write # push a GHCR
+  id-token: write # OIDC para azure/login
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }} # luego lo pasamos a lowercase
+  NODE_VERSION: "22.x"
+
+jobs:
+  # =========================
+  # CI - develop (lint, typecheck, tests, build)
+  # =========================
+  ci-develop:
+    name: "CI (develop)"
+    if: startsWith(github.ref, 'refs/heads/develop')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install deps (npm ci)
+        run: npm ci
+
+      - name: Lint (biome)
+        run: npm run lint --if-present
+
+      - name: Type-check (tsc)
+        run: npm run check --if-present
+
+      - name: Unit tests
+        run: npm run test:unit
+
+      - name: Build (nest build)
+        run: npm run build
+
+  # =========================
+  # CD - main (push a main) -> build & push imagen -> deploy a ACA
+  # =========================
+  deploy-main:
+    name: "Deploy (main → GHCR → Azure CA)"
+    # dispara en push a main; permite manual si el ref actual es main
+    if: |
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
+    runs-on: ubuntu-latest
+    concurrency:
+      group: frutsmart-deploy-main
+      cancel-in-progress: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Lowercase image name
+        id: repo
+        run: echo "name=${IMAGE_NAME,,}" >> $GITHUB_OUTPUT
+
+      - name: Docker metadata (tags/labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ steps.repo.outputs.name }}
+          tags: |
+            type=sha,format=long      # ghcr.io/owner/repo:aaaaaaaa... (usa github.sha)
+            type=raw,value=latest     # ghcr.io/owner/repo:latest
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.title=frutsmart-back
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR (push)
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Cache de capas (acelera builds)
+      - name: Build & Push image (Dockerfile)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # ---- Azure login con OIDC (sin secretos de contraseña) ----
+      - name: Azure Login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      # (opcional) Ver quién soy tras OIDC
+      - name: WhoAmI (AZ)
+        run: az account show -o table
+
+      # ---- Deploy a Azure Container Apps ----
+      - name: Deploy to Azure Container Apps
+        uses: azure/container-apps-deploy-action@v2
+        with:
+          resourceGroup: ${{ secrets.AZURE_RESOURCE_GROUP }}
+          containerAppName: ${{ secrets.AZURE_CONTAINERAPPS_NAME }}
+          imageToDeploy: ${{ env.REGISTRY }}/${{ steps.repo.outputs.name }}:${{ github.sha }}
+
+          # GHCR privado: inputs correctos para v2
+          registryUrl: ghcr.io
+          registryUsername: ${{ secrets.GHCR_USERNAME || github.actor }}
+          registryPassword: ${{ secrets.GHCR_TOKEN || secrets.GITHUB_TOKEN }}

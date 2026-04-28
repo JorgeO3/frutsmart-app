@@ -1,0 +1,92 @@
+{
+  "name": "frutsmart-field",
+  "main": "expo-router/entry",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "expo start",
+    "reset-project": "node ./scripts/reset-project.js",
+    "ios": "expo run:ios",
+    "web": "expo start --web",
+    "android": "expo run:android",
+    "test": "jest --watchAll",
+    "lint": "expo lint"
+  },
+  "jest": {
+    "preset": "jest-expo"
+  },
+  "dependencies": {
+    "@expo-google-fonts/montserrat": "^0.3.0",
+    "@expo/vector-icons": "^14.1.0",
+    "@lottiefiles/dotlottie-react": "^0.13.5",
+    "@react-navigation/native": "^7.0.14",
+    "@sentry/react-native": "^7.0.1",
+    "@shopify/flash-list": "1.7.6",
+    "@tabler/icons-react-native": "^3.31.0",
+    "expo": "53.0.20",
+    "expo-constants": "~17.1.7",
+    "expo-crypto": "~14.1.5",
+    "expo-dev-client": "~5.2.4",
+    "expo-font": "~13.3.2",
+    "expo-haptics": "~14.1.4",
+    "expo-image": "~2.4.0",
+    "expo-image-manipulator": "~13.1.7",
+    "expo-image-picker": "~16.1.4",
+    "expo-linear-gradient": "~14.1.5",
+    "expo-linking": "~7.1.7",
+    "expo-location": "~18.1.6",
+    "expo-media-library": "~17.1.7",
+    "expo-network": "~7.1.5",
+    "expo-notifications": "~0.31.4",
+    "expo-print": "~14.1.4",
+    "expo-router": "~5.1.4",
+    "expo-secure-store": "~14.2.3",
+    "expo-sharing": "~13.1.5",
+    "expo-splash-screen": "~0.30.10",
+    "expo-sqlite": "~15.2.14",
+    "expo-status-bar": "~2.2.3",
+    "expo-system-ui": "~5.0.10",
+    "expo-updates": "~0.28.17",
+    "expo-web-browser": "~14.2.0",
+    "lottie-react-native": "7.2.2",
+    "mitt": "^3.0.1",
+    "react": "19.0.0",
+    "react-fast-compare": "^3.2.2",
+    "react-hook-form": "^7.55.0",
+    "react-native": "0.79.5",
+    "react-native-gesture-handler": "~2.24.0",
+    "react-native-reanimated": "~3.17.4",
+    "react-native-reanimated-carousel": "^4.0.2",
+    "react-native-safe-area-context": "5.4.0",
+    "react-native-screens": "~4.11.1",
+    "react-native-svg": "15.11.2",
+    "react-native-ui-datepicker": "^3.1.2",
+    "react-native-web": "^0.20.0",
+    "react-native-webview": "13.13.5",
+    "zustand": "^5.0.3"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.25.2",
+    "@biomejs/biome": "1.9.4",
+    "@types/d3-scale": "^4.0.9",
+    "@types/d3-shape": "^3.1.7",
+    "@types/jest": "^29.5.12",
+    "@types/react": "~19.0.10",
+    "@types/react-test-renderer": "^18.3.0",
+    "@typescript/native-preview": "^7.0.0-dev.20250705.1",
+    "expo-atlas": "^0.4.0",
+    "jest": "^29.2.1",
+    "jest-expo": "~53.0.9",
+    "knip": "^5.61.3",
+    "react-native-cli": "^2.0.1",
+    "react-test-renderer": "18.3.1",
+    "typescript": "~5.8.3"
+  },
+  "expo": {
+    "doctor": {
+      "reactNativeDirectoryCheck": {
+        "listUnknownPackages": false
+      }
+    }
+  },
+  "private": true
+}

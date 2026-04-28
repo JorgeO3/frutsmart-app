@@ -1,0 +1,25 @@
+# Workspace
+node_modules/
+bun.lockb
+
+# JavaScript / TypeScript
+.DS_Store
+*.log
+
+# Expo / React Native build artifacts
+**/.expo/
+**/.expo-shared/
+**/android/.gradle/
+**/android/build/
+**/android/app/build/
+**/ios/build/
+**/ios/Pods/
+
+# Test artifacts
+**/coverage/
+**/artifacts/
+
+# Local environment files
+**/.env
+**/.env.*
+!**/.env.example

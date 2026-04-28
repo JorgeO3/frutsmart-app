@@ -1,0 +1,122 @@
+############################
+# Dependencias y locks
+############################
+node_modules
+**/node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+bun.lock
+bun.lockb
+
+############################
+# Salidas de build / bundlers
+############################
+dist
+build
+.next
+out
+*.tsbuildinfo
+
+############################
+# Cobertura y reports
+############################
+coverage
+.nyc_output
+**/lcov-report
+**/coverage-final.json
+**/clover.xml
+
+############################
+# Variables de entorno
+############################
+.env
+.env.*
+!.env.example
+!.env.schema
+
+############################
+# Infra, tooling y artefactos no necesarios en la imagen
+############################
+.github
+.hypothesis
+deno-tester
+docker
+docs
+scripts
+terraform
+trash
+.test
+
+############################
+# Tests (código y config)
+############################
+test
+tests
+__tests__
+**/*.spec.ts
+**/*.test.ts
+jest*.config.*    
+jest.*
+
+############################
+# IDEs y editores
+############################
+.idea
+.vscode
+*.swp
+*.swo
+*~
+*.iml
+
+############################
+# Archivos del SO
+############################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+############################
+# Logs y runtime data
+############################
+logs
+**/*.log
+pids
+*.pid
+*.seed
+*.pid.lock
+
+############################
+# Temporales / cache
+############################
+.tmp
+.temp
+tmp
+temp
+.cache
+.parcel-cache
+
+############################
+# Git
+############################
+.git
+.gitignore
+.gitattributes
+
+############################
+# Archivos Docker/Compose
+############################
+docker-compose.yml
+docker-compose.*.yml
+Dockerfile*
+.dockerignore
+
+############################
+# Documentación (si no la copias al contenedor)
+############################
+README.md
