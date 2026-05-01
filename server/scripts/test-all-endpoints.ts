@@ -1,111 +1,112 @@
 import { readFileSync, statSync, existsSync } from "node:fs";
 import { basename } from "node:path";
 import { randomUUID, createHash } from "node:crypto";
+import { resolve } from "node:path";
 
 // ============================
 // Config
 // ============================
-const BASE_URL = process.env.BASE_URL ?? "http://localhost:3000/api/v1";
-const DEV_AUTH = process.env.DEV_AUTH ?? "dev-secret";
+const BASE_URL = process.env.BACKEND_BASE_URL ?? "http://localhost:3000/api/v1";
+const DEV_AUTH = process.env.BACKEND_DEV_AUTH ?? "dev-secret";
 const INTERNAL_SECRET =
-	process.env.INTERNAL_SECRET ??
-	"c0d29aceed17f3ae05be3f73e24174755ae1ae585600d30b93414c9e4f7934e1";
+  process.env.BACKEND_INTERNAL_SECRET ??
+  "c0d29aceed17f3ae05be3f73e24174755ae1ae585600d30b93414c9e4f7934e1";
 
 // endpoint de refresh (ajústalo si tu API usa otro)
 const SAS_REFRESH_PATH = (sessionId: string) =>
-	`${BASE_URL}/upload/sessions/${sessionId}/sas/refresh`;
+  `${BASE_URL}/upload/sessions/${sessionId}/sas/refresh`;
 
 // Ajusta las rutas a tus archivos de prueba
 const FILE_PATHS = [
-	"/home/jorge/Documents/projects/frutsmart-back/scripts/images/sample_image.webp",
+  resolve(__dirname, "images/sample_image.webp"),
 ];
 
 // ============================
 // Tipos compartidos Upload
 // ============================
 enum UploadDomain {
-	PLANT = "plant",
-	FIELD = "field",
+  PLANT = "plant",
+  FIELD = "field",
 }
 type UploadItemStatus =
-	| "PENDING"
-	| "IN_PROGRESS"
-	| "UPLOADED"
-	| "VERIFIED"
-	| "FAILED"
-	| "ABORTED";
+  | "PENDING"
+  | "IN_PROGRESS"
+  | "UPLOADED"
+  | "VERIFIED"
+  | "FAILED"
+  | "ABORTED";
 type UploadSessionStatus = "OPEN" | "COMPLETED" | "FAILED";
 
 type UploadFileDto = {
-	clientItemId: string;
-	fileName: string;
-	fileSizeBytes: number;
-	contentType: string;
-	md5: string; // hex
+  clientItemId: string;
+  fileName: string;
+  fileSizeBytes: number;
+  contentType: string;
+  md5: string; // hex
 };
 type CreateUploadSessionDto = {
-	domain: UploadDomain;
-	clientBatchId: string;
-	files: UploadFileDto[];
-	description?: string;
+  domain: UploadDomain;
+  clientBatchId: string;
+  files: UploadFileDto[];
+  description?: string;
 };
 type UploadItemResponse = {
-	itemId: string;
-	clientItemId: string;
-	status: UploadItemStatus;
-	blobContainer: string;
-	blobName: string;
-	createdAt: string;
+  itemId: string;
+  clientItemId: string;
+  status: UploadItemStatus;
+  blobContainer: string;
+  blobName: string;
+  createdAt: string;
 };
 type CreateUploadSessionResult = {
-	sessionId: string;
-	domain: "plant" | "field";
-	clientBatchId?: string;
-	status: UploadSessionStatus;
-	createdAt: string;
-	description?: string;
-	items: UploadItemResponse[];
+  sessionId: string;
+  domain: "plant" | "field";
+  clientBatchId?: string;
+  status: UploadSessionStatus;
+  createdAt: string;
+  description?: string;
+  items: UploadItemResponse[];
 };
 
 type SasItemDto = { blobName: string; contentType?: string };
 type GetSasBatchRequestDto = { items: SasItemDto[] };
 type SasEntryResponse = {
-	blobName: string;
-	url: string; // SAS URL
-	blobUrl: string;
-	expiresOn: string; // ISO
-	contentType?: string;
+  blobName: string;
+  url: string; // SAS URL
+  blobUrl: string;
+  expiresOn: string; // ISO
+  contentType?: string;
 };
 type GetSasBatchResponse = { sas: SasEntryResponse[] };
 
 type ClientItemIdDto = { clientItemId: string };
 type CompleteSessionDto = {
-	verifyAndPromote?: boolean;
-	failOnIncomplete?: boolean;
-	onlyClientItems?: ClientItemIdDto[];
+  verifyAndPromote?: boolean;
+  failOnIncomplete?: boolean;
+  onlyClientItems?: ClientItemIdDto[];
 };
 type CompleteSessionItemResult = {
-	clientItemId: string;
-	finalStatus: UploadItemStatus;
-	sizeBytes?: number;
-	md5?: string;
-	error?: {
-		code?: string;
-		message?: string;
-		detailsJson?: Record<string, unknown>;
-	};
+  clientItemId: string;
+  finalStatus: UploadItemStatus;
+  sizeBytes?: number;
+  md5?: string;
+  error?: {
+    code?: string;
+    message?: string;
+    detailsJson?: Record<string, unknown>;
+  };
 };
 type CompleteSessionSummaryResponse = {
-	verified: number;
-	incomplete: number;
-	failed: number;
-	total: number;
+  verified: number;
+  incomplete: number;
+  failed: number;
+  total: number;
 };
 type CompleteSessionResponse = {
-	sessionId: string;
-	finalStatus: UploadSessionStatus;
-	summary: CompleteSessionSummaryResponse;
-	results: CompleteSessionItemResult[];
+  sessionId: string;
+  finalStatus: UploadSessionStatus;
+  summary: CompleteSessionSummaryResponse;
+  results: CompleteSessionItemResult[];
 };
 
 // ============================
@@ -113,20 +114,20 @@ type CompleteSessionResponse = {
 // ============================
 type UUID = string;
 type ModelType =
-	| "detection"
-	| "external_classification"
-	| "internal_classification";
+  | "detection"
+  | "external_classification"
+  | "internal_classification";
 const MODEL_TYPES: readonly ModelType[] = [
-	"detection",
-	"external_classification",
-	"internal_classification",
+  "detection",
+  "external_classification",
+  "internal_classification",
 ] as const;
 
 type CreateModelDto = {
-	id: UUID;
-	name: string;
-	versionTag: string;
-	type: ModelType;
+  id: UUID;
+  name: string;
+  versionTag: string;
+  type: ModelType;
 };
 type CreateProgramDto = { id: UUID; name: string };
 type CreateLotDto = { id: UUID; name: string; programId: UUID };
@@ -135,10 +136,10 @@ type CreateProviderDto = { id: UUID; name: string };
 type CreateSubProviderDto = { id: UUID; name: string; providerId: UUID };
 
 type ModelResponse = {
-	id: UUID;
-	name: string;
-	versionTag: string;
-	type: ModelType;
+  id: UUID;
+  name: string;
+  versionTag: string;
+  type: ModelType;
 };
 type ProgramResponse = { id: UUID; name: string };
 type LotResponse = { id: UUID; name: string; programId: UUID };
@@ -150,86 +151,87 @@ type SubProviderResponse = { id: UUID; name: string; providerId: UUID };
 // Tipos Evaluation
 // ============================
 type CreateResultDto = {
-	id: UUID;
-	aiClassName: string;
-	aiConfidence: number;
-	aiRawConfidencesJson: Record<string, number>;
-	hfIsCorrect?: boolean;
-	hfCorrectedClassName?: string;
-	hfObservation?: string;
+  id: UUID;
+  aiClassName: string;
+  aiConfidence: number;
+  aiRawConfidencesJson: Record<string, number>;
+  hfIsCorrect?: boolean;
+  hfCorrectedClassName?: string;
+  hfObservation?: string;
 };
 type CreatePhotoDto = {
-	id: UUID;
-	role: "raw" | "segmented" | "cropped";
-	uploadItemId: UUID;
+  id: UUID;
+  role: "raw" | "segmented" | "cropped";
+  uploadItemId: UUID;
 };
 type CreateSegmentDto = {
-	id: UUID;
-	uploadItemId: UUID;
-	bestClassName: string;
-	bestConfidence: number;
-	confidencesJson: Record<string, number>;
+  id: UUID;
+  uploadItemId: UUID;
+  bestClassName: string;
+  bestConfidence: number;
+  confidencesJson: Record<string, number>;
 };
 type CreateStepDto = {
-	id: UUID;
-	kind: "external" | "internal";
-	iterationIndex: number; // 0..3
-	result?: CreateResultDto;
-	photos?: CreatePhotoDto[];
-	segments?: CreateSegmentDto[];
+  id: UUID;
+  kind: "external" | "internal";
+  iterationIndex: number; // 0..3
+  result?: CreateResultDto;
+  photos?: CreatePhotoDto[];
+  segments?: CreateSegmentDto[];
 };
 type CreateEvaluationDto = {
-	id: UUID;
-	type: "PLANT_ANALYSIS" | "FIELD_EVENT";
-	creationTimestamp: string; // ISO
-	uploadSessionId: UUID;
-	qrCode?: string;
+  id: UUID;
+  type: "PLANT_ANALYSIS" | "FIELD_EVENT";
+  creationTimestamp: string; // ISO
+  uploadSessionId: UUID;
+  qrCode?: string;
 
-	truckPlate: string;
-	consecutiveNumber: string;
+  truckPlate: string;
+  consecutiveNumber: string;
 
-	// FIELD_EVENT | PLANT_ANALYSIS condicionales (ver esquema)
-	providerKind?: "own" | "third-party";
-	providerId?: UUID;
-	subProviderId?: UUID;
-	programId?: UUID;
-	lotId?: UUID;
-	centerId?: UUID;
+  // FIELD_EVENT | PLANT_ANALYSIS condicionales (ver esquema)
+  providerKind?: "own" | "third-party";
+  providerId?: UUID;
+  subProviderId?: UUID;
+  programId?: UUID;
+  lotId?: UUID;
+  centerId?: UUID;
 
-	// Solo para PLANT_ANALYSIS + own (evaluation_lots)
-	lotIds?: UUID[];
+  // Solo para PLANT_ANALYSIS + own (evaluation_lots)
+  lotIds?: UUID[];
 
-	deviceTimeOfDay: "day" | "night";
-	deviceWeather: string;
-	deviceHasInternet: boolean;
-	geoLatitude: number;
-	geoLongitude: number;
-	harvestCriteriaJson: Record<string, unknown>;
-	harvestObservation?: string;
+  deviceTimeOfDay: "day" | "night";
+  deviceWeather: string;
+  deviceHasInternet: boolean;
+  geoLatitude: number;
+  geoLongitude: number;
+  harvestCriteriaJson: Record<string, unknown>;
+  harvestObservation?: string;
 
-	modelDetectionId?: UUID;
-	modelExternalId?: UUID;
-	modelInternalId?: UUID;
+  modelDetectionId?: UUID;
+  modelExternalId?: UUID;
+  modelInternalId?: UUID;
 
-	steps?: CreateStepDto[];
+  steps?: CreateStepDto[];
 };
 
 type StepSummaryDto = {
-	kind: "external" | "internal";
-	iterationIndex: number;
-	hasResult: boolean;
-	photoCount: number;
-	segmentCount: number;
+  kind: "external" | "internal";
+  iterationIndex: number;
+  hasResult: boolean;
+  photoCount: number;
+  segmentCount: number;
 };
+
 type CreateEvaluationResponse = {
-	id: UUID;
-	type: "PLANT_ANALYSIS" | "FIELD_EVENT";
-	isFinalized: boolean;
-	createdAt: string; // date ISO
-	totalSteps: number;
-	totalPhotos: number;
-	totalSegments: number;
-	stepsSummary: StepSummaryDto[];
+  id: UUID;
+  type: "PLANT_ANALYSIS" | "FIELD_EVENT";
+  isFinalized: boolean;
+  createdAt: string; // date ISO
+  totalSteps: number;
+  totalPhotos: number;
+  totalSegments: number;
+  stepsSummary: StepSummaryDto[];
 };
 
 // ============================
@@ -238,247 +240,247 @@ type CreateEvaluationResponse = {
 //
 // ============================
 function md5Hex(filePath: string): string {
-	const fileBuffer = readFileSync(filePath);
-	return createHash("md5").update(fileBuffer).digest("hex");
+  const fileBuffer = readFileSync(filePath);
+  return createHash("md5").update(fileBuffer).digest("hex");
 }
 function md5Base64(buffer: Buffer): string {
-	return createHash("md5").update(buffer).digest("base64");
+  return createHash("md5").update(buffer).digest("base64");
 }
 function guessContentType(fileName: string): string {
-	const lower = fileName.toLowerCase();
-	if (lower.endsWith(".webp")) return "image/webp";
-	if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) return "image/jpeg";
-	if (lower.endsWith(".png")) return "image/png";
-	return "application/octet-stream";
+  const lower = fileName.toLowerCase();
+  if (lower.endsWith(".webp")) return "image/webp";
+  if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) return "image/jpeg";
+  if (lower.endsWith(".png")) return "image/png";
+  return "application/octet-stream";
 }
 function headersJSON(withInternal = false): HeadersInit {
-	return {
-		"Content-Type": "application/json",
-		"x-dev-auth": DEV_AUTH,
-		...(withInternal ? { "x-internal-secret": INTERNAL_SECRET } : {}),
-	};
+  return {
+    "Content-Type": "application/json",
+    "x-dev-auth": DEV_AUTH,
+    ...(withInternal ? { "x-internal-secret": INTERNAL_SECRET } : {}),
+  };
 }
 async function doJson<T>(
-	url: string,
-	init: RequestInit,
-	label: string,
+  url: string,
+  init: RequestInit,
+  label: string,
 ): Promise<T> {
-	const res = await fetch(url, init);
-	if (!res.ok) {
-		const text = await res.text();
-		throw new Error(`[${label}] HTTP ${res.status} ${res.statusText}\n${text}`);
-	}
-	return (await res.json()) as T;
+  const res = await fetch(url, init);
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`[${label}] HTTP ${res.status} ${res.statusText}\n${text}`);
+  }
+  return (await res.json()) as T;
 }
 
 // ============================
 // Upload helpers
 // ============================
 function createUploadSessionDto(filePaths: string[]): {
-	dto: CreateUploadSessionDto;
-	byClientId: Map<
-		string,
-		{ path: string; contentType: string; md5Hex: string }
-	>;
+  dto: CreateUploadSessionDto;
+  byClientId: Map<
+    string,
+    { path: string; contentType: string; md5Hex: string }
+  >;
 } {
-	const byClientId = new Map<
-		string,
-		{ path: string; contentType: string; md5Hex: string }
-	>();
+  const byClientId = new Map<
+    string,
+    { path: string; contentType: string; md5Hex: string }
+  >();
 
-	const files: UploadFileDto[] = filePaths.map((filePath) => {
-		const size = statSync(filePath).size;
-		const fileName = basename(filePath);
-		const contentType = guessContentType(fileName);
-		const clientItemId = randomUUID();
-		const md5h = md5Hex(filePath);
+  const files: UploadFileDto[] = filePaths.map((filePath) => {
+    const size = statSync(filePath).size;
+    const fileName = basename(filePath);
+    const contentType = guessContentType(fileName);
+    const clientItemId = randomUUID();
+    const md5h = md5Hex(filePath);
 
-		byClientId.set(clientItemId, { path: filePath, contentType, md5Hex: md5h });
+    byClientId.set(clientItemId, { path: filePath, contentType, md5Hex: md5h });
 
-		return {
-			clientItemId,
-			fileName,
-			fileSizeBytes: size,
-			contentType,
-			md5: md5h,
-		};
-	});
+    return {
+      clientItemId,
+      fileName,
+      fileSizeBytes: size,
+      contentType,
+      md5: md5h,
+    };
+  });
 
-	return {
-		dto: {
-			domain: UploadDomain.FIELD,
-			clientBatchId: randomUUID(),
-			files,
-		},
-		byClientId,
-	};
+  return {
+    dto: {
+      domain: UploadDomain.FIELD,
+      clientBatchId: randomUUID(),
+      files,
+    },
+    byClientId,
+  };
 }
 async function putBlobToSas(
-	sasUrl: string,
-	data: Buffer,
-	contentType: string,
-	md5b64?: string,
+  sasUrl: string,
+  data: Buffer,
+  contentType: string,
+  md5b64?: string,
 ): Promise<void> {
-	const headers: HeadersInit = {
-		"x-ms-blob-type": "BlockBlob",
-		"Content-Type": contentType,
-	};
-	if (md5b64) headers["Content-MD5"] = md5b64;
+  const headers: HeadersInit = {
+    "x-ms-blob-type": "BlockBlob",
+    "Content-Type": contentType,
+  };
+  if (md5b64) headers["Content-MD5"] = md5b64;
 
-	const res = await fetch(sasUrl, {
-		method: "PUT",
-		headers,
-		body: data as unknown as BodyInit,
-	});
-	if (!res.ok) {
-		const text = await res.text();
-		throw new Error(`[PUT Blob] HTTP ${res.status} ${res.statusText}\n${text}`);
-	}
+  const res = await fetch(sasUrl, {
+    method: "PUT",
+    headers,
+    body: data as unknown as BodyInit,
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`[PUT Blob] HTTP ${res.status} ${res.statusText}\n${text}`);
+  }
 }
 
 // ============================
 // Catalog helpers
 // ============================
 const CatalogAPI = {
-	createModel: (dto: CreateModelDto) =>
-		doJson<ModelResponse>(
-			`${BASE_URL}/catalog/models`,
-			{ method: "POST", headers: headersJSON(), body: JSON.stringify(dto) },
-			"CreateModel",
-		),
-	getModel: (id: UUID) =>
-		doJson<ModelResponse>(
-			`${BASE_URL}/catalog/models/${id}`,
-			{ method: "GET", headers: headersJSON() },
-			"GetModel",
-		),
-	listModels: (params?: { type?: ModelType }) => {
-		const qs = params?.type ? `?type=${encodeURIComponent(params.type)}` : "";
-		return doJson<ModelResponse[]>(
-			`${BASE_URL}/catalog/models${qs}`,
-			{ method: "GET", headers: headersJSON() },
-			"ListModels",
-		);
-	},
+  createModel: (dto: CreateModelDto) =>
+    doJson<ModelResponse>(
+      `${BASE_URL}/catalog/models`,
+      { method: "POST", headers: headersJSON(), body: JSON.stringify(dto) },
+      "CreateModel",
+    ),
+  getModel: (id: UUID) =>
+    doJson<ModelResponse>(
+      `${BASE_URL}/catalog/models/${id}`,
+      { method: "GET", headers: headersJSON() },
+      "GetModel",
+    ),
+  listModels: (params?: { type?: ModelType }) => {
+    const qs = params?.type ? `?type=${encodeURIComponent(params.type)}` : "";
+    return doJson<ModelResponse[]>(
+      `${BASE_URL}/catalog/models${qs}`,
+      { method: "GET", headers: headersJSON() },
+      "ListModels",
+    );
+  },
 
-	createProgram: (dto: CreateProgramDto) =>
-		doJson<ProgramResponse>(
-			`${BASE_URL}/catalog/programs`,
-			{ method: "POST", headers: headersJSON(), body: JSON.stringify(dto) },
-			"CreateProgram",
-		),
-	getProgram: (id: UUID) =>
-		doJson<ProgramResponse>(
-			`${BASE_URL}/catalog/programs/${id}`,
-			{ method: "GET", headers: headersJSON() },
-			"GetProgram",
-		),
-	listPrograms: () =>
-		doJson<ProgramResponse[]>(
-			`${BASE_URL}/catalog/programs`,
-			{ method: "GET", headers: headersJSON() },
-			"ListPrograms",
-		),
+  createProgram: (dto: CreateProgramDto) =>
+    doJson<ProgramResponse>(
+      `${BASE_URL}/catalog/programs`,
+      { method: "POST", headers: headersJSON(), body: JSON.stringify(dto) },
+      "CreateProgram",
+    ),
+  getProgram: (id: UUID) =>
+    doJson<ProgramResponse>(
+      `${BASE_URL}/catalog/programs/${id}`,
+      { method: "GET", headers: headersJSON() },
+      "GetProgram",
+    ),
+  listPrograms: () =>
+    doJson<ProgramResponse[]>(
+      `${BASE_URL}/catalog/programs`,
+      { method: "GET", headers: headersJSON() },
+      "ListPrograms",
+    ),
 
-	createLot: (dto: CreateLotDto) =>
-		doJson<LotResponse>(
-			`${BASE_URL}/catalog/lots`,
-			{ method: "POST", headers: headersJSON(), body: JSON.stringify(dto) },
-			"CreateLot",
-		),
-	getLot: (id: UUID) =>
-		doJson<LotResponse>(
-			`${BASE_URL}/catalog/lots/${id}`,
-			{ method: "GET", headers: headersJSON() },
-			"GetLot",
-		),
-	listLots: (params?: { programId?: UUID }) => {
-		const qs = params?.programId
-			? `?programId=${encodeURIComponent(params.programId)}`
-			: "";
-		return doJson<LotResponse[]>(
-			`${BASE_URL}/catalog/lots${qs}`,
-			{ method: "GET", headers: headersJSON() },
-			"ListLots",
-		);
-	},
+  createLot: (dto: CreateLotDto) =>
+    doJson<LotResponse>(
+      `${BASE_URL}/catalog/lots`,
+      { method: "POST", headers: headersJSON(), body: JSON.stringify(dto) },
+      "CreateLot",
+    ),
+  getLot: (id: UUID) =>
+    doJson<LotResponse>(
+      `${BASE_URL}/catalog/lots/${id}`,
+      { method: "GET", headers: headersJSON() },
+      "GetLot",
+    ),
+  listLots: (params?: { programId?: UUID }) => {
+    const qs = params?.programId
+      ? `?programId=${encodeURIComponent(params.programId)}`
+      : "";
+    return doJson<LotResponse[]>(
+      `${BASE_URL}/catalog/lots${qs}`,
+      { method: "GET", headers: headersJSON() },
+      "ListLots",
+    );
+  },
 
-	createCenter: (dto: CreateCenterDto) =>
-		doJson<CenterResponse>(
-			`${BASE_URL}/catalog/centers`,
-			{ method: "POST", headers: headersJSON(), body: JSON.stringify(dto) },
-			"CreateCenter",
-		),
-	getCenter: (id: UUID) =>
-		doJson<CenterResponse>(
-			`${BASE_URL}/catalog/centers/${id}`,
-			{ method: "GET", headers: headersJSON() },
-			"GetCenter",
-		),
-	listCenters: (params?: { lotId?: UUID }) => {
-		const qs = params?.lotId
-			? `?lotId=${encodeURIComponent(params.lotId)}`
-			: "";
-		return doJson<CenterResponse[]>(
-			`${BASE_URL}/catalog/centers${qs}`,
-			{ method: "GET", headers: headersJSON() },
-			"ListCenters",
-		);
-	},
+  createCenter: (dto: CreateCenterDto) =>
+    doJson<CenterResponse>(
+      `${BASE_URL}/catalog/centers`,
+      { method: "POST", headers: headersJSON(), body: JSON.stringify(dto) },
+      "CreateCenter",
+    ),
+  getCenter: (id: UUID) =>
+    doJson<CenterResponse>(
+      `${BASE_URL}/catalog/centers/${id}`,
+      { method: "GET", headers: headersJSON() },
+      "GetCenter",
+    ),
+  listCenters: (params?: { lotId?: UUID }) => {
+    const qs = params?.lotId
+      ? `?lotId=${encodeURIComponent(params.lotId)}`
+      : "";
+    return doJson<CenterResponse[]>(
+      `${BASE_URL}/catalog/centers${qs}`,
+      { method: "GET", headers: headersJSON() },
+      "ListCenters",
+    );
+  },
 
-	createProvider: (dto: CreateProviderDto) =>
-		doJson<ProviderResponse>(
-			`${BASE_URL}/catalog/providers`,
-			{ method: "POST", headers: headersJSON(), body: JSON.stringify(dto) },
-			"CreateProvider",
-		),
-	getProvider: (id: UUID) =>
-		doJson<ProviderResponse>(
-			`${BASE_URL}/catalog/providers/${id}`,
-			{ method: "GET", headers: headersJSON() },
-			"GetProvider",
-		),
-	listProviders: () =>
-		doJson<ProviderResponse[]>(
-			`${BASE_URL}/catalog/providers`,
-			{ method: "GET", headers: headersJSON() },
-			"ListProviders",
-		),
+  createProvider: (dto: CreateProviderDto) =>
+    doJson<ProviderResponse>(
+      `${BASE_URL}/catalog/providers`,
+      { method: "POST", headers: headersJSON(), body: JSON.stringify(dto) },
+      "CreateProvider",
+    ),
+  getProvider: (id: UUID) =>
+    doJson<ProviderResponse>(
+      `${BASE_URL}/catalog/providers/${id}`,
+      { method: "GET", headers: headersJSON() },
+      "GetProvider",
+    ),
+  listProviders: () =>
+    doJson<ProviderResponse[]>(
+      `${BASE_URL}/catalog/providers`,
+      { method: "GET", headers: headersJSON() },
+      "ListProviders",
+    ),
 
-	createSubProvider: (dto: CreateSubProviderDto) =>
-		doJson<SubProviderResponse>(
-			`${BASE_URL}/catalog/sub-providers`,
-			{ method: "POST", headers: headersJSON(), body: JSON.stringify(dto) },
-			"CreateSubProvider",
-		),
-	getSubProvider: (id: UUID) =>
-		doJson<SubProviderResponse>(
-			`${BASE_URL}/catalog/sub-providers/${id}`,
-			{ method: "GET", headers: headersJSON() },
-			"GetSubProvider",
-		),
-	listSubProviders: (params?: { providerId?: UUID }) => {
-		const qs = params?.providerId
-			? `?providerId=${encodeURIComponent(params.providerId)}`
-			: "";
-		return doJson<SubProviderResponse[]>(
-			`${BASE_URL}/catalog/sub-providers${qs}`,
-			{ method: "GET", headers: headersJSON() },
-			"ListSubProviders",
-		);
-	},
+  createSubProvider: (dto: CreateSubProviderDto) =>
+    doJson<SubProviderResponse>(
+      `${BASE_URL}/catalog/sub-providers`,
+      { method: "POST", headers: headersJSON(), body: JSON.stringify(dto) },
+      "CreateSubProvider",
+    ),
+  getSubProvider: (id: UUID) =>
+    doJson<SubProviderResponse>(
+      `${BASE_URL}/catalog/sub-providers/${id}`,
+      { method: "GET", headers: headersJSON() },
+      "GetSubProvider",
+    ),
+  listSubProviders: (params?: { providerId?: UUID }) => {
+    const qs = params?.providerId
+      ? `?providerId=${encodeURIComponent(params.providerId)}`
+      : "";
+    return doJson<SubProviderResponse[]>(
+      `${BASE_URL}/catalog/sub-providers${qs}`,
+      { method: "GET", headers: headersJSON() },
+      "ListSubProviders",
+    );
+  },
 };
 
 // ============================
 // Evaluation helper
 // ============================
 const EvaluationAPI = {
-	createEvaluation: (dto: CreateEvaluationDto) =>
-		doJson<CreateEvaluationResponse>(
-			`${BASE_URL}/evaluations`,
-			{ method: "POST", headers: headersJSON(), body: JSON.stringify(dto) },
-			"CreateEvaluation",
-		),
+  createEvaluation: (dto: CreateEvaluationDto) =>
+    doJson<CreateEvaluationResponse>(
+      `${BASE_URL}/evaluations`,
+      { method: "POST", headers: headersJSON(), body: JSON.stringify(dto) },
+      "CreateEvaluation",
+    ),
 };
 
 // ============================
@@ -729,12 +731,12 @@ async function main() {
 
 // Ejecutar si es el módulo principal
 if (require.main === module) {
-	main().catch((err: Error) => {
-		console.error("❌ Script failed:");
-		console.error(err);
-		if ((err as { cause?: unknown })?.cause) {
-			console.error("Cause:", (err as { cause?: unknown }).cause);
-		}
-		process.exit(1);
-	});
+  main().catch((err: Error) => {
+    console.error("❌ Script failed:");
+    console.error(err);
+    if ((err as { cause?: unknown })?.cause) {
+      console.error("Cause:", (err as { cause?: unknown }).cause);
+    }
+    process.exit(1);
+  });
 }

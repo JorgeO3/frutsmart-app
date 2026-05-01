@@ -2,8 +2,8 @@
 import 'reflect-metadata';
 
 // Configuración de entorno para E2E
-process.env.NODE_ENV = 'test';
-process.env.LOG_LEVEL = 'silent';
+process.env.BACKEND_NODE_ENV = 'test';
+process.env.BACKEND_LOG_LEVEL = 'silent';
 
 // Timeouts más largos para E2E (levantar servidor, DB, etc.)
 jest.setTimeout(60000); // 60 segundos

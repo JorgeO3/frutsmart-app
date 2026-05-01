@@ -26,7 +26,7 @@ global.testContext = {
 };
 
 // Mock environment variables if needed
-process.env.NODE_ENV = 'test';
-process.env.LOG_LEVEL = 'silent';
+process.env.BACKEND_NODE_ENV = 'test';
+process.env.BACKEND_LOG_LEVEL = 'silent';
 
 console.log('🧪 Jest unit test setup loaded');

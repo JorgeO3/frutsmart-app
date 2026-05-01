@@ -50,6 +50,9 @@ start:
 watch:
   {{ PACKAGE_MANAGER }} run start:dev
 
+start-auth-gateway:
+  {{ PACKAGE_MANAGER }} run start-auth-gateway
+
 # ===========================================
 # DATABASE COMMANDS
 # ===========================================

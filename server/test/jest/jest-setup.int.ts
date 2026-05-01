@@ -2,8 +2,8 @@
 import 'reflect-metadata';
 
 // Silenciar logs en test
-process.env.NODE_ENV = 'test';
-process.env.LOG_LEVEL = 'silent';
+process.env.BACKEND_NODE_ENV = 'test';
+process.env.BACKEND_LOG_LEVEL = 'silent';
 
 // Timeouts razonables para integración (DB, Azure, etc.)
 jest.setTimeout(30000); // 30 segundos

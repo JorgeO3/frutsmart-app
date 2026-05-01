@@ -2,31 +2,31 @@ import { registerAs } from "@nestjs/config";
 import { AppConfig } from "./config.type";
 
 enum Environment {
-	Local = "local",
-	Production = "production",
+  Local = "local",
+  Production = "production",
 }
 
+// This configuration is designed for production first, with sensible defaults.
 export default registerAs<AppConfig>("app", (): AppConfig => {
-	return {
-		nodeEnv: process.env.NODE_ENV || Environment.Local,
-		name: process.env.APP_NAME || "FrutSmart API",
-		// Use APP_VERSION (aligned with env.validation); previously used API_VERSION
-		version: process.env.APP_VERSION || "1.0.0",
-		workingDirectory: process.env.PWD || process.cwd(),
-		frontendDomain: process.env.FRONTEND_DOMAIN,
-		backendDomain: process.env.BACKEND_DOMAIN || "http://localhost:3000",
-		port: process.env.PORT ? parseInt(process.env.PORT, 10) : 3000,
-		host: process.env.APP_HOST || "0.0.0.0",
-		apiPrefix: process.env.API_PREFIX || "api/v1",
-		url: process.env.APP_URL || "http://localhost:3000",
-		fallbackLanguage: process.env.APP_FALLBACK_LANGUAGE || "en",
-		headerLanguage: process.env.APP_HEADER_LANGUAGE || "x-custom-lang",
-		rateLimitEnabled: process.env.RATE_LIMIT_ENABLED === "true" || false,
-		rateLimitMax: process.env.RATE_LIMIT_MAX
-			? parseInt(process.env.RATE_LIMIT_MAX, 10)
-			: 100,
-		rateLimitTimeWindowMs: process.env.RATE_LIMIT_TIME_WINDOW_MS
-			? parseInt(process.env.RATE_LIMIT_TIME_WINDOW_MS, 10)
-			: 60000,
-	};
+  return {
+    nodeEnv: process.env.BACKEND_NODE_ENV || Environment.Production,
+    name: process.env.BACKEND_APP_NAME || "FrutSmart API",
+    version: process.env.BACKEND_APP_VERSION || "1.0.0",
+    workingDirectory: process.env.BACKEND_PWD || process.cwd(),
+    port: process.env.BACKEND_PORT ? parseInt(process.env.BACKEND_PORT, 10) : 80,
+    host: process.env.BACKEND_APP_HOST || "0.0.0.0",
+    apiPrefix: process.env.BACKEND_API_PREFIX || "api/v1",
+    url: process.env.BACKEND_APP_URL || "http://localhost:80",
+    rateLimitEnabled: process.env.BACKEND_RATE_LIMIT_ENABLED === "false" ? false : true,
+    rateLimitMax: process.env.BACKEND_RATE_LIMIT_MAX
+      ? parseInt(process.env.BACKEND_RATE_LIMIT_MAX, 10)
+      : 300,
+    rateLimitTimeWindowMs: process.env.BACKEND_RATE_LIMIT_TIME_WINDOW_MS
+      ? parseInt(process.env.BACKEND_RATE_LIMIT_TIME_WINDOW_MS, 10)
+      : 60000,
+    logoLevel: process.env.BACKEND_LOG_LEVEL || "warn",
+    logFileEnabled: process.env.BACKEND_LOG_FILE_ENABLED === "true" ? true : false,
+    swaggerEnabled: process.env.BACKEND_SWAGGER_ENABLED === "false" ? false : true,
+    swaggerPath: process.env.BACKEND_SWAGGER_PATH || "docs",
+  };
 });

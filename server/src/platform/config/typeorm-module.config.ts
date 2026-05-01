@@ -3,42 +3,55 @@ import { TypeOrmModuleAsyncOptions } from "@nestjs/typeorm";
 import { AllConfigType } from "./config.type";
 
 export const typeOrmModuleOptions: TypeOrmModuleAsyncOptions = {
-	inject: [ConfigService],
-	useFactory: (configService: ConfigService<AllConfigType>) => {
-		const dbConfig = configService.getOrThrow("database", { infer: true });
+  inject: [ConfigService],
+  useFactory: (config: ConfigService<AllConfigType>) => {
+    const db = config.getOrThrow("database", { infer: true });
 
-		// Verificar que tenemos configuración válida
-		if (!dbConfig.url && !dbConfig.host) {
-			throw new Error(
-				"Database configuration is incomplete: Either DATABASE_URL or DATABASE_HOST must be provided",
-			);
-		}
+    // Reglas: si hay URL -> modo URL; si no -> modo campos sueltos.
+    const useUrl = !!db.url;
 
-		console.log("Configuring database connection...");
+    if (!useUrl && !db.host) {
+      throw new Error("Either DATABASE_URL or DATABASE_HOST must be provided");
+    }
 
-		return {
-			type: "postgres",
-			url: dbConfig.url,
-			host: dbConfig.host,
-			port: dbConfig.port,
-			username: dbConfig.username,
-			password: dbConfig.password,
-			database: dbConfig.database,
-			synchronize: dbConfig.synchronize,
-			logging: dbConfig.logging,
-			dropSchema: dbConfig.dropSchema,
-			migrationsRun: dbConfig.migrationsRun,
-			ssl: dbConfig.ssl,
-			extra: {
-				max: dbConfig.maxConnections,
-				connectionTimeoutMillis: dbConfig.connectTimeoutMS,
-				acquireTimeoutMillis: dbConfig.acquireTimeoutMS,
-				timeout: dbConfig.timeout,
-			},
-			retryAttempts: dbConfig.retryAttempts,
-			retryDelay: dbConfig.retryDelay,
-			entities: ["dist/modules/**/infrastructure/**/*.orm-entity.js"],
-			migrations: ["dist/platform/database/migrations/*{.ts,.js}"],
-		};
-	},
+    // Base común
+    const base = {
+      type: "postgres" as const,
+      synchronize: false,
+      dropSchema: false,
+      migrationsRun: false,
+      logging: db.logging ?? false,
+      retryAttempts: db.retryAttempts ?? 3,
+      retryDelay: db.retryDelay ?? 2000,
+      entities: ["dist/modules/**/infrastructure/**/*.orm-entity.js"],
+      migrations: ["dist/platform/database/migrations/*{.ts,.js}"],
+      extra: {
+        max: db.maxConnections ?? 10,
+        connectionTimeoutMillis: db.connectTimeoutMS ?? 10000,
+        acquireTimeoutMillis: db.acquireTimeoutMS ?? 10000,
+        // statement timeout del lado del cliente (node-postgres)
+        statement_timeout: db.timeout ?? undefined,
+      },
+    };
+
+    if (useUrl) {
+      return {
+        ...base,
+        url: db.url,
+        // SSL: para Azure PG suele requerirse
+        ssl: db.ssl ?? { rejectUnauthorized: false }, // o true si subes el CA
+      };
+    }
+
+    // Fallback sin URL (solo si de verdad lo necesitas)
+    return {
+      ...base,
+      host: db.host,
+      port: db.port ?? 5432,
+      username: db.username,
+      password: db.password,
+      database: db.database,
+      ssl: db.ssl ?? { rejectUnauthorized: false },
+    };
+  },
 };
