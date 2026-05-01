@@ -77,6 +77,7 @@ interface UploadJobsRepository {
     jobId: string,
     pipelineStep: PipelineStep,
     stepStatus: UploadJobStatus,
+    options?: { resetAttempts?: boolean; clearAttemptWindow?: boolean },
   ): Promise<void>;
 
   markJobFailed(jobId: string, lastError: string | null): Promise<void>;
@@ -101,9 +102,9 @@ const uploadJobsRepo: UploadJobsRepository = {
     return database.uploadJobs.getRunnableJobs();
   },
 
-  async updateJobStep(jobId, pipelineStep, stepStatus) {
+  async updateJobStep(jobId, pipelineStep, stepStatus, options) {
     // Firma real: updateJobStep(jobId, pipelineStep, stepStatus)
-    return database.uploadJobs.updateJobStep(jobId, pipelineStep, stepStatus);
+    return database.uploadJobs.updateJobStep(jobId, pipelineStep, stepStatus, options);
   },
 
   async markJobFailed(jobId, error) {
@@ -142,6 +143,7 @@ export class UploadScheduler {
     private readonly nativeUpload: NativeUploadApi,
     private readonly config: SchedulerConfig = DEFAULT_CONFIG,
     private readonly jobs: UploadJobsRepository = uploadJobsRepo,
+    private readonly onUploadStarted?: (jobId: string, skyboltSessionId: string) => void,
   ) { }
 
   /**
@@ -178,8 +180,16 @@ export class UploadScheduler {
       });
 
       // Procesamos de manera SECUENCIAL para mantener el sistema más determinista.
+      // Si un job avanza de paso exitosamente, lo reprocesamos en el mismo tick
+      // para encadenar create_session → upload → (evento) → complete_session → evaluation.
       for (const job of runnable) {
-        await this.processJob(job);
+        let currentJob: UploadJobRow | null = job;
+        while (currentJob) {
+          const advanced = await this.processJob(currentJob);
+          if (!advanced) break;
+          currentJob = await this.jobs.findJobById(currentJob.id);
+          if (!currentJob || !this.canProcessNextStep(currentJob)) break;
+        }
       }
     } finally {
       this.running = false;
@@ -227,51 +237,61 @@ export class UploadScheduler {
     return Math.max(0, capped + jitter);
   }
 
+  private canProcessNextStep(job: UploadJobRow): boolean {
+    return job.step_status === "pending" && job.pipeline_step !== "done";
+  }
+
   // -------------------------------------------------------------------------
   // Máquina de estados del pipeline
   // -------------------------------------------------------------------------
 
-  private async processJob(job: UploadJobRow): Promise<void> {
+  private async processJob(job: UploadJobRow): Promise<boolean> {
     switch (job.pipeline_step) {
       case "create_session":
-        await this.handleCreateSession(job);
-        break;
+        await this.jobs.incrementAttempts(job.id);
+        return this.handleCreateSession(job);
 
       case "upload":
-        await this.handleUpload(job);
-        break;
+        await this.jobs.incrementAttempts(job.id);
+        return this.handleUpload(job);
 
       case "complete_session":
-        await this.handleCompleteSession(job);
-        break;
+        await this.jobs.incrementAttempts(job.id);
+        return this.handleCompleteSession(job);
 
       case "evaluation":
-        await this.handleEvaluation(job);
-        break;
+        await this.jobs.incrementAttempts(job.id);
+        return this.handleEvaluation(job);
 
       case "done":
       default:
-        // En teoría nunca deberían llegar jobs con 'done' a este punto.
         console.log("[UploadScheduler] processJob(): job ya está en 'done'", { id: job.id });
-        break;
+        return false;
     }
   }
 
   // Paso 1: create_session -> POST /upload/sessions
-  private async handleCreateSession(job: UploadJobRow): Promise<void> {
+  private async handleCreateSession(job: UploadJobRow): Promise<boolean> {
     console.log("[UploadScheduler] handleCreateSession()", { id: job.id });
 
     await this.jobs.updateJobStep(job.id, "create_session", "running");
 
     try {
+      const t0 = Date.now();
       const response = await this.backend.createUploadSession({
         domain: job.domain,
         clientBatchId: job.client_batch_id,
         qualityAnalysisId: job.quality_analysis_id ?? null,
       });
+      console.log("[UploadScheduler] handleCreateSession() OK", { id: job.id, sessionId: response.sessionId, elapsedMs: Date.now() - t0 });
 
       await this.jobs.setBackendSessionId(job.id, response.sessionId);
-      await this.jobs.updateJobStep(job.id, "upload", "pending");
+      await this.jobs.updateJobStep(job.id, "upload", "pending", {
+        resetAttempts: true,
+        clearAttemptWindow: true,
+      });
+
+      return true;
     } catch (err) {
       const errorMessage = this.normalizeError(err);
       console.warn("[UploadScheduler] handleCreateSession() failed", {
@@ -280,6 +300,7 @@ export class UploadScheduler {
       });
 
       await this.jobs.markJobFailed(job.id, errorMessage);
+      return false;
     }
   }
 
@@ -289,14 +310,16 @@ export class UploadScheduler {
   // - Aquí sólo disparamos la subida nativa.
   // - La transición a 'complete_session' se hará cuando el módulo nativo
   //   emita `session:completed` y el UploadService actualice el job.
-  private async handleUpload(job: UploadJobRow): Promise<void> {
+  // - Retorna false para detener el loop: el worker nativo emitirá
+  //   session:completed que disparará runSchedulerTick() fuera de este tick.
+  private async handleUpload(job: UploadJobRow): Promise<boolean> {
     console.log("[UploadScheduler] handleUpload()", { id: job.id });
 
     if (!job.backend_session_id) {
       const msg = "Invariant: backend_session_id is null in 'upload' step";
       console.error(`[UploadScheduler] ${msg}`, { id: job.id });
       await this.jobs.markJobFailed(job.id, msg);
-      return;
+      return false;
     }
 
     await this.jobs.updateJobStep(job.id, "upload", "running");
@@ -309,12 +332,15 @@ export class UploadScheduler {
 
       await this.jobs.setSkyboltSessionId(job.id, result.skyboltSessionId);
       await this.jobs.updateJobStep(job.id, "upload", "running");
+      console.log("[UploadScheduler DIAG] handleUpload: native upload started, skyboltSessionId:", result.skyboltSessionId, "jobId:", job.id);
+      this.onUploadStarted?.(job.id, result.skyboltSessionId);
 
-      // IMPORTANTE:
-      // - No movemos el pipeline_step aquí.
-      // - Cuando SkyVault termine, emitirá 'session:completed'.
-      // - El UploadService, al manejar ese evento, deberá:
-      //     updateJobStep(jobId, 'complete_session', 'pending', { ... })
+      // No movemos el pipeline_step aquí.
+      // Cuando SkyVault termine, emitirá 'session:completed'.
+      // El UploadService, al manejar ese evento, deberá:
+      //   updateJobStep(jobId, 'complete_session', 'pending', { ... })
+
+      return false;
     } catch (err) {
       const errorMessage = this.normalizeError(err);
       console.warn("[UploadScheduler] handleUpload() failed", {
@@ -323,18 +349,19 @@ export class UploadScheduler {
       });
 
       await this.jobs.markJobFailed(job.id, errorMessage);
+      return false;
     }
   }
 
   // Paso 3: complete_session -> POST /upload/sessions/:id/complete
-  private async handleCompleteSession(job: UploadJobRow): Promise<void> {
+  private async handleCompleteSession(job: UploadJobRow): Promise<boolean> {
     console.log("[UploadScheduler] handleCompleteSession()", { id: job.id });
 
     if (!job.backend_session_id) {
       const msg = "Invariant: backend_session_id is null in 'complete_session' step";
       console.error(`[UploadScheduler] ${msg}`, { id: job.id });
       await this.jobs.markJobFailed(job.id, msg);
-      return;
+      return false;
     }
 
     await this.jobs.updateJobStep(job.id, "complete_session", "running");
@@ -342,7 +369,12 @@ export class UploadScheduler {
     try {
       await this.backend.completeUploadSession(job.backend_session_id);
 
-      await this.jobs.updateJobStep(job.id, "evaluation", "pending");
+      await this.jobs.updateJobStep(job.id, "evaluation", "pending", {
+        resetAttempts: true,
+        clearAttemptWindow: true,
+      });
+
+      return true;
     } catch (err) {
       const errorMessage = this.normalizeError(err);
       console.warn("[UploadScheduler] handleCompleteSession() failed", {
@@ -351,18 +383,19 @@ export class UploadScheduler {
       });
 
       await this.jobs.markJobFailed(job.id, errorMessage);
+      return false;
     }
   }
 
   // Paso 4: evaluation -> POST /evaluations
-  private async handleEvaluation(job: UploadJobRow): Promise<void> {
+  private async handleEvaluation(job: UploadJobRow): Promise<boolean> {
     console.log("[UploadScheduler] handleEvaluation()", { id: job.id });
 
     if (!job.quality_analysis_id || !job.backend_session_id) {
       const msg = "Invariant: quality_analysis_id or backend_session_id is null in 'evaluation' step";
       console.error(`[UploadScheduler] ${msg}`, { id: job.id });
       await this.jobs.markJobFailed(job.id, msg);
-      return;
+      return false;
     }
 
     await this.jobs.updateJobStep(job.id, "evaluation", "running");
@@ -374,6 +407,7 @@ export class UploadScheduler {
       });
 
       await this.jobs.markJobDone(job.id);
+      return false;
     } catch (err) {
       const errorMessage = this.normalizeError(err);
       console.warn("[UploadScheduler] handleEvaluation() failed", {
@@ -382,6 +416,7 @@ export class UploadScheduler {
       });
 
       await this.jobs.markJobFailed(job.id, errorMessage);
+      return false;
     }
   }
 

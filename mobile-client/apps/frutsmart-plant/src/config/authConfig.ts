@@ -18,6 +18,7 @@ export interface AppExtraConfig {
   oidc: OidcConfig;
   featureFlags: {
     authEnabled: boolean;
+    uploadJobDeletionEnabled: boolean;
   };
 }
 
@@ -33,3 +34,10 @@ export const apiBaseUrl: string = extraConfig.apiBaseUrl;
 export const easyAuthBaseUrl: string = extraConfig.easyAuthBaseUrl;
 export const oidcConfig: OidcConfig = extraConfig.oidc;
 export const authEnabled: boolean = extraConfig.featureFlags?.authEnabled ?? true;
+const uploadJobDeletionEnabledEnv =
+  process.env.EXPO_PUBLIC_UPLOAD_JOB_DELETE_ENABLED?.toLowerCase();
+
+export const uploadJobDeletionEnabled: boolean =
+  appEnv === 'local' &&
+  (uploadJobDeletionEnabledEnv === 'true' ||
+    extraConfig.featureFlags?.uploadJobDeletionEnabled === true);

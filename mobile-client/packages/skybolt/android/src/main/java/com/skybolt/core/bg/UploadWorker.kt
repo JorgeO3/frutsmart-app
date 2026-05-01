@@ -167,7 +167,11 @@ class UploadWorker(
     }
 
     override suspend fun doWork(): WMResult = withContext(Dispatchers.IO) {
-        val sessionId = inputData.getString(KEY_SESSION_ID) ?: return@withContext WMResult.failure()
+        val sessionId = inputData.getString(KEY_SESSION_ID) ?: run {
+            log.e { "[DIAG] UploadWorker.doWork: KEY_SESSION_ID is null — worker will FAIL" }
+            return@withContext WMResult.failure()
+        }
+        log.i { "[DIAG] UploadWorker.doWork START sessionId=$sessionId runAttempt=$runAttemptCount" }
         setForeground(getForegroundInfo())
 
         try {
@@ -184,6 +188,7 @@ class UploadWorker(
             ensureAuthEnvironmentReady()
 
             Events.emit(SkyboltEvent.SessionStarted(sessionId = sessionId))
+            log.i { "[DIAG] UploadWorker emitted session:started for $sessionId" }
 
             // Política de red: si no hay conectividad, pausamos declarativamente
             val isConnected = networkConnectedOverride?.invoke(applicationContext)
@@ -216,6 +221,7 @@ class UploadWorker(
             if (result.isSuccess) {
                 sessionRepository.setSessionStatus(sessionId, SessionStatus.COMPLETED)
                 Events.emit(SkyboltEvent.SessionCompleted(sessionId = sessionId))
+                log.i { "[DIAG] UploadWorker emitted session:completed for $sessionId" }
                 log.i { "Session $sessionId completed successfully" }
                 WMResult.success()
             } else {
@@ -236,6 +242,7 @@ class UploadWorker(
                         errorMessage = errorMessage
                     )
                 )
+                log.i { "[DIAG] UploadWorker emitted session:failed for $sessionId: $errorCode - $errorMessage" }
 
                 log.w { "Session $sessionId failed: $errorCode - $errorMessage" }
                 WMResult.failure()

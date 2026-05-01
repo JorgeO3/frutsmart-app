@@ -456,6 +456,8 @@ const UploadsScreen = () => {
     resumeJob,
     forceRetryJob,
     cancelJob,
+    removeJob,
+    uploadJobDeletionEnabled,
   } = useSkyboltUploadContext();
 
   const sessions = useMemo(
@@ -500,6 +502,9 @@ const UploadsScreen = () => {
         case "cancel":
           await cancelJob(sessionId);
           break;
+        case "delete":
+          await removeJob(sessionId);
+          break;
         default:
           break;
       }
@@ -524,7 +529,11 @@ const UploadsScreen = () => {
           <AppText style={styles.emptyText}>No hay analisis pendientes de sincronizar.</AppText>
         ) : (
           sessions.map((session) => (
-            <SessionCard key={session.id} session={session} onPress={handleSessionPress} />
+            <SessionCard
+              key={session.id}
+              session={session}
+              onPress={handleSessionPress}
+            />
           ))
         )}
       </ScrollView>
@@ -534,6 +543,7 @@ const UploadsScreen = () => {
         visible={modalVisible}
         onClose={handleModalClose}
         onAction={handleAction}
+        canDelete={uploadJobDeletionEnabled}
       />
     </AppView>
   );

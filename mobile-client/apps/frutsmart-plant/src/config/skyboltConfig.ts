@@ -8,9 +8,9 @@ export function getDefaultSkyboltUploadConfig(): CloudUploadSettings {
     environment: 'dev',
     backend: {
       auth: {
-        clientId: oidcConfig.clientId,
-        scope: oidcConfig.scopes.join(' '),
         tokenEndpoint: oidcConfig.tokenEndpoint,
+        clientId: oidcConfig.clientId,
+        scope: oidcConfig.scopes?.join(' ') ?? '',
         clockSkewMs: 60000,
       },
       baseUrl: `${apiBaseUrl}/api/v1`,

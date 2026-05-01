@@ -101,7 +101,6 @@ export class QualityClassificationsRepository {
     }
 
     console.log({ valuesLength: values.length, expectedLength });
-    console.log({ values });
 
     await tx.runAsync(sql, values);
   }

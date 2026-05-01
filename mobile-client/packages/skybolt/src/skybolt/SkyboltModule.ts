@@ -392,12 +392,16 @@ export function addUploadListener(
   listener: UploadEventListener
 ): EventSubscription {
   const module = assertModule();
+  console.log("[Skybolt DIAG] addUploadListener: registering NativeEventEmitter for 'onUploadEvent'");
   const emitter = new NativeEventEmitter(module as never);
 
   return emitter.addListener('onUploadEvent', (nativeEvent: NativeUploadEventSpec) => {
+    console.log("[Skybolt DIAG] JS received native event:", nativeEvent.type, "sessionId:", nativeEvent.sessionId);
     const native = toNativeEvent(nativeEvent);
     try {
-      listener(toUploadEvent(native));
+      const uploadEvent = toUploadEvent(native);
+      console.log("[Skybolt DIAG] converted to UploadEvent:", uploadEvent.type);
+      listener(uploadEvent);
     } catch (error) {
       console.error('[Skybolt] Event conversion error:', error, native);
     }
@@ -468,6 +472,7 @@ export async function applyDefaults(
  */
 export async function configure(settings: CloudUploadSettings): Promise<void> {
   const configWithDefaults = await applyDefaults(settings);
+  console.log("[Skybolt DIAG] configure calling native: baseUrl=", configWithDefaults.backend.baseUrl);
   return assertModule().configure(toNativeSettings(configWithDefaults));
 }
 
@@ -479,6 +484,7 @@ export async function configure(settings: CloudUploadSettings): Promise<void> {
  * Initialize a new upload session with specified configuration.
  */
 export async function initializeSession(config: SessionConfig): Promise<void> {
+  console.log("[Skybolt DIAG] initializeSession calling native:", config.sessionId, "items:", config.items.length);
   return assertModule().initializeSession(toNativeSessionConfig(config));
 }
 
@@ -489,7 +495,9 @@ export async function startSession(sessionId: string): Promise<void> {
   if (!sessionId) {
     throw new Error('[Skybolt] sessionId required');
   }
-  return assertModule().startSession(sessionId);
+  console.log("[Skybolt DIAG] startSession calling native:", sessionId);
+  await assertModule().startSession(sessionId);
+  console.log("[Skybolt DIAG] startSession native returned for:", sessionId);
 }
 
 /**
@@ -537,7 +545,9 @@ export async function getSessionProgress(
   if (!sessionId) {
     throw new Error('[Skybolt] sessionId required');
   }
-  return assertModule().getSessionProgress(sessionId);
+  const result = await assertModule().getSessionProgress(sessionId);
+  console.log("[Skybolt DIAG] getSessionProgress:", sessionId, result ? `status=${(result as { status?: string }).status}` : "null");
+  return result;
 }
 
 /**

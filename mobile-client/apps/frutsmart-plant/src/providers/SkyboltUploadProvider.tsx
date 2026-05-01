@@ -15,6 +15,7 @@ import type {
   UploadJobViewModel,
   UploadPauseReason,
 } from "@services/uploads/types";
+import { uploadJobDeletionEnabled } from "@src/config/authConfig";
 
 import type { UploadEvent } from "skybolt";
 import * as Skybolt from "skybolt";
@@ -33,6 +34,8 @@ type SkyboltUploadContextValue = {
   resumeJob: (jobId: string) => Promise<void>;
   forceRetryJob: (jobId: string) => Promise<void>;
   cancelJob: (jobId: string) => Promise<void>;
+  removeJob: (jobId: string) => Promise<void>;
+  uploadJobDeletionEnabled: boolean;
 };
 
 type JobProgressSnapshot = {
@@ -197,6 +200,8 @@ const SkyboltUploadJobsInnerProvider = ({ children }: Props) => {
 
   const handleUploadEvent = useCallback(
     async (event: UploadEvent) => {
+      console.log("[SkyboltUploadProvider DIAG] handleUploadEvent received:", event.type, "sessionId:", (event as { sessionId?: string }).sessionId);
+
       if (event.type === "item:progress") {
         const jobId = resolveJobIdFromSession(event.sessionId);
         if (jobId) {
@@ -258,6 +263,7 @@ const SkyboltUploadJobsInnerProvider = ({ children }: Props) => {
       }
 
       // aquí entra la resiliencia, sin importar en qué pantalla estés
+      console.log("[SkyboltUploadProvider DIAG] forwarding event to uploadService.handleSkyboltEvent:", event.type);
       await uploadService.handleSkyboltEvent(event);
       await refreshJobs();
     },
@@ -313,6 +319,14 @@ const SkyboltUploadJobsInnerProvider = ({ children }: Props) => {
     [refreshJobs],
   );
 
+  const removeJob = useCallback(
+    async (jobId: string) => {
+      await uploadService.removeJob(jobId);
+      await refreshJobs();
+    },
+    [refreshJobs],
+  );
+
   useEffect(() => {
     let mounted = true;
 
@@ -329,6 +343,7 @@ const SkyboltUploadJobsInnerProvider = ({ children }: Props) => {
     const subscription = Skybolt.addUploadListener((evt: UploadEvent) => {
       void handleUploadEvent(evt);
     });
+    console.log("[SkyboltUploadProvider DIAG] addUploadListener registered");
 
     return () => {
       mounted = false;
@@ -349,6 +364,8 @@ const SkyboltUploadJobsInnerProvider = ({ children }: Props) => {
       resumeJob,
       forceRetryJob,
       cancelJob,
+      removeJob,
+      uploadJobDeletionEnabled,
     }),
     [
       jobs,
@@ -362,6 +379,8 @@ const SkyboltUploadJobsInnerProvider = ({ children }: Props) => {
       resumeJob,
       forceRetryJob,
       cancelJob,
+      removeJob,
+      uploadJobDeletionEnabled,
     ],
   );
 

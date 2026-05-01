@@ -413,8 +413,6 @@ const OverallSummaryScreen = () => {
   const { setExternalSummary, setInternalSummary, complete } =
     usePlantWorkActions();
 
-  console.log({ qualityClassifications, harvestCriteria });
-
   const externalSummary = useExternalSummary();
   const internalSummary = useInternalSummary();
 

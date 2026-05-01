@@ -6,6 +6,7 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
+import com.skybolt.BuildConfig
 import com.skybolt.azureblob.auth.AzureAuthConfig
 import com.skybolt.azureblob.auth.AzureB2CTokenRefresher
 import com.skybolt.core.bg.UploadWorker
@@ -73,13 +74,19 @@ object SkyboltManager {
     internal var enqueueSessionOverride: (suspend (String) -> Unit)? = null
 
     private val sharedOkHttp by lazy {
+        val specs = if (BuildConfig.ALLOW_HTTP_IN_DEV) {
+            listOf(ConnectionSpec.MODERN_TLS, ConnectionSpec.CLEARTEXT)
+        } else {
+            listOf(ConnectionSpec.MODERN_TLS)
+        }
+
         OkHttpClient.Builder()
             .connectionPool(ConnectionPool(10, 5, TimeUnit.MINUTES))
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(120, TimeUnit.SECONDS)
             .writeTimeout(120, TimeUnit.SECONDS)
             .retryOnConnectionFailure(true)
-            .connectionSpecs(listOf(ConnectionSpec.MODERN_TLS))
+            .connectionSpecs(specs)
             .build()
     }
 
@@ -273,7 +280,7 @@ object SkyboltManager {
         // Enqueue work
         workManager.enqueue(workRequest)
 
-        log.i { "Session enqueued: $sessionId, workId=${workRequest.id}" }
+        log.i { "[DIAG] Session enqueued: $sessionId, workId=${workRequest.id}, networkType=${constraints.requiredNetworkType}" }
     }
     
     /**

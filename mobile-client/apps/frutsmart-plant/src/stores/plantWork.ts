@@ -282,12 +282,7 @@ export const usePlantWorkStoreBase = create<PlantWorkState>((set, get) => ({
         qualityClassifications,
       } = get();
 
-      console.log("Completing with state:", {
-        traceability,
-        metadata,
-        harvestCriteria,
-        qualityClassifications,
-      });
+      console.log("Completing...");
 
       if (!traceability || !metadata || !harvestCriteria) {
         throw new Error(ERRORS.MISSING_DATA_FOR_COMPLETION);

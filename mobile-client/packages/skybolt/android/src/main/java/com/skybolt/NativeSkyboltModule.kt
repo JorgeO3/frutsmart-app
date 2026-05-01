@@ -40,10 +40,12 @@ class NativeSkyboltModule(reactContext: ReactApplicationContext) : NativeSkybolt
 
     SkyboltManager.initialize(appContext)
     Events.setSink(NativeEventSink { type, payload ->
+      log.i { "[DIAG] NativeEventSink: type=$type, payloadSize=${payload.size}" }
       val event = LinkedHashMap<String, Any?>(payload.size + 1)
       event["type"] = type
       event.putAll(payload)
       sendEvent("onUploadEvent", NativeSkyboltConverters.toWritableMap(event))
+      log.i { "[DIAG] sendEvent completed for type=$type" }
     })
 
     log.i { "NativeSkybolt initialized" }
@@ -199,9 +201,18 @@ class NativeSkyboltModule(reactContext: ReactApplicationContext) : NativeSkybolt
   }
 
   private fun sendEvent(eventName: String, payload: com.facebook.react.bridge.WritableMap) {
-    reactApplicationContext
-      .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
-      .emit(eventName, payload)
+    try {
+      val emitter = reactApplicationContext
+        .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
+      if (emitter == null) {
+        log.e { "[DIAG] sendEvent: getJSModule returned null for $eventName — event LOST" }
+        return
+      }
+      emitter.emit(eventName, payload)
+      log.i { "[DIAG] sendEvent emitted OK: $eventName" }
+    } catch (t: Throwable) {
+      log.e(t) { "[DIAG] sendEvent crashed for $eventName: ${t.message}" }
+    }
   }
 
   private fun launchPromise(promise: Promise, block: suspend () -> Unit) {

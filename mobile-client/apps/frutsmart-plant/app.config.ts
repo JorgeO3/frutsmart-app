@@ -38,6 +38,7 @@ interface ExtraConfig {
   oidc: OidcExtraConfig;
   featureFlags: {
     authEnabled: boolean;
+    uploadJobDeletionEnabled: boolean;
   };
 }
 
@@ -170,6 +171,8 @@ function buildEnvConfig(env: AppEnv): RawEnvConfig {
 const APP_ENV: AppEnv = getAppEnv();
 const envConfig: RawEnvConfig = buildEnvConfig(APP_ENV);
 const authEnabled = process.env.EXPO_PUBLIC_AUTH_ENABLED !== 'false';
+const uploadJobDeletionEnabled =
+  APP_ENV === 'local' && process.env.EXPO_PUBLIC_UPLOAD_JOB_DELETE_ENABLED === 'true';
 
 const extra: ExtraConfig = {
   appEnv: APP_ENV,
@@ -186,6 +189,7 @@ const extra: ExtraConfig = {
   },
   featureFlags: {
     authEnabled,
+    uploadJobDeletionEnabled,
   },
 };
 
@@ -194,6 +198,13 @@ const expoConfig = ({ config }: ConfigContext): ExpoConfig => ({
   name: 'FrutoSmart',
   slug: 'frutosmart',
   scheme: 'frutsmartp',
+  android: {
+    ...config.android,
+    blockedPermissions: [
+      'android.permission.READ_EXTERNAL_STORAGE',
+      'android.permission.WRITE_EXTERNAL_STORAGE',
+    ],
+  },
   extra,
 });
 

@@ -39,10 +39,7 @@ const SavingClassificationScreen = () => {
 
       const stateData = usePlantWorkStoreBase.getState();
 
-      console.log(
-        "Clasificación a guardar:",
-        JSON.stringify(stateData, null, 2),
-      );
+      console.log("Clasificación a guardar");
 
       // Se llama al servicio de persistencia con todo el estado.
       const analysisId = await analysisPersistenceService.saveAnalysis(

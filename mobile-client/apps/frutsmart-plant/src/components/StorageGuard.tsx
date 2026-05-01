@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { Alert } from "react-native";
 
-import * as FileSystem from "expo-file-system/legacy";
 import { type Href, usePathname, useRouter } from "expo-router";
 
 import {
@@ -9,12 +8,14 @@ import {
   LOGIN_SYNC_BUDGET,
   PDF_GENERATION_BUDGET,
   PHOTO_CAPTURE_BUDGET,
+  PLANT_WORK_SESSION_BUDGET,
 } from "@src/constants/spaceBudgets";
 import { openStorageManagement } from "@utils/openStorageManagement";
 import { ensureSpace } from "@utils/storage";
 
 const routeBudgets = {
   "/auth/login": LOGIN_SYNC_BUDGET,
+  "/plant-work/work-flow/fruit-origin-selector": PLANT_WORK_SESSION_BUDGET,
   "/plant-work/work-flow/external/picture": PHOTO_CAPTURE_BUDGET,
   "/plant-work/work-flow/internal/picture": PHOTO_CAPTURE_BUDGET,
   "/plant-work/work-flow/external/detection": INFERENCE_BUDGET,
@@ -51,12 +52,7 @@ export function StorageGuard({ enabled }: StorageGuardProps): null {
     let cancelled = false;
 
     void (async () => {
-      const tempDirUri: string = `${FileSystem.documentDirectory}tmp_media`;
-
-      const result = await ensureSpace(budget, {
-        tempDirUri,
-        tryCleanup: true,
-      });
+      const result = await ensureSpace(budget);
 
       if (cancelled) {
         return;

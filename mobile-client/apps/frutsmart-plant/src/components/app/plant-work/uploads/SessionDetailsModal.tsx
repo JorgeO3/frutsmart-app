@@ -71,6 +71,7 @@ interface SessionDetailsModalProps {
   visible: boolean;
   onClose: () => void;
   onAction: (action: string) => void;
+  canDelete: boolean;
 }
 
 interface RingProgressBarProps {
@@ -99,6 +100,7 @@ interface ActionButtonsProps {
   status: SessionStatus;
   onAction: (action: string) => void;
   onClose: () => void;
+  canDelete: boolean;
 }
 
 // ============================================================================
@@ -391,7 +393,7 @@ const StatusMessage = memo<StatusMessageProps>(({ type, message }) => {
 StatusMessage.displayName = "StatusMessage";
 
 const ActionButtons = memo<ActionButtonsProps>(
-  ({ status, onAction, onClose }) => {
+  ({ status, onAction, onClose, canDelete }) => {
     const renderButtons = () => {
       switch (status) {
         case "completed":
@@ -418,6 +420,19 @@ const ActionButtons = memo<ActionButtonsProps>(
               >
                 <Text style={styles.outlineButtonText}>Cerrar</Text>
               </TouchableOpacity>
+              {canDelete ? (
+                <TouchableOpacity
+                  style={[styles.actionButton, styles.redButton]}
+                  onPress={() => onAction("delete")}
+                >
+                  <MaterialCommunityIcons
+                    name="trash-can-outline"
+                    size={SIZES.icon.button}
+                    color={COLORS.error}
+                  />
+                  <Text style={styles.redButtonText}>Eliminar</Text>
+                </TouchableOpacity>
+              ) : null}
               <TouchableOpacity
                 style={[styles.actionButton, styles.primaryButton]}
                 onPress={() => onAction("retry")}
@@ -572,7 +587,7 @@ ActionButtons.displayName = "ActionButtons";
 // ============================================================================
 
 const SessionDetailsModal = memo<SessionDetailsModalProps>(
-  ({ session, visible, onClose, onAction }) => {
+  ({ session, visible, onClose, onAction, canDelete }) => {
     const computedData = useMemo(() => {
       if (!session) return null;
 
@@ -761,6 +776,7 @@ const SessionDetailsModal = memo<SessionDetailsModalProps>(
               status={session.status}
               onAction={onAction}
               onClose={onClose}
+              canDelete={canDelete}
             />
           </View>
         </SafeAreaView>

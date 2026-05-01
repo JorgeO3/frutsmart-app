@@ -1,6 +1,8 @@
-import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useRef, useState } from "react";
 import {
+  AppState,
   ActivityIndicator,
+  InteractionManager,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -9,6 +11,7 @@ import {
 
 import * as Crypto from "expo-crypto";
 import { useRouter } from "expo-router";
+import { useFocusEffect } from "@react-navigation/native";
 import isEqual from "react-fast-compare";
 
 // --- State & Hooks ---
@@ -172,13 +175,28 @@ const PictureScreenComponent = () => {
     navigateToDetection(photo);
   }, [photo, navigateToDetection]);
 
-  // Launch camera automatically on initial mount
-  useEffect(() => {
-    if (!isInitialCaptureComplete()) {
-      markInitialCaptureAttempted();
-      handleCapture();
-    }
-  }, [handleCapture, isInitialCaptureComplete, markInitialCaptureAttempted]);
+  useFocusEffect(
+    useCallback(() => {
+      if (isInitialCaptureComplete()) {
+        return undefined;
+      }
+
+      const task = InteractionManager.runAfterInteractions(() => {
+        if (AppState.currentState !== "active") {
+          return;
+        }
+
+        if (isInitialCaptureComplete()) {
+          return;
+        }
+
+        markInitialCaptureAttempted();
+        void handleCapture();
+      });
+
+      return () => task.cancel();
+    }, [handleCapture, isInitialCaptureComplete, markInitialCaptureAttempted]),
+  );
 
   // --- Render Logic ---
   if (loading) {

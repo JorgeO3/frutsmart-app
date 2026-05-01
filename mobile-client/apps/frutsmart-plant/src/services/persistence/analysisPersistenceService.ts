@@ -84,6 +84,13 @@ export class AnalysisPersistenceService {
         classification.internal.rawPhotoUri = newInternalRawUri;
       }
 
+      // Mover la foto segmentada interna (si existe)
+      if (classification.internal?.segmentedPhotoUri) {
+        const newInternalSegmentedUri = `${permanentDir}internal_segmented_${i}.webp`;
+        movePromises.push(FileSystem.moveAsync({ from: classification.internal.segmentedPhotoUri, to: newInternalSegmentedUri }));
+        classification.internal.segmentedPhotoUri = newInternalSegmentedUri;
+      }
+
       // Mover todos los segmentos clasificados
       classification.external.classifiedSegments.forEach((segment, j) => {
         const segmentUri = segment.uri;

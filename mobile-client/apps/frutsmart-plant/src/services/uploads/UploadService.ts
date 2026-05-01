@@ -3,7 +3,10 @@ import * as FileSystem from "expo-file-system/legacy";
 
 import { database } from "@adapters/repository/Database";
 import type { UploadJobRow } from "@adapters/repository/types";
-import { apiBaseUrl } from "@src/config/authConfig";
+import {
+  apiBaseUrl,
+  uploadJobDeletionEnabled,
+} from "@src/config/authConfig";
 
 import type { UploadEvent } from "skybolt";
 import * as Skybolt from "skybolt";
@@ -36,6 +39,11 @@ type PreparedSkyboltItem = {
 const analysisFilesCache = new Map<string, AnalysisUploadFile[]>();
 const preparedSkyboltItemsCache = new Map<string, PreparedSkyboltItem[]>();
 
+function clearUploadJobCaches(jobId: string): void {
+  analysisFilesCache.delete(jobId);
+  preparedSkyboltItemsCache.delete(jobId);
+}
+
 function inferContentType(fileName: string): string {
   const lower = fileName.toLowerCase();
   if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) return "image/jpeg";
@@ -57,8 +65,11 @@ async function collectAnalysisUris(analysisId: string): Promise<string[]> {
 
   const uris = new Set<string>();
   const add = (value: string | null | undefined) => {
-    if (typeof value === "string" && value.length > 0) {
-      uris.add(value);
+    if (typeof value === "string") {
+      const trimmed = value.trim();
+      if (trimmed.length > 0) {
+        uris.add(trimmed);
+      }
     }
   };
 
@@ -81,11 +92,13 @@ async function buildAnalysisFiles(analysisId: string): Promise<AnalysisUploadFil
   }
 
   const md5Results = await Skybolt.extractMD5FromFiles(uris);
-  const md5ByUri = new Map(md5Results.map((result) => [result.uri, result]));
+  const md5ByUri = new Map(
+    (md5Results ?? []).filter(r => r?.uri).map((r) => [r.uri, r])
+  );
 
   const files: AnalysisUploadFile[] = [];
   for (const uri of uris) {
-    const md5Info = md5ByUri.get(uri);
+    const md5Info = md5ByUri.get(uri) ?? md5ByUri.get(uri.trim());
     const info = await FileSystem.getInfoAsync(uri);
 
     if (!info.exists) {
@@ -97,6 +110,12 @@ async function buildAnalysisFiles(analysisId: string): Promise<AnalysisUploadFil
     const sizeBytes = md5Info?.sizeBytes ?? info.size ?? 0;
 
     if (!md5Info?.md5Hex) {
+      console.warn("[UploadService] md5 lookup failed", {
+        uri,
+        uriTrimmed: uri.trim(),
+        md5ByUriKeys: Array.from(md5ByUri.keys()).slice(0, 10),
+        infoExists: info.exists,
+      });
       throw new Error(`No se pudo obtener md5 para archivo ${uri}`);
     }
 
@@ -119,17 +138,33 @@ async function postJson<T>(
   token: string,
 ): Promise<T> {
   const url = `${apiBaseUrl}/api/v1${path}`;
-  const response = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(body),
-  });
+  const payloadStr = JSON.stringify(body);
+  console.log("[postJson] fetch start", { url, bodyLen: payloadStr.length });
+  const startMs = Date.now();
+  let response: Response;
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+    response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: payloadStr,
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+  } catch (err) {
+    console.log("[postJson] fetch threw", { url, elapsedMs: Date.now() - startMs, error: String(err) });
+    throw err;
+  }
+  console.log("[postJson] fetch returned", { url, status: response.status, ok: response.ok, elapsedMs: Date.now() - startMs });
 
+  console.log("[postJson] reading body...", { status: response.status });
   const text = await response.text();
+  console.log("[postJson] body read", { byteLen: text.length, preview: text.slice(0, 120) });
   const payload = text
     ? (() => {
         try {
@@ -141,9 +176,11 @@ async function postJson<T>(
     : null;
 
   if (!response.ok) {
-    throw new Error(
-      `Upload backend ${response.status} ${response.statusText}: ${text || "sin cuerpo"}`,
-    );
+    const friendly =
+      typeof payload === "object" && payload !== null
+        ? ((payload as Record<string, unknown>).message as string) ?? response.statusText
+        : response.statusText;
+    throw new Error(`Upload backend ${response.status}: ${friendly}`);
   }
 
   return payload as T;
@@ -237,14 +274,29 @@ class NativeUploadClient implements NativeUploadApi {
       return { skyboltSessionId: job.skybolt_session_id };
     }
 
-    const items = preparedSkyboltItemsCache.get(input.jobId);
+    let items = preparedSkyboltItemsCache.get(input.jobId);
     if (!items || items.length === 0) {
-      throw new Error(
-        "No hay manifest de upload en memoria para iniciar sesion nativa. Reintenta desde create_session.",
-      );
+      console.log("[NativeUploadClient] cache miss, rebuilding manifest", { jobId: input.jobId });
+      const files = analysisFilesCache.get(input.jobId) ??
+        (job.quality_analysis_id ? await buildAnalysisFiles(job.quality_analysis_id) : null);
+      if (!files || files.length === 0) {
+        throw new Error(
+          "No hay manifest de upload en memoria ni es posible reconstruirlo desde quality_analysis_id.",
+        );
+      }
+      analysisFilesCache.set(input.jobId, files);
+      items = files.map((file) => ({
+        clientItemId: file.clientItemId,
+        localUri: file.localUri,
+        blobName: `uploads/${input.backendSessionId}/${file.fileName}`,
+        contentType: file.contentType,
+        sizeBytes: file.sizeBytes,
+        md5Hex: file.md5,
+      }));
+      preparedSkyboltItemsCache.set(input.jobId, items);
     }
 
-    const skyboltSessionId = `skybolt-${input.backendSessionId}`;
+    const skyboltSessionId = input.backendSessionId;
 
     await Skybolt.initializeSession({
       sessionId: skyboltSessionId,
@@ -259,17 +311,26 @@ class NativeUploadClient implements NativeUploadApi {
     });
 
     await Skybolt.startSession(skyboltSessionId);
+    console.log("[NativeUploadClient DIAG] startSession returned, verifying session exists...");
+
+    const progress = await Skybolt.getSessionProgress(skyboltSessionId);
+    console.log("[NativeUploadClient DIAG] getSessionProgress after start:", progress ? `status=${progress.status}, files=${progress.totalFiles}` : "null — session NOT FOUND in native!");
+
     return { skyboltSessionId };
   }
 }
 
 export class UploadService {
   private readonly scheduler: UploadScheduler;
+  private readonly pollingTimers = new Map<string, ReturnType<typeof setInterval>>();
 
   constructor() {
     this.scheduler = new UploadScheduler(
       new BackendUploadClient(),
       new NativeUploadClient(),
+      undefined, // default config
+      undefined, // default repo
+      (jobId, skyboltSessionId) => this.startProgressPolling(jobId, skyboltSessionId),
     );
   }
 
@@ -320,6 +381,7 @@ export class UploadService {
   }
 
   public async handleSkyboltEvent(event: UploadEvent): Promise<void> {
+    console.log("[UploadService DIAG] handleSkyboltEvent:", event.type, "sessionId:", (event as { sessionId?: string }).sessionId);
     switch (event.type) {
       case "session:started":
       case "session:resumed":
@@ -372,8 +434,30 @@ export class UploadService {
     const job = await database.uploadJobs.findJobById(jobId);
     if (!job) return;
 
-    await database.uploadJobs.updateJobStep(job.id, job.pipeline_step, "pending");
+    await database.uploadJobs.updateJobStep(job.id, job.pipeline_step, "pending", {
+      clearAttemptWindow: true,
+    });
     await this.runSchedulerTick();
+  }
+
+  public async removeJob(jobId: string): Promise<void> {
+    if (!uploadJobDeletionEnabled) {
+      throw new Error("La eliminacion de jobs solo esta habilitada en local.");
+    }
+
+    const job = await database.uploadJobs.findJobById(jobId);
+    if (!job) return;
+
+    if (job.skybolt_session_id) {
+      try {
+        await Skybolt.cancelSession(job.skybolt_session_id);
+      } catch (error) {
+        console.warn("[UploadService] cancelSession nativa fallo antes de borrar job", error);
+      }
+    }
+
+    await database.uploadJobs.deleteJob(job.id);
+    clearUploadJobCaches(job.id);
   }
 
   public async cancelJob(jobId: string): Promise<void> {
@@ -389,8 +473,7 @@ export class UploadService {
     }
 
     await database.uploadJobs.markJobFailed(job.id, "cancelled_by_user");
-    analysisFilesCache.delete(job.id);
-    preparedSkyboltItemsCache.delete(job.id);
+    clearUploadJobCaches(job.id);
   }
 
   public async pauseJob(jobId: string): Promise<void> {
@@ -421,11 +504,25 @@ export class UploadService {
   }
 
   private async handleSessionCompleted(sessionId: string): Promise<void> {
+    if (this.sessionAlreadyHandled.has(sessionId)) {
+      console.log("[UploadService DIAG] handleSessionCompleted: already handled, skipping:", sessionId);
+      return;
+    }
+    this.sessionAlreadyHandled.add(sessionId);
+
+    console.log("[UploadService DIAG] handleSessionCompleted:", sessionId);
     const job = await database.uploadJobs.findBySkyboltSessionId(sessionId);
-    if (!job) return;
+    if (!job) {
+      console.log("[UploadService DIAG] handleSessionCompleted: no job found for sessionId:", sessionId);
+      return;
+    }
 
     await this.syncMetricsFromSessionId(sessionId);
-    await database.uploadJobs.updateJobStep(job.id, "complete_session", "pending");
+    await database.uploadJobs.updateJobStep(job.id, "complete_session", "pending", {
+      resetAttempts: true,
+      clearAttemptWindow: true,
+    });
+    console.log("[UploadService DIAG] handleSessionCompleted: job advanced to complete_session, calling runSchedulerTick");
     await this.runSchedulerTick();
   }
 
@@ -433,9 +530,16 @@ export class UploadService {
     sessionId: string,
     reason: string,
   ): Promise<void> {
+    if (this.sessionAlreadyHandled.has(sessionId)) {
+      console.log("[UploadService DIAG] handleSessionFailed: already handled, skipping:", sessionId);
+      return;
+    }
+    this.sessionAlreadyHandled.add(sessionId);
+
     const job = await database.uploadJobs.findBySkyboltSessionId(sessionId);
     if (!job) return;
 
+    this.stopPolling(job.id);
     await database.uploadJobs.markJobFailed(job.id, reason);
   }
 
@@ -452,6 +556,61 @@ export class UploadService {
       totalBytes: progress.totalBytes,
       uploadedBytes: progress.uploadedBytes,
     });
+  }
+
+  // ---------------------------------------------------------------------------
+  // Polling fallback — safety net por si los eventos nativos no llegan a JS.
+  // El polling solo se detiene cuando la sesión termina (completed/failed) o
+  // cuando el evento sí llega (evita doble procesamiento con un flag).
+  // ---------------------------------------------------------------------------
+
+  private sessionAlreadyHandled = new Set<string>();
+
+  public startProgressPolling(jobId: string, skyboltSessionId: string): void {
+    if (this.pollingTimers.has(jobId)) return;
+
+    console.log("[UploadService DIAG] startProgressPolling:", { jobId, skyboltSessionId });
+
+    const timer = setInterval(async () => {
+      try {
+        const progress = await Skybolt.getSessionProgress(skyboltSessionId);
+        console.log("[UploadService DIAG] poll result:", { jobId, progress: progress ? `status=${(progress as { status?: string }).status}` : "null" });
+
+        if (!progress) return;
+
+        if (progress.status === "completed") {
+          console.log("[UploadService DIAG] poll detected completed:", skyboltSessionId);
+          this.stopPolling(jobId);
+          if (!this.sessionAlreadyHandled.has(skyboltSessionId)) {
+            this.sessionAlreadyHandled.add(skyboltSessionId);
+            await this.handleSessionCompleted(skyboltSessionId);
+          }
+        } else if (progress.status === "failed") {
+          console.log("[UploadService DIAG] poll detected failed:", skyboltSessionId);
+          this.stopPolling(jobId);
+          if (!this.sessionAlreadyHandled.has(skyboltSessionId)) {
+            this.sessionAlreadyHandled.add(skyboltSessionId);
+            await this.handleSessionFailed(skyboltSessionId, "native_session_failed");
+          }
+        } else {
+          // Still uploading — sync metrics
+          await this.syncMetricsFromSessionId(skyboltSessionId);
+        }
+      } catch (err) {
+        console.log("[UploadService DIAG] poll error:", String(err));
+      }
+    }, 3000);
+
+    this.pollingTimers.set(jobId, timer);
+  }
+
+  public stopPolling(jobId: string): void {
+    const timer = this.pollingTimers.get(jobId);
+    if (timer) {
+      clearInterval(timer);
+      this.pollingTimers.delete(jobId);
+      console.log("[UploadService DIAG] stopPolling:", jobId);
+    }
   }
 }
 

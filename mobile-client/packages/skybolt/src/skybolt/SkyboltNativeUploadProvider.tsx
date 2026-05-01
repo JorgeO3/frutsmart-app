@@ -429,6 +429,7 @@ export function SkyboltNativeUploadProvider({ children }: Props) {
 
   const onEvent = useCallback(
     (event: UploadEvent) => {
+      console.log("[SkyboltNativeUploadProvider DIAG] onEvent received:", event.type, "sessionId:", (event as { sessionId?: string }).sessionId);
       const currentSessionId = sessionRef.current;
 
       const isGlobalEvent =

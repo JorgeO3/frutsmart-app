@@ -49,7 +49,13 @@ const SQL = {
     UPDATE upload_jobs
     SET pipeline_step = ?,
         step_status   = ?,
+        attempts_count = CASE WHEN ? THEN 0 ELSE attempts_count END,
+        last_attempt_at = CASE WHEN ? THEN NULL ELSE last_attempt_at END,
         updated_at    = ?
+    WHERE id = ?;
+  `,
+  DELETE_BY_ID: `
+    DELETE FROM upload_jobs
     WHERE id = ?;
   `,
   SET_BACKEND_SESSION_ID: `
@@ -184,14 +190,23 @@ export class UploadJobsRepository {
     jobId: string,
     pipelineStep: UploadJobPipelineStep,
     stepStatus: UploadJobStatus,
+    options: { resetAttempts?: boolean; clearAttemptWindow?: boolean } = {},
   ): Promise<void> {
     const now = new Date().toISOString();
+    const resetAttempts = options.resetAttempts ?? false;
+    const clearAttemptWindow = resetAttempts || options.clearAttemptWindow === true;
     await this.db.execute(SQL.UPDATE_STEP, [
       pipelineStep,
       stepStatus,
+      resetAttempts ? 1 : 0,
+      clearAttemptWindow ? 1 : 0,
       now,
       jobId,
     ]);
+  }
+
+  public async deleteJob(jobId: string): Promise<void> {
+    await this.db.execute(SQL.DELETE_BY_ID, [jobId]);
   }
 
   public async setBackendSessionId(

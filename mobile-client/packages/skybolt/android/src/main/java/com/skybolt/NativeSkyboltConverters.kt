@@ -53,10 +53,12 @@ internal object NativeSkyboltConverters {
         is Float -> writable.pushDouble(value.toDouble())
         is Double -> writable.pushDouble(value)
         is String -> writable.pushString(value)
+        is ReadableMap -> writable.pushMap(value)
         is Map<*, *> -> {
           @Suppress("UNCHECKED_CAST")
           writable.pushMap(toWritableMap(value as Map<String, Any?>))
         }
+        is ReadableArray -> writable.pushArray(value)
         is List<*> -> writable.pushArray(toWritableArray(value as List<Any?>))
         else -> writable.pushString(value.toString())
       }
@@ -83,10 +85,12 @@ internal object NativeSkyboltConverters {
       is Float -> target.putDouble(key, value.toDouble())
       is Double -> target.putDouble(key, value)
       is String -> target.putString(key, value)
+      is ReadableMap -> target.putMap(key, value)
       is Map<*, *> -> {
         @Suppress("UNCHECKED_CAST")
         target.putMap(key, toWritableMap(value as Map<String, Any?>))
       }
+      is ReadableArray -> target.putArray(key, value)
       is List<*> -> target.putArray(key, toWritableArray(value as List<Any?>))
       else -> target.putString(key, value.toString())
     }

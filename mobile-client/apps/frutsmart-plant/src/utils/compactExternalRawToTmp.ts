@@ -1,7 +1,7 @@
 import { tempFileManager } from "@services/temp-file-manager/TempFileManager";
 import { PHOTO_CAPTURE_BUDGET } from "@src/constants/spaceBudgets";
 import { resizeToWebp } from "@utils/resizeToWebp";
-import { ensureSpace } from "@utils/storage";
+import { getFreeBytes } from "@utils/storage";
 import * as FileSystem from "expo-file-system/legacy";
 
 export async function compactExternalRawToTmp(
@@ -9,11 +9,12 @@ export async function compactExternalRawToTmp(
   maxLongEdge = 2560,
   quality = 0.95,
 ): Promise<string> {
-  // Asegura algo de espacio y limpia TMP si hace falta
-  await ensureSpace(PHOTO_CAPTURE_BUDGET, {
-    tempDirUri: tempFileManager.getTempDirUri(),
-    tryCleanup: true,
-  });
+  const free = await getFreeBytes();
+  if (free < PHOTO_CAPTURE_BUDGET) {
+    throw new Error(
+      `Espacio insuficiente: necesita al menos ${(PHOTO_CAPTURE_BUDGET / 1024 / 1024).toFixed(0)} MB libres para procesar la imagen.`
+    );
+  }
 
   // Destino en tu TMP (se borra al reiniciar sesión)
   const dst = tempFileManager.getNewTempFileUri(".webp");
