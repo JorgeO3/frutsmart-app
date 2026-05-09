@@ -4,6 +4,7 @@ import { UUID } from "../../../domain/types";
 import { ClientIdentifier } from "../../../domain/value-objects/client-identifier.vo";
 import { UploadSession } from "../../../domain/entities/upload-session.entity";
 import { UploadSessionsRepo } from "../repositories/upload-sessions.typeorm-repo";
+import { UploadItemsRepository } from "../repositories/upload-items.typeorm-repo";
 import type { IUploadSessionOrmMapper } from "../mappers/upload-session-orm.mapper.port";
 import { UPLOAD_SESSION_ORM_MAPPER } from "../mappers/upload-session-orm.mapper.port";
 import { isUniqueViolation } from "@platform/database/errors/pg-unique-violation";
@@ -19,6 +20,7 @@ export class UploadSessionsRepositoryAdapter
 {
 	constructor(
 		private readonly repo: UploadSessionsRepo,
+		private readonly itemsRepo: UploadItemsRepository,
 		@Inject(UPLOAD_SESSION_ORM_MAPPER)
 		private readonly mapper: IUploadSessionOrmMapper,
 	) {}
@@ -85,5 +87,19 @@ export class UploadSessionsRepositoryAdapter
 	 */
 	isUniqueViolation(err: unknown): boolean {
 		return isUniqueViolation(err);
+	}
+
+	async markItemsAsInProgress(
+		sessionId: UUID,
+		blobNames: string[],
+	): Promise<number> {
+		return this.itemsRepo.markAsInProgress(sessionId, blobNames);
+	}
+
+	async countItemsInSession(
+		sessionId: UUID,
+		blobNames: string[],
+	): Promise<number> {
+		return this.itemsRepo.countInSession(sessionId, blobNames);
 	}
 }

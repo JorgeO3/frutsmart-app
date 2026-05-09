@@ -48,19 +48,25 @@ describe("GetSasBatchUseCase", () => {
 		// mapper = module.get<GetSasBatchMapper>(GET_SAS_BATCH_MAPPER);
 	});
 
-	describe("execute", () => {
-		const blobName = "plant/2025-01-01/item-1/test.jpg";
+  describe("execute", () => {
+    const blobName = "plant/2025-01-01/item-1/test.jpg";
 
-		const validInput: GetSasBatchInput = {
-			sessionId: randomUUID(),
-			items: [
-				{
-					objectKey: blobName,
-					contentType: "image/jpeg",
-				},
-			],
-			ttlMinutes: 60,
-		};
+    const validInput: GetSasBatchInput = {
+      sessionId: randomUUID(),
+      items: [
+        {
+          objectKey: blobName,
+          contentType: "image/jpeg",
+        },
+      ],
+      ttlMinutes: 60,
+    };
+
+    beforeEach(() => {
+      // Defaults: items exist in session, 1 updated
+      mockSessionRepo.countItemsInSession.mockResolvedValue(10);
+      mockSessionRepo.markItemsAsInProgress.mockResolvedValue(1);
+    });
 
 		it("should generate SAS tokens successfully for an OPEN session", async () => {
 			// APP-SAS-HPY-001 - Genera SAS válido (sesión OPEN)
@@ -299,6 +305,7 @@ describe("GetSasBatchUseCase", () => {
 			};
 
 			mockSessionRepo.findById.mockResolvedValue(session);
+			mockSessionRepo.countItemsInSession.mockResolvedValue(0);
 
 			await expect(useCase.execute(inputWithInvalidItem)).rejects.toThrow(
 				ItemNotFoundError,
@@ -333,6 +340,8 @@ describe("GetSasBatchUseCase", () => {
 			};
 
 			mockSessionRepo.findById.mockResolvedValue(session);
+			// 2 blobNames, pero solo 1 existe en la sesión
+			mockSessionRepo.countItemsInSession.mockResolvedValue(1);
 
 			await expect(useCase.execute(inputWithMixedItems)).rejects.toThrow(
 				ItemNotFoundError,
@@ -708,6 +717,7 @@ describe("GetSasBatchUseCase", () => {
 			});
 
 			mockSessionRepo.findById.mockResolvedValue(session);
+			mockSessionRepo.countItemsInSession.mockResolvedValue(0);
 
 			const inputWithNonExistentItems: GetSasBatchInput = {
 				sessionId: validInput.sessionId,
@@ -726,7 +736,7 @@ describe("GetSasBatchUseCase", () => {
 			expect(mockBlobStorage.generateUploadUrls).not.toHaveBeenCalled();
 		});
 
-		it("APP-SAS-STATE-001 marca como IN_PROGRESS los items PENDING solicitados y persiste una sola vez", async () => {
+		it("APP-SAS-STATE-001 marca como IN_PROGRESS los items PENDING solicitados sin persistir el agregado", async () => {
 			const blob1 = "plant/2025/i1.jpg";
 			const blob2 = "plant/2025/i2.jpg";
 
@@ -751,12 +761,14 @@ describe("GetSasBatchUseCase", () => {
 
 			await useCase.execute(input);
 
-			expect(i1.status).toBe("IN_PROGRESS"); // solicitado → IN_PROGRESS
-			expect(i2.status).toBe("PENDING"); // NO solicitado → se queda como estaba
-			expect(mockSessionRepo.save).toHaveBeenCalledTimes(1);
+			// El UPDATE dirigido solo toca el blob solicitado (sin cascade al agregado)
+			expect(mockSessionRepo.markItemsAsInProgress).toHaveBeenCalledWith(
+				session.id,
+				[blob1],
+			);
 		});
 
-		it("APP-SAS-STATE-002 no persiste si no había PENDING (ya estaban IN_PROGRESS/UPLOADED)", async () => {
+		it("APP-SAS-STATE-002 no persiste el agregado; UPDATE dirigido se ejecuta igual (0 filas si ya está IN_PROGRESS)", async () => {
 			const blob = "plant/2025/i1.jpg";
 			const i = makeUploadItem({ blobName: blob, status: "IN_PROGRESS" });
 			const session = makeUploadSession({
@@ -775,11 +787,14 @@ describe("GetSasBatchUseCase", () => {
 				items: [{ objectKey: blob, contentType: "image/jpeg" }],
 			});
 
-			expect(i.status).toBe("IN_PROGRESS");
-			expect(mockSessionRepo.save).not.toHaveBeenCalled(); // nada cambió
+			// UPDATE se ejecuta, pero WHERE status=PENDING matchea 0 filas
+			expect(mockSessionRepo.markItemsAsInProgress).toHaveBeenCalledWith(
+				session.id,
+				[blob],
+			);
 		});
 
-		it("APP-SAS-STATE-003 dedup: ítem duplicado se marca una vez y se persiste una vez", async () => {
+		it("APP-SAS-STATE-003 dedup: ítem duplicado se marca una vez", async () => {
 			const blob = "plant/2025/i1.jpg";
 			const i = makeUploadItem({ blobName: blob, status: "PENDING" });
 			const session = makeUploadSession({
@@ -801,13 +816,16 @@ describe("GetSasBatchUseCase", () => {
 				],
 			});
 
-			expect(i.status).toBe("IN_PROGRESS");
-			expect(mockSessionRepo.save).toHaveBeenCalledTimes(1);
+			// blobNames se deduplican antes del UPDATE
+			expect(mockSessionRepo.markItemsAsInProgress).toHaveBeenCalledWith(
+				session.id,
+				[blob],
+			);
 			const [requests] = mockBlobStorage.generateUploadUrls.mock.calls[0];
 			expect(requests).toHaveLength(1); // deduplicado
 		});
 
-		it("APP-SAS-STATE-004 no marca ni persiste si algún objectKey no existe (falla validación previa)", async () => {
+		it("APP-SAS-STATE-004 no marca si algún objectKey no existe (falla validación previa)", async () => {
 			const exists = "plant/2025/existing.jpg";
 			const missing = "plant/2025/missing.jpg";
 
@@ -819,20 +837,21 @@ describe("GetSasBatchUseCase", () => {
 			});
 
 			mockSessionRepo.findById.mockResolvedValue(session);
+			mockSessionRepo.countItemsInSession.mockResolvedValue(1);
 
 			await expect(
 				useCase.execute({
 					sessionId: randomUUID(),
 					items: [
 						{ objectKey: exists, contentType: "image/jpeg" },
-						{ objectKey: missing, contentType: "image/jpeg" }, // no existe en la sesión
+						{ objectKey: missing, contentType: "image/jpeg" },
 					],
 				}),
 			).rejects.toThrow(ItemNotFoundError);
 
-			// como validamos primero, no se marcó nada ni se guardó
+			// como validamos primero, no se marcó nada
 			expect(i.status).toBe("PENDING");
-			expect(mockSessionRepo.save).not.toHaveBeenCalled();
+			expect(mockSessionRepo.markItemsAsInProgress).not.toHaveBeenCalled();
 			expect(mockBlobStorage.generateUploadUrls).not.toHaveBeenCalled();
 		});
 
@@ -853,7 +872,7 @@ describe("GetSasBatchUseCase", () => {
 				}),
 			).rejects.toThrow(SessionNotOpenError);
 
-			expect(mockSessionRepo.save).not.toHaveBeenCalled();
+			expect(mockSessionRepo.markItemsAsInProgress).not.toHaveBeenCalled();
 			expect(mockBlobStorage.generateUploadUrls).not.toHaveBeenCalled();
 		});
 
@@ -874,7 +893,7 @@ describe("GetSasBatchUseCase", () => {
 
 			expect(res.urls).toHaveLength(0);
 			expect(i.status).toBe("PENDING");
-			expect(mockSessionRepo.save).not.toHaveBeenCalled();
+			expect(mockSessionRepo.markItemsAsInProgress).not.toHaveBeenCalled();
 			expect(mockBlobStorage.generateUploadUrls).not.toHaveBeenCalled();
 		});
 	});

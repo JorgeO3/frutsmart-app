@@ -109,4 +109,44 @@ export class UploadItemsRepository {
 
 		return result;
 	}
+
+	/**
+	 * Marca items como IN_PROGRESS de forma atómica, sin cargar el agregado a memoria.
+	 * Solo toca items en estado PENDING pertenecientes a la sesión indicada.
+	 *
+	 * @returns Número de filas actualizadas.
+	 */
+	async markAsInProgress(
+		sessionId: string,
+		blobNames: string[],
+	): Promise<number> {
+		if (!blobNames?.length) return 0;
+
+		const result = await this.repo
+			.createQueryBuilder()
+			.update(UploadItemEntity)
+			.set({ status: "IN_PROGRESS" as UploadItemStatus })
+			.where("sessionId = :sessionId", { sessionId })
+			.andWhere("blobName IN (:...blobNames)", { blobNames })
+			.andWhere("status = :status", { status: "PENDING" as UploadItemStatus })
+			.execute();
+
+		return result.affected ?? 0;
+	}
+
+	/**
+	 * Cuenta cuántos items de una lista de blob_names pertenecen a una sesión.
+	 */
+	async countInSession(
+		sessionId: string,
+		blobNames: string[],
+	): Promise<number> {
+		if (!blobNames?.length) return 0;
+		return this.repo.count({
+			where: {
+				sessionId,
+				blobName: In(blobNames),
+			},
+		});
+	}
 }

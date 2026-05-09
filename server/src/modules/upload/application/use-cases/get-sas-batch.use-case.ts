@@ -13,7 +13,6 @@ import { GetSasBatchOutput } from "../dto/get-sas-batch/get-sas-batch.output";
 import {
 	BLOB_STORAGE,
 	type IBlobStorage,
-	type SignedUrlRequest,
 } from "../ports/blob-storage.port";
 import {
 	type IUploadSessionsRepository,
@@ -66,35 +65,42 @@ export class GetSasBatchUseCase {
 		// 2) Sesión válida y OPEN
 		const session = await this.fetchAndValidateSession(input.sessionId);
 
-		// 3) Validar que TODOS los items existan en la sesión ANTES de tocar estado
-		for (const it of uniqueItems) {
-			const exists = session.items.some(
-				(sItem) => sItem.location.blobName === it.objectKey,
-			);
-			if (!exists) {
-				throw new ItemNotFoundError(it.objectKey, session.id);
+		// 3) Validar que TODOS los items existan en la sesión (COUNT, sin cargar el agregado)
+		const blobNames = uniqueItems.map((i) => i.objectKey);
+		const itemCount = await this.sessionRepo.countItemsInSession(
+			session.id,
+			blobNames,
+		);
+		if (itemCount < blobNames.length) {
+			// Encontrar cuál falta (poco frecuente, se hace con los datos en memoria de session)
+			for (const it of uniqueItems) {
+				const exists = session.items.some(
+					(sItem) => sItem.location.blobName === it.objectKey,
+				);
+				if (!exists) {
+					throw new ItemNotFoundError(it.objectKey, session.id);
+				}
 			}
 		}
 
-		// 4) Marcar IN_PROGRESS solo los PENDING solicitados y persistir si hubo cambios
-		const requested = new Set(uniqueItems.map((i) => i.objectKey));
-		let touched = 0;
-		for (const item of session.items) {
-			if (requested.has(item.location.blobName) && item.status === "PENDING") {
-				item.markAsInProgress();
-				touched++;
-			}
-		}
-		if (touched > 0) {
-			await this.sessionRepo.save(session);
+		// 4) Marcar IN_PROGRESS de forma atómica (UPDATE dirigido, sin cascade)
+		const updated = await this.sessionRepo.markItemsAsInProgress(
+			session.id,
+			blobNames,
+		);
+		if (updated > 0) {
 			this.logger.debug("Marked items as IN_PROGRESS prior to SAS generation", {
 				sessionId: session.id,
-				touched,
+				touched: updated,
 			});
 		}
 
 		// 5) Preparar requests y normalizar TTL
-		const requests = this.buildStorageRequests(session, uniqueItems);
+		const requests = uniqueItems.map((it) => ({
+			domain: session.domain,
+			objectKey: it.objectKey,
+			contentType: it.contentType,
+		}));
 		const rawTtl = input.ttlMinutes ?? SAS_CONFIG.DEFAULT_TTL_MINUTES;
 		const ttl = Math.max(
 			SAS_CONFIG.MIN_TTL_MINUTES,
@@ -144,29 +150,5 @@ export class GetSasBatchUseCase {
 
 		session.guardCanGenerateSas();
 		return session;
-	}
-
-	private buildStorageRequests(
-		session: UploadSession,
-		items: GetSasBatchInput["items"],
-	): SignedUrlRequest[] {
-		return items.map((item) => this.buildStorageRequest(session, item));
-	}
-
-	private buildStorageRequest(
-		session: UploadSession,
-		item: GetSasBatchInput["items"][number],
-	): SignedUrlRequest {
-		// En este punto ya validamos existencia para todos,
-		// este check es defensivo ante regresiones futuras.
-		if (!session.items.some((i) => i.location.blobName === item.objectKey)) {
-			throw new ItemNotFoundError(item.objectKey, session.id);
-		}
-
-		return {
-			domain: session.domain,
-			objectKey: item.objectKey,
-			contentType: item.contentType,
-		};
 	}
 }

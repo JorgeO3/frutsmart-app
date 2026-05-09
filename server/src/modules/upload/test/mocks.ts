@@ -39,6 +39,8 @@ export class MockUploadSessionsRepository implements IUploadSessionsRepository {
 	findOpenByClientBatchId = jest.fn();
 	save = jest.fn();
 	update = jest.fn();
+	countItemsInSession = jest.fn();
+	markItemsAsInProgress = jest.fn();
 	// biome-ignore format: true
 	isUniqueViolation = jest.fn<
     ReturnType<() => boolean>,

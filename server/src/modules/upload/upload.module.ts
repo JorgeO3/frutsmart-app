@@ -62,6 +62,7 @@ import { UploadSessionsRepositoryAdapter } from "./infrastructure/persistence/ad
 import { UPLOAD_SESSION_ORM_MAPPER } from "./infrastructure/persistence/mappers/upload-session-orm.mapper.port";
 import { UploadSessionOrmMapper } from "./infrastructure/persistence/mappers/upload-session-orm.mapper";
 import { UploadSessionsRepo } from "./infrastructure/persistence/repositories/upload-sessions.typeorm-repo";
+import { UploadItemsRepository } from "./infrastructure/persistence/repositories/upload-items.typeorm-repo";
 
 // External Modules
 import { AzureBlobModule } from "../../platform/integrations/azure/azure-blob.module";
@@ -110,6 +111,7 @@ import { AzureBlobModule } from "../../platform/integrations/azure/azure-blob.mo
 
 		// Infrastructure - TypeORM Repos (internal use only)
 		UploadSessionsRepo,
+		UploadItemsRepository,
 	],
 })
 export class UploadModule {}

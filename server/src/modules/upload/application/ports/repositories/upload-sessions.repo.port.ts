@@ -49,4 +49,23 @@ export interface IUploadSessionsRepository {
 
 	/** Detects if the given error is a unique constraint violation. */
 	isUniqueViolation(err: unknown): boolean;
+
+	/**
+	 * Atomically marks items as IN_PROGRESS without loading the aggregate.
+	 * Only touches PENDING items in the given session.
+	 *
+	 * @returns Number of rows actually updated.
+	 */
+	markItemsAsInProgress(
+		sessionId: UUID,
+		blobNames: string[],
+	): Promise<number>;
+
+	/**
+	 * Counts how many of the given blobNames belong to a session.
+	 */
+	countItemsInSession(
+		sessionId: UUID,
+		blobNames: string[],
+	): Promise<number>;
 }
