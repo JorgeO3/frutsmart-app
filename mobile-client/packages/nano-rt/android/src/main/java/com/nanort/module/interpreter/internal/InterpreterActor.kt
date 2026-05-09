@@ -463,9 +463,13 @@ internal class InterpreterActor(
   private suspend fun ensureModel(modelId: ModelId) {
     if (currentModelId == modelId && state == InterpreterState.READY && interpreter.isLoaded()) return
 
+    logI(tag) { "ensure_model_begin ${kv("model" to modelId.name)}" }
     val modelFile = getModelFile(modelId)
+    logI(tag) { "ensure_model_after_get_file ${kv("model" to modelId.name, "path" to modelFile.name, "sizeB" to modelFile.length())}" }
     val modelHash = getModelHash(modelFile)
+    logI(tag) { "ensure_model_after_hash ${kv("model" to modelId.name, "hashPrefix" to modelHash.take(12))}" }
     val tryGpu = gpuPolicy.shouldUseGpu(modelId)
+    logI(tag) { "ensure_model_after_gpu_policy ${kv("model" to modelId.name, "tryGpu" to tryGpu)}" }
 
     if (tryGpu) {
       tryLoadWithGpuFallback(modelId, modelFile, modelHash)
@@ -584,7 +588,12 @@ internal class InterpreterActor(
     val path = modelFile.absolutePath
     modelHashCache[path]?.let { return it }
 
-    val hash = withContext(Dispatchers.IO) { computeFileHash(modelFile) }
+    // Compute the model hash on the actor thread instead of Dispatchers.IO.
+    // On app startup, Skybolt/WorkManager can heavily saturate Dispatchers.IO with
+    // upload reads, SAS requests and persistence, which starves NanoRT warmup right
+    // after `ensure_model_after_get_file`. The model file is small (~11 MB), so the
+    // dedicated actor thread is a better place for this deterministic one-off read.
+    val hash = computeFileHash(modelFile)
     assertOnActorThread("model_hash_cache_put")
     modelHashCache[path] = hash
     return hash

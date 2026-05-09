@@ -1,26 +1,42 @@
+/**
+ * SkyboltUploadProvider v2 Bridge
+ *
+ * Reemplaza al provider v1. Expone la MISMA interfaz para compatibilidad
+ * con uploads.tsx y saving-classification.tsx, pero usa uploads-v2 internamente.
+ *
+ * Esto elimina los listeners duplicados de addUploadListener que bloqueaban el splash.
+ */
+
 import {
   createContext,
-  useCallback,
   useContext,
-  useEffect,
   useMemo,
   useRef,
-  useState,
   type ReactNode,
 } from "react";
 
-import { uploadService } from "@services/uploads/UploadService";
+import {
+  useAllUploadJobs,
+  createUploadJob as v2CreateUploadJob,
+  retryUploadJob as v2RetryUploadJob,
+  cancelUploadJob as v2CancelUploadJob,
+  pauseUploadJob as v2PauseUploadJob,
+  resumeUploadJob as v2ResumeUploadJob,
+  removeUploadJob as v2RemoveUploadJob,
+} from "@services/uploads-v2";
+import { uploadOrchestrator } from "@services/uploads-v2";
+import * as Skybolt from "skybolt";
+
 import type {
   UploadJobLiveMetrics,
   UploadJobViewModel,
-  UploadPauseReason,
-} from "@services/uploads/types";
+} from "@src/services/uploads/types";
 import { uploadJobDeletionEnabled } from "@src/config/authConfig";
+import type { UploadJobSnapshot } from "@services/uploads-v2";
 
-import type { UploadEvent } from "skybolt";
-import * as Skybolt from "skybolt";
-import { SkyboltNativeUploadProvider } from "skybolt";
-import { getDefaultSkyboltUploadConfig } from "@src/config/skyboltConfig";
+// ---------------------------------------------------------------------------
+// Types (misma interfaz que v1)
+// ---------------------------------------------------------------------------
 
 type SkyboltUploadContextValue = {
   jobs: UploadJobViewModel[];
@@ -35,27 +51,9 @@ type SkyboltUploadContextValue = {
   forceRetryJob: (jobId: string) => Promise<void>;
   cancelJob: (jobId: string) => Promise<void>;
   removeJob: (jobId: string) => Promise<void>;
+  notifyAuthRefreshed: () => Promise<void>;
   uploadJobDeletionEnabled: boolean;
 };
-
-type JobProgressSnapshot = {
-  uploadedBytes: number;
-  atMs: number;
-};
-
-const RECENT_PROGRESS_STALE_MS = 8000;
-const MAX_SPEED_SAMPLE_WINDOW_MS = 12000;
-const MIN_SPEED_SAMPLE_WINDOW_MS = 250;
-
-const defaultLiveMetrics = (): UploadJobLiveMetrics => ({
-  speedBytesPerSec: null,
-  estimatedRemainingSeconds: null,
-  pauseReason: null,
-  nextRetryAtMs: null,
-  retryAfterMs: null,
-  currentItemId: null,
-  lastProgressAtMs: null,
-});
 
 const SkyboltUploadContext = createContext<SkyboltUploadContextValue | null>(
   null,
@@ -76,311 +74,166 @@ type Props = {
 };
 
 // ---------------------------------------------------------------------------
-// Inner provider: jobs + resiliencia
+// Mapper: UploadJobSnapshot (v2) → UploadJobViewModel (v1 interface)
 // ---------------------------------------------------------------------------
 
-const SkyboltUploadJobsInnerProvider = ({ children }: Props) => {
-  const [jobs, setJobs] = useState<UploadJobViewModel[]>([]);
-  const [liveMetricsByJobId, setLiveMetricsByJobId] = useState<
-    Record<string, UploadJobLiveMetrics>
-  >({});
-  const [activeJob, setActiveJob] = useState<UploadJobViewModel | null>(null);
-  const [isRecovering, setIsRecovering] = useState(true);
+function snapshotToViewModel(snap: UploadJobSnapshot): UploadJobViewModel {
+  const ctx = snap.context;
+  return {
+    id: snap.jobId,
+    qualityAnalysisId: ctx.analysisId || null,
+    domain: ctx.domain,
+    skyboltSessionId: ctx.skyboltSessionId,
+    pipelineStep: snap.state.split(".")[0] as UploadJobViewModel["pipelineStep"],
+    status: snap.displayStatus === "permanently_failed" ? "failed" : (snap.displayStatus as UploadJobViewModel["status"]),
+    totalFiles: ctx.totalFiles,
+    completedFiles: ctx.completedFiles,
+    totalBytes: ctx.totalBytes,
+    uploadedBytes: ctx.uploadedBytes,
+    lastError: ctx.lastError,
+    attemptsCount: ctx.attempts,
+    createdAt: new Date(ctx.createdAt).toISOString(),
+    updatedAt: new Date(ctx.createdAt).toISOString(),
+  };
+}
 
-  const lastSnapshotsRef = useRef<Record<string, JobProgressSnapshot>>({});
-  const jobIdBySessionIdRef = useRef<Record<string, string>>({});
+// ---------------------------------------------------------------------------
+// Provider
+// ---------------------------------------------------------------------------
 
-  const resolveJobIdFromSession = useCallback((sessionId?: string): string | null => {
-    if (!sessionId) return null;
-    return jobIdBySessionIdRef.current[sessionId] ?? null;
-  }, []);
+export const SkyboltUploadProvider = ({ children }: Props) => {
+  console.log("[DIAG] SkyboltUploadProvider — render");
+  const ts = Date.now();
+  const isRecovering = false;
 
-  const patchLiveMetrics = useCallback(
-    (jobId: string, patch: Partial<UploadJobLiveMetrics>) => {
-      setLiveMetricsByJobId((prev) => {
-        const current = prev[jobId] ?? defaultLiveMetrics();
-        return {
-          ...prev,
-          [jobId]: {
-            ...current,
-            ...patch,
-          },
-        };
-      });
-    },
-    [],
+  // Read jobs from v2 store
+  const snapshots = useAllUploadJobs();
+  console.log("[DIAG] SkyboltUploadProvider — snapshots:", snapshots.length > 0
+    ? snapshots.map(s => ({
+        jobId: s.jobId.slice(0, 8),
+        state: s.state,
+        skyboltSessionId: s.context.skyboltSessionId?.slice(0, 8) ?? null,
+        backendSessionId: s.context.backendSessionId?.slice(0, 8) ?? null,
+        progress: `${s.context.completedFiles ?? 0}/${s.context.totalFiles ?? 0}`,
+      }))
+    : "0 jobs", "elapsed:", Date.now() - ts);
+
+  const jobs = useMemo(
+    () => snapshots.map(snapshotToViewModel),
+    [snapshots],
   );
 
-  const refreshJobs = useCallback(async () => {
-    const viewModels = await uploadService.getAllJobsView();
+  console.log("[DIAG] SkyboltUploadProvider — jobs count:", jobs.length);
 
-    const now = Date.now();
-    const nextSessionMap: Record<string, string> = {};
-    const nextSnapshots: Record<string, JobProgressSnapshot> = {};
+  const activeJob = useMemo(() => jobs[0] ?? null, [jobs]);
 
-    setLiveMetricsByJobId((prev) => {
-      const next = { ...prev };
+  // Live metrics: compute transfer rate & ETA via exponential moving average
+  const metricsRef = useRef<Map<string, { lastBytes: number; lastTime: number; rate: number }>>(new Map());
 
-      for (const job of viewModels) {
-        if (job.skyboltSessionId) {
-          nextSessionMap[job.skyboltSessionId] = job.id;
+  const liveMetricsByJobId = useMemo<Record<string, UploadJobLiveMetrics>>(
+    () => {
+      const now = Date.now();
+      const map: Record<string, UploadJobLiveMetrics> = {};
+      for (const snap of snapshots) {
+        const ctxSnap = snap.context;
+
+        let metric = metricsRef.current.get(snap.jobId);
+        if (!metric) {
+          metric = { lastBytes: 0, lastTime: now, rate: 0 };
+          metricsRef.current.set(snap.jobId, metric);
         }
 
-        const prevSnapshot = lastSnapshotsRef.current[job.id];
-        const prevMetrics = next[job.id] ?? defaultLiveMetrics();
-        const currentSnapshot: JobProgressSnapshot = {
-          uploadedBytes: job.uploadedBytes,
-          atMs: now,
-        };
-
-        let speedBytesPerSec = prevMetrics.speedBytesPerSec;
-        let lastProgressAtMs = prevMetrics.lastProgressAtMs;
-
-        if (prevSnapshot) {
-          const deltaBytes = job.uploadedBytes - prevSnapshot.uploadedBytes;
-          const rawDeltaMs = Math.max(1, now - prevSnapshot.atMs);
-          const deltaMs = Math.min(rawDeltaMs, MAX_SPEED_SAMPLE_WINDOW_MS);
-
-          if (deltaBytes < 0) {
-            speedBytesPerSec = null;
-            lastProgressAtMs = null;
-          } else if (deltaBytes > 0 && rawDeltaMs >= MIN_SPEED_SAMPLE_WINDOW_MS) {
-            const instantSpeed = (deltaBytes * 1000) / deltaMs;
-            speedBytesPerSec = speedBytesPerSec
-              ? speedBytesPerSec * 0.7 + instantSpeed * 0.3
-              : instantSpeed;
-            lastProgressAtMs = now;
-          } else if (lastProgressAtMs && now - lastProgressAtMs > RECENT_PROGRESS_STALE_MS) {
-            speedBytesPerSec = null;
+        const updatedBytes = ctxSnap.uploadedBytes ?? 0;
+        if (updatedBytes > metric.lastBytes) {
+          const timeDiffMs = now - metric.lastTime;
+          if (timeDiffMs > 500) {
+            const instantRate = ((updatedBytes - metric.lastBytes) / timeDiffMs) * 1000;
+            metric.rate = metric.rate === 0 ? instantRate : metric.rate * 0.7 + instantRate * 0.3;
+            metric.lastBytes = updatedBytes;
+            metric.lastTime = now;
           }
         }
 
-        const remainingBytes = Math.max(0, job.totalBytes - job.uploadedBytes);
-        const estimatedRemainingSeconds =
-          speedBytesPerSec && speedBytesPerSec > 1024 && remainingBytes > 0
-            ? Math.round(remainingBytes / speedBytesPerSec)
-            : null;
+        const remainingBytes = (ctxSnap.totalBytes ?? 0) - updatedBytes;
+        const eta = metric.rate > 0 && remainingBytes > 0 ? remainingBytes / metric.rate : 0;
 
-        const pauseReason: UploadPauseReason | null =
-          job.pipelineStep === "upload" && job.status === "pending"
-            ? (prevMetrics.pauseReason ?? "manual")
-            : null;
-
-        if (job.pipelineStep !== "upload" || job.status !== "running") {
-          speedBytesPerSec = null;
-        }
-
-        next[job.id] = {
-          ...prevMetrics,
-          speedBytesPerSec,
-          estimatedRemainingSeconds,
-          pauseReason,
-          lastProgressAtMs,
+        map[snap.jobId] = {
+          speedBytesPerSec: metric.rate > 0 ? metric.rate : null,
+          estimatedRemainingSeconds: eta > 0 ? eta : null,
+          pauseReason: null,
+          nextRetryAtMs: null,
+          retryAfterMs: null,
+          currentItemId: null,
+          lastProgressAtMs: metric.rate > 0 ? now : null,
         };
-
-        nextSnapshots[job.id] = currentSnapshot;
       }
-
-      const aliveJobIds = new Set(viewModels.map((job) => job.id));
-      for (const jobId of Object.keys(next)) {
-        if (!aliveJobIds.has(jobId)) {
-          delete next[jobId];
-        }
-      }
-
-      return next;
-    });
-
-    lastSnapshotsRef.current = nextSnapshots;
-    jobIdBySessionIdRef.current = nextSessionMap;
-
-    setJobs(viewModels);
-    setActiveJob(viewModels[0] ?? null);
-  }, []);
-
-  const handleUploadEvent = useCallback(
-    async (event: UploadEvent) => {
-      console.log("[SkyboltUploadProvider DIAG] handleUploadEvent received:", event.type, "sessionId:", (event as { sessionId?: string }).sessionId);
-
-      if (event.type === "item:progress") {
-        const jobId = resolveJobIdFromSession(event.sessionId);
-        if (jobId) {
-          patchLiveMetrics(jobId, {
-            currentItemId: event.payload.clientItemId,
-          });
-        }
-      }
-
-      if (event.type === "session:paused") {
-        const jobId = resolveJobIdFromSession(event.sessionId);
-        if (jobId) {
-          patchLiveMetrics(jobId, {
-            pauseReason: event.reason,
-          });
-        }
-      }
-
-      if (event.type === "session:resumed" || event.type === "session:started") {
-        const jobId = resolveJobIdFromSession(event.sessionId);
-        if (jobId) {
-          patchLiveMetrics(jobId, {
-            pauseReason: null,
-            retryAfterMs: null,
-            nextRetryAtMs: null,
-          });
-        }
-      }
-
-      if (event.type === "auth:required") {
-        for (const sessionId of event.pendingSessions) {
-          const jobId = resolveJobIdFromSession(sessionId);
-          if (jobId) {
-            patchLiveMetrics(jobId, {
-              pauseReason: "auth",
-            });
-          }
-        }
-      }
-
-      if (event.type === "error:rate-limited" || event.type === "error:throttled") {
-        const jobId = resolveJobIdFromSession(event.sessionId);
-        if (jobId) {
-          const retryAfterMs = Math.max(0, event.payload.retryAfterMs || 0);
-          patchLiveMetrics(jobId, {
-            retryAfterMs,
-            nextRetryAtMs: Date.now() + retryAfterMs,
-          });
-        }
-      }
-
-      if (event.type === "error:network") {
-        const jobId = resolveJobIdFromSession(event.sessionId);
-        if (jobId) {
-          patchLiveMetrics(jobId, {
-            pauseReason: "network",
-          });
-        }
-      }
-
-      // aquí entra la resiliencia, sin importar en qué pantalla estés
-      console.log("[SkyboltUploadProvider DIAG] forwarding event to uploadService.handleSkyboltEvent:", event.type);
-      await uploadService.handleSkyboltEvent(event);
-      await refreshJobs();
+      return map;
     },
-    [patchLiveMetrics, refreshJobs, resolveJobIdFromSession],
+    [snapshots],
   );
 
-  const enqueueUploadFromAnalysis = useCallback(
-    async (analysisId: string) => {
-      const jobId = await uploadService.createJobFromAnalysis(analysisId);
-      console.log("Created upload job from analysis", { jobId });
-      await refreshJobs();
-    },
-    [refreshJobs],
-  );
+  // Actions bridge to v2
+  const refreshJobs = async () => {
+    // In v2, the store is reactive; no manual refresh needed
+  };
 
-  const startJob = useCallback(
-    async (jobId: string) => {
-      await uploadService.startJob(jobId);
-      await refreshJobs();
-    },
-    [refreshJobs],
-  );
+  const enqueueUploadFromAnalysis = async (analysisId: string) => {
+    await v2CreateUploadJob(analysisId);
+  };
 
-  const pauseJob = useCallback(
-    async (jobId: string) => {
-      await uploadService.pauseJob(jobId);
-      await refreshJobs();
-    },
-    [refreshJobs],
-  );
+  const startJob = async (jobId: string) => {
+    await uploadOrchestrator.startJob(jobId);
+  };
 
-  const resumeJob = useCallback(
-    async (jobId: string) => {
-      await uploadService.resumeJob(jobId);
-      await refreshJobs();
-    },
-    [refreshJobs],
-  );
+  const pauseJob = async (jobId: string) => {
+    await v2PauseUploadJob(jobId);
+  };
 
-  const forceRetryJob = useCallback(
-    async (jobId: string) => {
-      await uploadService.forceRetryJob(jobId);
-      await refreshJobs();
-    },
-    [refreshJobs],
-  );
+  const resumeJob = async (jobId: string) => {
+    await v2ResumeUploadJob(jobId);
+  };
 
-  const cancelJob = useCallback(
-    async (jobId: string) => {
-      await uploadService.cancelJob(jobId);
-      await refreshJobs();
-    },
-    [refreshJobs],
-  );
+  const forceRetryJob = async (jobId: string) => {
+    await v2RetryUploadJob(jobId);
+  };
 
-  const removeJob = useCallback(
-    async (jobId: string) => {
-      await uploadService.removeJob(jobId);
-      await refreshJobs();
-    },
-    [refreshJobs],
-  );
+  const cancelJob = async (jobId: string) => {
+    await v2CancelUploadJob(jobId);
+  };
 
-  useEffect(() => {
-    let mounted = true;
+  const removeJob = async (jobId: string) => {
+    await v2RemoveUploadJob(jobId);
+  };
 
-    (async () => {
-      try {
-        await uploadService.recoverPendingJobs();
-        if (!mounted) return;
-        await refreshJobs();
-      } finally {
-        if (mounted) setIsRecovering(false);
-      }
-    })();
-
-    const subscription = Skybolt.addUploadListener((evt: UploadEvent) => {
-      void handleUploadEvent(evt);
-    });
-    console.log("[SkyboltUploadProvider DIAG] addUploadListener registered");
-
-    return () => {
-      mounted = false;
-      subscription.remove();
-    };
-  }, [handleUploadEvent, refreshJobs]);
+  const notifyAuthRefreshed = async () => {
+    await Skybolt.notifyAuthRefreshed();
+  };
 
   const value = useMemo<SkyboltUploadContextValue>(
-    () => ({
-      jobs,
-      liveMetricsByJobId,
-      activeJob,
-      isRecovering,
-      refreshJobs,
-      enqueueUploadFromAnalysis,
-      startJob,
-      pauseJob,
-      resumeJob,
-      forceRetryJob,
-      cancelJob,
-      removeJob,
-      uploadJobDeletionEnabled,
-    }),
+    () => {
+      console.log("[DIAG] SkyboltUploadProvider — value memo recalculated");
+      return {
+        jobs,
+        liveMetricsByJobId,
+        activeJob,
+        isRecovering,
+        refreshJobs,
+        enqueueUploadFromAnalysis,
+        startJob,
+        pauseJob,
+        resumeJob,
+        forceRetryJob,
+        cancelJob,
+        removeJob,
+        notifyAuthRefreshed,
+        uploadJobDeletionEnabled,
+      };
+    },
     [
       jobs,
       liveMetricsByJobId,
       activeJob,
       isRecovering,
-      refreshJobs,
-      enqueueUploadFromAnalysis,
-      startJob,
-      pauseJob,
-      resumeJob,
-      forceRetryJob,
-      cancelJob,
-      removeJob,
-      uploadJobDeletionEnabled,
     ],
   );
 
@@ -388,38 +241,5 @@ const SkyboltUploadJobsInnerProvider = ({ children }: Props) => {
     <SkyboltUploadContext.Provider value={value}>
       {children}
     </SkyboltUploadContext.Provider>
-  );
-};
-
-// ---------------------------------------------------------------------------
-// Provider principal: configura Skybolt al arrancar y monta los providers
-// ---------------------------------------------------------------------------
-
-export const SkyboltUploadProvider = ({ children }: Props) => {
-  useEffect(() => {
-    (async () => {
-      try {
-        const settings = getDefaultSkyboltUploadConfig();
-        console.log(
-          "[SkyboltUploadProvider] Configuring Skybolt with settings:",
-          settings,
-        );
-        await Skybolt.configure(settings);
-        console.log("[SkyboltUploadProvider] Skybolt configured OK");
-      } catch (err) {
-        console.error(
-          "[SkyboltUploadProvider] Failed to configure Skybolt:",
-          err,
-        );
-      }
-    })();
-  }, []);
-
-  return (
-    <SkyboltNativeUploadProvider>
-      <SkyboltUploadJobsInnerProvider>
-        {children}
-      </SkyboltUploadJobsInnerProvider>
-    </SkyboltNativeUploadProvider>
   );
 };

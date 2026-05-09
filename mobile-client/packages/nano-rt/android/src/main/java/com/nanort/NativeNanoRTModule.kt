@@ -12,6 +12,7 @@ import com.facebook.react.bridge.WritableNativeMap
 import com.facebook.react.modules.core.DeviceEventManagerModule
 import com.nanort.core.AppAssets
 import com.nanort.core.ModuleLogger
+import com.nanort.core.startup.BootstrapReadinessGate
 import com.nanort.core.logD
 import com.nanort.core.logE
 import com.nanort.core.logI
@@ -209,6 +210,7 @@ class NativeNanoRTModule(reactContext: ReactApplicationContext) : NativeNanoRTSp
 
   private fun startWarmupIfNeeded() {
     if (initState.markInitializingIfIdle()) {
+      BootstrapReadinessGate.markNanoRtReady(reactApplicationContext, false)
       moduleScope.launch { performWarmup() }
     }
   }
@@ -245,10 +247,12 @@ class NativeNanoRTModule(reactContext: ReactApplicationContext) : NativeNanoRTSp
     runCatching { InterpreterWarmer.warmUp() }
       .onSuccess {
         initState.markReady()
+        BootstrapReadinessGate.markNanoRtReady(reactApplicationContext, true)
         emitInitEvent("onReady", emptyMap())
       }
       .onFailure { error ->
         initState.markFailure(error)
+        BootstrapReadinessGate.markNanoRtReady(reactApplicationContext, false)
         logE(TAG, error) { "warmup_fail" }
         emitInitEvent(
           "onInitError",
@@ -261,6 +265,7 @@ class NativeNanoRTModule(reactContext: ReactApplicationContext) : NativeNanoRTSp
   }
 
   private fun cleanupModule() {
+    BootstrapReadinessGate.markNanoRtReady(reactApplicationContext, false)
     moduleScope.cancel()
     try {
       runBlocking(Dispatchers.Default) {

@@ -17,6 +17,7 @@ import com.skybolt.core.auth.TokenRefresher
 import com.skybolt.core.events.Events
 import com.skybolt.core.facade.SkyboltManager
 import com.skybolt.core.net.Network
+import com.skybolt.core.startup.StartupGate
 import com.skybolt.core.storage.Mappers
 import com.skybolt.core.storage.SessionRepository
 import com.skybolt.core.upload.api.Err.UploadError
@@ -172,6 +173,15 @@ class UploadWorker(
             return@withContext WMResult.failure()
         }
         log.i { "[DIAG] UploadWorker.doWork START sessionId=$sessionId runAttempt=$runAttemptCount" }
+
+        if (StartupGate.shouldDeferForegroundStartupWork(applicationContext)) {
+            log.i {
+                "[DIAG] UploadWorker deferred during app startup " +
+                    "sessionId=$sessionId runAttempt=$runAttemptCount nanortReady=${StartupGate.isNanoRtReady(applicationContext)}"
+            }
+            return@withContext WMResult.retry()
+        }
+
         setForeground(getForegroundInfo())
 
         try {
@@ -268,7 +278,7 @@ class UploadWorker(
         } catch (e: Exception) {
             val sid = inputData.getString(KEY_SESSION_ID) ?: "unknown"
             log.e { "Fatal upload error: ${LogSanitizer.sanitizeException(e)}" }
-            
+
             // Save PAUSED state before retry to ensure consistency on app restart
             try {
                 sessionRepository.setSessionStatus(sid, SessionStatus.PAUSED)
@@ -282,7 +292,14 @@ class UploadWorker(
                 stack = e.stackTraceToString(),
                 message = e.message ?: "Unknown error"
             ))
-            WMResult.retry()
+
+            // Limit retries to avoid FG service quota exhaustion (Android 12+)
+            if (runAttemptCount >= 3) {
+                log.w { "Session $sid reached max retries ($runAttemptCount). Giving up." }
+                WMResult.failure()
+            } else {
+                WMResult.retry()
+            }
         }
     }
 

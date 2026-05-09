@@ -24,7 +24,8 @@ type SessionStatus =
   | "retrying"
   | "finalizing"
   | "completed"
-  | "failed";
+  | "failed"
+  | "permanently_failed";
 
 interface UploadSession {
   id: string;
@@ -87,6 +88,9 @@ const formatSpeed = (speedBytesPerSec: number | null): string => {
 const errorToUserMessage = (lastError: string | null): string | null => {
   if (!lastError) return null;
   const normalized = lastError.toLowerCase();
+  if (normalized.includes("cert") || normalized.includes("trust anchor") || normalized.includes("ssl")) {
+    return "Error de conexion segura. Verifica que el certificado Azurite este instalado.";
+  }
   if (normalized.includes("auth") || normalized.includes("token")) {
     return "Debes iniciar sesion para continuar la sincronizacion.";
   }
@@ -110,11 +114,21 @@ const toAnalysisLabel = (analysisId: string | null, jobId: string): string => {
   return `Analisis ${id.slice(0, 8)}`;
 };
 
+const MAX_RETRY_ATTEMPTS = 5;
+
 const mapStatus = (
   job: UploadJobViewModel,
   live: UploadJobLiveMetrics,
 ): { status: SessionStatus; label: string; message: string } => {
   if (job.status === "failed") {
+    const isPermanent = job.lastError ? /^\[PERMANENT\]/i.test(job.lastError) : false;
+    if (isPermanent || job.attemptsCount >= MAX_RETRY_ATTEMPTS) {
+      return {
+        status: "permanently_failed",
+        label: "Error permanente",
+        message: "No se pudo completar la sincronizacion. Contacta al administrador.",
+      };
+    }
     return {
       status: "failed",
       label: "Error",
@@ -217,8 +231,8 @@ const mapJobToSession = (
 
   const progress =
     job.totalBytes > 0
-      ? Math.round((job.uploadedBytes / job.totalBytes) * 100)
-      : job.pipelineStep === "done"
+      ? Math.min(100, Math.round((job.uploadedBytes / job.totalBytes) * 100))
+      : job.pipelineStep === "done" || job.status === "success"
         ? 100
         : 0;
 
@@ -233,7 +247,8 @@ const mapJobToSession = (
     ? `Archivo actual: ${live.currentItemId.slice(0, 8)}`
     : null;
 
-  const userFacingError = errorToUserMessage(job.lastError);
+  const cleanLastError = job.lastError?.replace(/^\[PERMANENT\]\s*/i, "") ?? null;
+  const userFacingError = errorToUserMessage(cleanLastError);
 
   return {
     id: job.id,
@@ -251,7 +266,7 @@ const mapJobToSession = (
     speedBytesPerSec: live.speedBytesPerSec,
     currentItemLabel,
     retryHint,
-    lastError: job.lastError,
+    lastError: cleanLastError,
     userFacingError,
   };
 };
@@ -264,7 +279,9 @@ const getEtaLabel = (session: UploadSession): string => {
   if (session.estimatedSeconds && session.estimatedSeconds > 0) {
     return `Faltan ${formatDuration(session.estimatedSeconds)}`;
   }
+  if (session.progress >= 100 && session.status === "uploading") return "Finalizando carga";
   if (session.status === "uploading") return "Calculando tiempo";
+  if (session.status === "finalizing") return "Procesando resultado";
   return "Sin estimacion";
 };
 
@@ -277,6 +294,7 @@ const getStatusConfig = (status: SessionStatus): StatusConfig => {
         backgroundColor: "#dcfce7",
       };
     case "failed":
+    case "permanently_failed":
       return {
         color: THEME.colors.feedback.error,
         icon: "close-circle",
@@ -369,7 +387,7 @@ const RingProgressBarIcon = ({
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          stroke={color}
+          stroke="url(#ringGradient)"
           strokeWidth="6"
           fill="none"
           strokeDasharray={circumference}
@@ -390,7 +408,6 @@ const SessionCard = ({
   onPress: (session: UploadSession) => void;
 }) => {
   const statusConfig = getStatusConfig(session.status);
-
   return (
     <TouchableOpacity onPress={() => onPress(session)} style={styles.sessionCard}>
       <View style={styles.cardContent}>
@@ -465,48 +482,58 @@ const UploadsScreen = () => {
     [jobs, liveMetricsByJobId],
   );
 
-  const [selectedSession, setSelectedSession] = useState<UploadSession | null>(
+  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(
     null,
   );
   const [modalVisible, setModalVisible] = useState(false);
 
+  const selectedSession = useMemo(
+    () => sessions.find((s) => s.id === selectedSessionId) ?? null,
+    [sessions, selectedSessionId],
+  );
+
   const handleSessionPress = (session: UploadSession) => {
-    setSelectedSession(session);
+    setSelectedSessionId(session.id);
     setModalVisible(true);
   };
 
   const handleModalClose = () => {
     setModalVisible(false);
+    setSelectedSessionId(null);
   };
 
   const handleAction = (action: string) => {
     void (async () => {
-      if (!selectedSession?.id) return;
+      try {
+        if (!selectedSessionId) return;
 
-      const sessionId = selectedSession.id;
+        const sessionId = selectedSessionId;
 
-      switch (action) {
-        case "start":
-        case "new":
-          await startJob(sessionId);
-          break;
-        case "pause":
-          await pauseJob(sessionId);
-          break;
-        case "resume":
-          await resumeJob(sessionId);
-          break;
-        case "retry":
-          await forceRetryJob(sessionId);
-          break;
-        case "cancel":
-          await cancelJob(sessionId);
-          break;
-        case "delete":
-          await removeJob(sessionId);
-          break;
-        default:
-          break;
+        switch (action) {
+          case "start":
+          case "new":
+            await startJob(sessionId);
+            break;
+          case "pause":
+            await pauseJob(sessionId);
+            break;
+          case "resume":
+            await resumeJob(sessionId);
+            break;
+          case "retry":
+            await forceRetryJob(sessionId);
+            break;
+          case "cancel":
+            await cancelJob(sessionId);
+            break;
+          case "delete":
+            await removeJob(sessionId);
+            break;
+          default:
+            break;
+        }
+      } catch (err) {
+        console.warn("[uploads] handleAction failed:", { action, error: String(err) });
       }
     })();
   };

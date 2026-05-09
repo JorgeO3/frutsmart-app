@@ -36,6 +36,7 @@ interface AppSplashProps {
 }
 
 export default function AppSplash({ onComplete, isAppReady }: AppSplashProps) {
+  console.log("[DIAG] AppSplash mount — isAppReady:", isAppReady);
   const insets = useSafeAreaInsets();
   const [isVisible, setIsVisible] = useState(true);
   const [hasStartedExit, setHasStartedExit] = useState(false);
@@ -50,6 +51,7 @@ export default function AppSplash({ onComplete, isAppReady }: AppSplashProps) {
 
   // Animación de entrada - se ejecuta al montar
   const startEntranceAnimation = useCallback(() => {
+    console.log("[DIAG] AppSplash entrance animation started");
     const { FADE_IN, LOGO_BOUNCE } = ANIMATION_DURATION;
     const { TITLE, SLOGAN, LEGAL } = ANIMATION_DELAYS;
 
@@ -87,6 +89,7 @@ export default function AppSplash({ onComplete, isAppReady }: AppSplashProps) {
 
   // Animación de salida
   const startExitAnimation = useCallback(() => {
+    console.log("[DIAG] AppSplash startExitAnimation — isAppReady:", isAppReady);
     if (hasStartedExit) return;
     setHasStartedExit(true);
 
@@ -119,6 +122,7 @@ export default function AppSplash({ onComplete, isAppReady }: AppSplashProps) {
         },
         (finished) => {
           if (finished) {
+            console.log("[DIAG] AppSplash exit animation finished — calling onComplete");
             runOnJS(setIsVisible)(false);
             runOnJS(onComplete)();
           }

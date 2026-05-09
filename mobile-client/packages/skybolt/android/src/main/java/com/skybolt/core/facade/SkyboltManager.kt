@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.work.Constraints
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.BackoffPolicy
+import androidx.work.ExistingWorkPolicy
 import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.skybolt.BuildConfig
@@ -269,16 +271,25 @@ object SkyboltManager {
             .setRequiresBatteryNotLow(!session.lowPowerModeOkay)
             .build()
         
-        // Create work request
+        // Create work request with backoff to avoid FG service quota exhaustion
         val workRequest = OneTimeWorkRequestBuilder<UploadWorker>()
             .setInputData(workDataOf(UploadWorker.KEY_SESSION_ID to sessionId))
             .setConstraints(constraints)
+            .setBackoffCriteria(
+                BackoffPolicy.EXPONENTIAL,
+                10_000L, // 10 seconds base delay
+                java.util.concurrent.TimeUnit.MILLISECONDS
+            )
             .addTag(sessionId)
             .addTag("skybolt-upload")
             .build()
         
-        // Enqueue work
-        workManager.enqueue(workRequest)
+        // Enqueue work (unique per sessionId to prevent duplicate workers)
+        workManager.enqueueUniqueWork(
+            sessionId,
+            ExistingWorkPolicy.KEEP,
+            workRequest
+        )
 
         log.i { "[DIAG] Session enqueued: $sessionId, workId=${workRequest.id}, networkType=${constraints.requiredNetworkType}" }
     }

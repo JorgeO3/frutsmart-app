@@ -1,5 +1,5 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { memo, useMemo } from "react";
+import { memo, useEffect, useMemo } from "react";
 import {
   Modal,
   ScrollView,
@@ -25,7 +25,8 @@ type SessionStatus =
   | "retrying"
   | "finalizing"
   | "completed"
-  | "failed";
+  | "failed"
+  | "permanently_failed";
 
 type StatusIcon =
   | "check-circle"
@@ -207,6 +208,11 @@ const getStatusConfig = (status: SessionStatus): StatusConfig => {
       icon: "close-circle",
       backgroundColor: COLORS.status.error.bg,
     },
+    permanently_failed: {
+      color: COLORS.error,
+      icon: "close-circle",
+      backgroundColor: COLORS.status.error.bg,
+    },
     uploading: {
       color: COLORS.primary,
       icon: "cloud-upload",
@@ -262,6 +268,9 @@ const formatTime = (seconds: number): string => {
 const formatFailureMessage = (rawError: string | null): string => {
   if (!rawError) return "No se pudo completar la sincronizacion del analisis.";
   const normalized = rawError.toLowerCase();
+  if (normalized.includes("cert") || normalized.includes("trust anchor") || normalized.includes("ssl")) {
+    return "Error de conexion segura. Verifica que el certificado Azurite este instalado.";
+  }
   if (normalized.includes("auth") || normalized.includes("token")) {
     return "Debes iniciar sesion para continuar con la sincronizacion.";
   }
@@ -288,7 +297,8 @@ const RingProgressBar = memo<RingProgressBarProps>(
   ({ progress, size = SIZES.ring.default }) => {
     const { radius, strokeWidth } = SIZES.ring;
     const circumference = 2 * Math.PI * radius;
-    const offset = circumference - (progress / 100) * circumference;
+    const clampedProgress = Math.min(100, Math.max(0, progress));
+    const offset = circumference - (clampedProgress / 100) * circumference;
 
     return (
       <View style={[styles.ringContainer, { width: size, height: size }]}>
@@ -444,6 +454,31 @@ const ActionButtons = memo<ActionButtonsProps>(
                 />
                 <Text style={styles.primaryButtonText}>Reintentar</Text>
               </TouchableOpacity>
+            </>
+          );
+
+        case "permanently_failed":
+          return (
+            <>
+              <TouchableOpacity
+                style={[styles.actionButton, styles.primaryButton]}
+                onPress={onClose}
+              >
+                <Text style={styles.primaryButtonText}>Entendido</Text>
+              </TouchableOpacity>
+              {canDelete ? (
+                <TouchableOpacity
+                  style={[styles.actionButton, styles.redButton]}
+                  onPress={() => onAction("delete")}
+                >
+                  <MaterialCommunityIcons
+                    name="trash-can-outline"
+                    size={SIZES.icon.button}
+                    color={COLORS.error}
+                  />
+                  <Text style={styles.redButtonText}>Eliminar</Text>
+                </TouchableOpacity>
+              ) : null}
             </>
           );
 
@@ -622,11 +657,21 @@ const SessionDetailsModal = memo<SessionDetailsModalProps>(
         },
         {
           label: "Tiempo restante estimado",
-          value: remainingTime > 0 ? formatTime(remainingTime) : "N/D",
+          value: remainingTime > 0
+            ? formatTime(remainingTime)
+            : session.progress >= 100
+              ? "Completado"
+              : isProcessing
+                ? "Calculando..."
+                : "N/D",
           location:
-            uploadSpeed > 0
+            remainingTime > 0 && uploadSpeed > 0
               ? `${formatBytes(uploadSpeed)}/s aprox.`
-              : "Velocidad aun no disponible",
+              : remainingTime > 0
+                ? "Velocidad aun no disponible"
+                : session.progress >= 100
+                  ? "Todos los archivos transferidos"
+                  : "",
           color: COLORS.gradient.purple,
         },
       ];
@@ -658,7 +703,15 @@ const SessionDetailsModal = memo<SessionDetailsModalProps>(
       };
     }, [session]);
 
-    if (!session || !computedData) return null;
+    const hasSession = !!session && !!computedData;
+
+    useEffect(() => {
+      if (visible && !hasSession) {
+        onClose?.();
+      }
+    }, [visible, hasSession, onClose]);
+
+    if (!hasSession) return null;
 
     const { statusConfig, isProcessing, filesUploaded, uploadDetails } =
       computedData;
@@ -749,7 +802,7 @@ const SessionDetailsModal = memo<SessionDetailsModalProps>(
               )}
 
               {/* Status Messages */}
-              {session.status === "failed" && (
+              {(session.status === "failed" || session.status === "permanently_failed") && (
                 <StatusMessage
                   type="error"
                   message={formatFailureMessage(session.lastError)}

@@ -30,6 +30,16 @@ internal class GpuPolicy(
   fun shouldUseGpu(modelId: ModelId): Boolean {
     if (!InferenceFlags.gpuEnabled) return false
 
+    if (isLikelyEmulator()) {
+      logW(tag) {
+        "gpu_emulator_forced_cpu " +
+          "model=${modelId.name} " +
+          "fingerprint=${Build.FINGERPRINT} " +
+          "sig=${deviceSignature()}"
+      }
+      return false
+    }
+
     if (isBlacklisted(modelId)) {
       logW(tag) {
         "gpu_blacklisted model=${modelId.name} " +
@@ -87,6 +97,22 @@ internal class GpuPolicy(
     val device = buildInfo.device
     val hw = buildInfo.hardware
     return "$man|$model|$device|$hw"
+  }
+
+  private fun isLikelyEmulator(): Boolean {
+    val fp = buildInfo.fingerprint.lowercase()
+    val model = buildInfo.model.lowercase()
+    val device = buildInfo.device.lowercase()
+    val hw = buildInfo.hardware.lowercase()
+
+    return fp.contains("sdk_gphone") ||
+      fp.contains("generic") ||
+      fp.contains("emulator") ||
+      model.contains("sdk_gphone") ||
+      model.contains("emulator") ||
+      device.contains("emu") ||
+      hw.contains("ranchu") ||
+      hw.contains("goldfish")
   }
 
   internal data class BuildInfo(

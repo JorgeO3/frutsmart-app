@@ -24,6 +24,8 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import kotlin.collections.map
 import kotlin.ranges.coerceAtLeast
 
@@ -46,7 +48,8 @@ class BlobDriver(
         progressChannel: Channel<ItemProgress>
     ) = coroutineScope {
         val parallelism = session.maxParallelFiles.coerceAtLeast(1)
-        val fileDispatcher = Dispatchers.IO.limitedParallelism(parallelism)
+        val fileDispatcher = Dispatchers.IO
+        val fileSemaphore = Semaphore(parallelism)
 
         log.i { "Starting session upload: ${session.sessionId}, parallelism=$parallelism" }
 
@@ -60,15 +63,17 @@ class BlobDriver(
         // Si uno lanza Halt (Auth/Network), coroutineScope cancelará a los demás y propagará la excepción.
         pendingItems.map { itemRecord ->
             async(fileDispatcher) {
-                if (!isActive) throw CancellationException()
-                uploadItemSafe(
-                    scope,
-                    session.sessionId,
-                    itemRecord,
-                    session.chunkSizeBytes,
-                    session.maxParallelChunks,
-                    progressChannel
-                )
+                fileSemaphore.withPermit {
+                    if (!isActive) throw CancellationException()
+                    uploadItemSafe(
+                        scope,
+                        session.sessionId,
+                        itemRecord,
+                        session.chunkSizeBytes,
+                        session.maxParallelChunks,
+                        progressChannel
+                    )
+                }
             }
         }.awaitAll()
     }

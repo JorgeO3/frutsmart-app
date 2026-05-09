@@ -12,12 +12,17 @@ class AuthManager(
     private val log by logger()
     private val mutex = Mutex()
 
+    private sealed interface AccessTokenDecision {
+        data class Return(val token: String?) : AccessTokenDecision
+        data class Refresh(val tokens: AuthTokens, val refresher: TokenRefresher) : AccessTokenDecision
+        object AuthRequired : AccessTokenDecision
+    }
+
     suspend fun getValidAccessTokenOrNull(): String? =
-        mutex.withLock {
+        when (val decision = mutex.withLock {
             val tokens = persistence.load() ?: run {
                 log.d { "No tokens found in persistence" }
-                onAuthRequired?.invoke()
-                return null
+                return@withLock AccessTokenDecision.AuthRequired
             }
 
             val now = System.currentTimeMillis()
@@ -25,35 +30,28 @@ class AuthManager(
             if (now >= tokens.refreshExpiresAtMs) {
                 log.i { "Refresh token expired, clearing auth" }
                 persistence.save(null)
-                onAuthRequired?.invoke()
-                return null
+                return@withLock AccessTokenDecision.AuthRequired
             }
 
             if (now < tokens.accessExpiresAtMs) {
                 log.v { "Access token valid (expires in ${(tokens.accessExpiresAtMs - now) / 1000}s)" }
-                return tokens.accessToken
+                return@withLock AccessTokenDecision.Return(tokens.accessToken)
             }
 
             val ref = refresher ?: run {
                 log.w { "Access token expired but no refresher available" }
                 persistence.save(null)
-                onAuthRequired?.invoke()
-                return null
+                return@withLock AccessTokenDecision.AuthRequired
             }
 
-            return try {
-                log.i { "Refreshing access token..." }
-                val refreshed = ref.refresh(tokens)
-                validate(refreshed)
-                persistence.save(refreshed)
-                log.i { "Token refresh successful" }
-                refreshed.accessToken
-            } catch (e: Exception) {
-                log.w(e) { "Token refresh failed" }
-                persistence.save(null)
+            AccessTokenDecision.Refresh(tokens, ref)
+        }) {
+            is AccessTokenDecision.Return -> decision.token
+            AccessTokenDecision.AuthRequired -> {
                 onAuthRequired?.invoke()
                 null
             }
+            is AccessTokenDecision.Refresh -> refreshAccessToken(decision.tokens, decision.refresher)
         }
 
     suspend fun updateTokens(tokens: AuthTokens?) {
@@ -70,6 +68,51 @@ class AuthManager(
 
     suspend fun clear() {
         updateTokens(null)
+    }
+
+    private suspend fun refreshAccessToken(tokens: AuthTokens, refresher: TokenRefresher): String? {
+        return try {
+            log.i { "Refreshing access token..." }
+            val refreshed = refresher.refresh(tokens)
+            validate(refreshed)
+
+            mutex.withLock {
+                val latest = persistence.load()
+                if (latest != null && latest != tokens) {
+                    val now = System.currentTimeMillis()
+                    if (now < latest.accessExpiresAtMs) {
+                        log.i { "Skipping refreshed token save because tokens changed while refresh was in flight" }
+                        return@withLock latest.accessToken
+                    }
+                }
+
+                persistence.save(refreshed)
+                log.i { "Token refresh successful" }
+                refreshed.accessToken
+            }
+        } catch (e: Exception) {
+            log.w(e) { "Token refresh failed" }
+
+            val shouldNotifyAuthRequired = mutex.withLock {
+                val latest = persistence.load()
+                if (latest != null && latest != tokens) {
+                    val now = System.currentTimeMillis()
+                    if (now < latest.accessExpiresAtMs) {
+                        log.i { "Ignoring refresh failure because tokens changed while refresh was in flight" }
+                        return@withLock false to latest.accessToken
+                    }
+                }
+
+                persistence.save(null)
+                true to null
+            }
+
+            if (shouldNotifyAuthRequired.first) {
+                onAuthRequired?.invoke()
+            }
+
+            shouldNotifyAuthRequired.second
+        }
     }
 
     private fun validate(tokens: AuthTokens) {

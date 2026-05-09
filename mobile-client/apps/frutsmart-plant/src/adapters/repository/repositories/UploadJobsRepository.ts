@@ -125,6 +125,11 @@ const SQL = {
     FROM upload_jobs
     ORDER BY created_at DESC;
   `,
+  FIND_ALL: `
+    SELECT *
+    FROM upload_jobs
+    ORDER BY created_at DESC;
+  `,
   FIND_BY_SKYBOLT_SESSION_ID: `
     SELECT *
     FROM upload_jobs
@@ -278,6 +283,10 @@ export class UploadJobsRepository {
   // ---------------------------------------------------------------------------
   // Proyección para UI
   // ---------------------------------------------------------------------------
+  public async getAllJobs(): Promise<UploadJobRow[]> {
+    return this.db.getAll<UploadJobRow>(SQL.FIND_ALL);
+  }
+
   public async getAllJobsView(): Promise<UploadJobViewModel[]> {
     const rows = await this.db.getAll<{
       id: string;

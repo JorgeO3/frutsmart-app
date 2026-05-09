@@ -1,6 +1,7 @@
 package com.skybolt
 
 import android.app.Application
+import android.os.SystemClock
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReadableArray
@@ -30,15 +31,19 @@ class NativeSkyboltModule(reactContext: ReactApplicationContext) : NativeSkybolt
     super.initialize()
 
     val appContext = reactApplicationContext.applicationContext
+    val bootMs = SystemClock.elapsedRealtime()
     val prefix = "Skybolt"
     val minLevel = if (BuildConfig.DEBUG) LogLevel.VERBOSE else LogLevel.WARN
+    log.i { "[DIAG] NativeSkybolt.initialize ENTER elapsedMs=$bootMs thread=${Thread.currentThread().name}" }
     AppLogger.init(
         prefix = prefix,
         isDebug = BuildConfig.DEBUG,
         minLevel = minLevel,
         application = appContext as? Application)
 
+    log.i { "[DIAG] NativeSkybolt.initialize BEFORE SkyboltManager.initialize elapsedMs=${SystemClock.elapsedRealtime()}" }
     SkyboltManager.initialize(appContext)
+    log.i { "[DIAG] NativeSkybolt.initialize AFTER SkyboltManager.initialize elapsedMs=${SystemClock.elapsedRealtime()}" }
     Events.setSink(NativeEventSink { type, payload ->
       log.i { "[DIAG] NativeEventSink: type=$type, payloadSize=${payload.size}" }
       val event = LinkedHashMap<String, Any?>(payload.size + 1)
@@ -48,6 +53,7 @@ class NativeSkyboltModule(reactContext: ReactApplicationContext) : NativeSkybolt
       log.i { "[DIAG] sendEvent completed for type=$type" }
     })
 
+    log.i { "[DIAG] NativeSkybolt.initialize EXIT elapsedMs=${SystemClock.elapsedRealtime()}" }
     log.i { "NativeSkybolt initialized" }
   }
 

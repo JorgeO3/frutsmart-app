@@ -24,15 +24,17 @@ object AuthEnvironment {
         refresher: TokenRefresher?,
         onAuthRequired: (() -> Unit)?
     ) {
-        if (initialized) {
-            log.d { "AuthEnvironment already initialized" }
-            return
-        }
-
         mutex.withLock {
-            if (initialized) return@withLock
+            if (initialized && refresher == null) {
+                log.d { "AuthEnvironment already initialized" }
+                return@withLock
+            }
 
-            log.i { "Initializing AuthEnvironment" }
+            if (initialized) {
+                log.i { "Reconfiguring AuthEnvironment" }
+            } else {
+                log.i { "Initializing AuthEnvironment" }
+            }
             val persistence = DataStoreAuthPersistence(appContext)
 
             manager = AuthManager(

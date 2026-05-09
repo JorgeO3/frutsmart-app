@@ -62,33 +62,36 @@ class BlobUploader(
         plan: UploadPlan,
         reporter: ProgressReporter
     ) = log.trace("uploadBlockBlob") {
-        withContext(Dispatchers.IO) {
-            log.iFields {
-                msg = "Starting blob upload"
-                "sessionId" to sessionId
-                "itemId" to item.clientItemId
-                "sizeBytes" to item.sizeBytes
-                "blobName" to item.blobName
-                "chunkCount" to plan.totalBlocks
-            }
-            
-            if (item.sizeBytes < MEMORY_UPLOAD_THRESHOLD) {
-                log.d { "Optimized path: In-memory upload for small file: item=${item.clientItemId}" }
-                uploadSmallBlobInMemory(context, item, reporter)
+        // Important: do NOT hop to Dispatchers.IO here.
+        // BlobDriver already invokes us from a limited-parallelism dispatcher that
+        // enforces maxParallelFiles. Switching to the global IO dispatcher here
+        // bypasses that limit and can flood the process with many simultaneous
+        // uploads, starving foreground work like camera/auth/UI interactions.
+        log.iFields {
+            msg = "Starting blob upload"
+            "sessionId" to sessionId
+            "itemId" to item.clientItemId
+            "sizeBytes" to item.sizeBytes
+            "blobName" to item.blobName
+            "chunkCount" to plan.totalBlocks
+        }
+
+        if (item.sizeBytes < MEMORY_UPLOAD_THRESHOLD) {
+            log.d { "Optimized path: In-memory upload for small file: item=${item.clientItemId}" }
+            uploadSmallBlobInMemory(context, item, reporter)
+        } else {
+            // Siempre resolvemos MD5 final del blob para que backend pueda verificar metadata.
+            val blobMd5B64 = item.md5Hex?.let { md5HexToBase64(it) }
+                ?: log.duration(label = "md5Compute") { computeFileMd5(context, item) }
+
+            log.d { "Blob MD5 ready: item=${item.clientItemId}" }
+
+            if (item.sizeBytes <= singlePutMaxBytes) {
+                log.d { "Using single PUT upload: item=${item.clientItemId}" }
+                uploadSingleBlob(context, item, blobMd5B64, reporter)
             } else {
-                // Siempre resolvemos MD5 final del blob para que backend pueda verificar metadata.
-                val blobMd5B64 = item.md5Hex?.let { md5HexToBase64(it) }
-                    ?: log.duration(label = "md5Compute") { computeFileMd5(context, item) }
-
-                log.d { "Blob MD5 ready: item=${item.clientItemId}" }
-
-                if (item.sizeBytes <= singlePutMaxBytes) {
-                    log.d { "Using single PUT upload: item=${item.clientItemId}" }
-                    uploadSingleBlob(context, item, blobMd5B64, reporter)
-                } else {
-                    log.d { "Using chunked upload: item=${item.clientItemId}, chunks=${plan.totalBlocks}" }
-                    uploadByBlocks(context, sessionId, item, plan, blobMd5B64, reporter)
-                }
+                log.d { "Using chunked upload: item=${item.clientItemId}, chunks=${plan.totalBlocks}" }
+                uploadByBlocks(context, sessionId, item, plan, blobMd5B64, reporter)
             }
         }
     }
