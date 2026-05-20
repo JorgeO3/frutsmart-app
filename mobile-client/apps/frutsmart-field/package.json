@@ -67,6 +67,7 @@
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@biomejs/biome": "1.9.4",
+    "@socketsecurity/bun-security-scanner": "^1.1.2",
     "@types/d3-scale": "^4.0.9",
     "@types/d3-shape": "^3.1.7",
     "@types/jest": "^29.5.12",

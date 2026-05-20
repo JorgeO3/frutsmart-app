@@ -66,6 +66,7 @@
   "devDependencies": {
     "@babel/core": "~7.29.0",
     "@biomejs/biome": "~2.4.12",
+    "@socketsecurity/bun-security-scanner": "^1.1.2",
     "@types/react": "~19.2.14",
     "@typescript/native-preview": "~7.0.0-dev.20250805.1",
     "babel-preset-expo": "~55.0.8",

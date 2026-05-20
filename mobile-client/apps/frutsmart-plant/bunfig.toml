@@ -1,0 +1,29 @@
+# bunfig.toml
+
+# En producción/CI prefiero no cargar .env automáticamente.
+# En local puedes quitarlo si te estorba.
+env = false
+
+[install]
+# Nada de instalar paquetes implícitamente al ejecutar imports/scripts.
+auto = "disable"
+
+# 7 días en segundos.
+minimumReleaseAge = 604800
+
+# Lockfile textual y revisable.
+saveTextLockfile = true
+
+# Local: false para poder actualizar deps.
+# CI: usar `bun ci`, no depender de este valor global.
+frozenLockfile = false
+
+# Permite scripts del proyecto.
+# Las dependencias siguen bloqueadas salvo trustedDependencies.
+ignoreScripts = false
+
+# Recomendado: evita phantom dependencies.
+linker = "isolated"
+
+[install.security]
+scanner = "@socketsecurity/bun-security-scanner"
