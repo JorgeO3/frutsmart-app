@@ -225,7 +225,9 @@ class UploadOrchestrator {
     }
 
     // Ejecutar effects
-    void this.runEffects(jobId, result.effects, result.context);
+    void this.runEffects(jobId, result.effects, result.context).then(() => {
+      this.maybeDispatchImmediateFollowUp(jobId);
+    });
   }
 
   // -------------------------------------------------------------------------
@@ -465,6 +467,22 @@ class UploadOrchestrator {
     for (const jobId of ids) {
       this.dispatch(jobId, { type: "SCHEDULER_TICK", nowMs });
     }
+  }
+
+  private maybeDispatchImmediateFollowUp(jobId: string): void {
+    const entry = useUploadStore.getState().getEntry(jobId);
+    if (!entry) return;
+
+    if (
+      entry.state !== "upload.idle"
+      && entry.state !== "complete_session.idle"
+      && entry.state !== "evaluation.idle"
+    ) {
+      return;
+    }
+
+    console.log(`[DIAG] UploadOrchestrator immediate follow-up tick — jobId=${jobId}, state=${entry.state}`);
+    this.dispatch(jobId, { type: "SCHEDULER_TICK", nowMs: Date.now() });
   }
 
   stopScheduler(): void {

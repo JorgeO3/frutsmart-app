@@ -91,6 +91,26 @@ describe("updateMetrics", () => {
     const result = contextMutators.updateMetrics(makeCtx(), event);
     expect(result!.totalFiles).toBe(15);
     expect(result!.uploadedBytes).toBe(5_000);
+    expect(result!.transferRateBps).toBeNull();
+    expect(result!.estimatedRemainingSeconds).toBeNull();
+  });
+
+  it("propaga velocidad y ETA desde POLL_TICK", () => {
+    const event: UploadMachineEvent = {
+      type: "POLL_TICK",
+      status: "uploading",
+      metrics: {
+        totalFiles: 15,
+        completedFiles: 5,
+        totalBytes: 15_000,
+        uploadedBytes: 5_000,
+        transferRateBps: 2_500,
+        estimatedRemainingSeconds: 4,
+      },
+    };
+    const result = contextMutators.updateMetrics(makeCtx(), event);
+    expect(result!.transferRateBps).toBe(2_500);
+    expect(result!.estimatedRemainingSeconds).toBe(4);
   });
 
   it("retorna undefined si POLL_TICK no trae metrics", () => {

@@ -138,6 +138,8 @@ export async function getNativeProgress(sessionId: string): Promise<{
   totalBytes: number;
   uploadedBytes: number;
   status: string;
+  transferRateBps: number | null;
+  estimatedRemainingSeconds: number | null;
 } | null> {
   const progress = await Skybolt.getSessionProgress(sessionId);
   if (!progress) return null;
@@ -147,6 +149,11 @@ export async function getNativeProgress(sessionId: string): Promise<{
     totalBytes: progress.totalBytes ?? 0,
     uploadedBytes: progress.uploadedBytes ?? 0,
     status: (progress as { status?: string }).status ?? "unknown",
+    transferRateBps: progress.transferRateBps ?? null,
+    estimatedRemainingSeconds:
+      typeof progress.estimatedCompletionMs === "number"
+        ? Math.max(0, Math.ceil(progress.estimatedCompletionMs / 1000))
+        : null,
   };
 }
 

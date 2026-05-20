@@ -49,6 +49,8 @@ export interface UploadJobContext {
   completedFiles: number;
   totalBytes: number;
   uploadedBytes: number;
+  transferRateBps?: number | null;
+  estimatedRemainingSeconds?: number | null;
   attempts: number;
   lastError: string | null;
   lastAttemptAt: number | null; // epoch ms
@@ -93,6 +95,8 @@ export interface NativeMetricsSnapshot {
   completedFiles: number;
   totalBytes: number;
   uploadedBytes: number;
+  transferRateBps?: number | null;
+  estimatedRemainingSeconds?: number | null;
 }
 
 // ---------------------------------------------------------------------------

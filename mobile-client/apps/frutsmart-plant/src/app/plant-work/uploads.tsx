@@ -272,6 +272,7 @@ const mapJobToSession = (
 };
 
 const getEtaLabel = (session: UploadSession): string => {
+  if (session.status === "completed") return "Completado";
   if (session.status === "waiting_network") return "Esperando conexion";
   if (session.status === "auth_required") return "Esperando inicio de sesion";
   if (session.status === "paused") return "En pausa";

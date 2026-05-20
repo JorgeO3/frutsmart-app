@@ -73,6 +73,12 @@ type Props = {
   children: ReactNode;
 };
 
+type RateMetric = {
+  lastBytes: number;
+  lastTime: number;
+  rate: number;
+};
+
 // ---------------------------------------------------------------------------
 // Mapper: UploadJobSnapshot (v2) → UploadJobViewModel (v1 interface)
 // ---------------------------------------------------------------------------
@@ -128,7 +134,7 @@ export const SkyboltUploadProvider = ({ children }: Props) => {
   const activeJob = useMemo(() => jobs[0] ?? null, [jobs]);
 
   // Live metrics: compute transfer rate & ETA via exponential moving average
-  const metricsRef = useRef<Map<string, { lastBytes: number; lastTime: number; rate: number }>>(new Map());
+  const metricsRef = useRef<Map<string, RateMetric>>(new Map());
 
   const liveMetricsByJobId = useMemo<Record<string, UploadJobLiveMetrics>>(
     () => {
@@ -155,16 +161,21 @@ export const SkyboltUploadProvider = ({ children }: Props) => {
         }
 
         const remainingBytes = (ctxSnap.totalBytes ?? 0) - updatedBytes;
-        const eta = metric.rate > 0 && remainingBytes > 0 ? remainingBytes / metric.rate : 0;
+        const fallbackRate = metric.rate > 0 ? metric.rate : null;
+        const fallbackEta =
+          fallbackRate && remainingBytes > 0 ? remainingBytes / fallbackRate : null;
+        const speedBytesPerSec = ctxSnap.transferRateBps ?? fallbackRate;
+        const estimatedRemainingSeconds =
+          ctxSnap.estimatedRemainingSeconds ?? (fallbackEta && fallbackEta > 0 ? fallbackEta : null);
 
         map[snap.jobId] = {
-          speedBytesPerSec: metric.rate > 0 ? metric.rate : null,
-          estimatedRemainingSeconds: eta > 0 ? eta : null,
+          speedBytesPerSec,
+          estimatedRemainingSeconds,
           pauseReason: null,
           nextRetryAtMs: null,
           retryAfterMs: null,
           currentItemId: null,
-          lastProgressAtMs: metric.rate > 0 ? now : null,
+          lastProgressAtMs: speedBytesPerSec && speedBytesPerSec > 0 ? now : null,
         };
       }
       return map;

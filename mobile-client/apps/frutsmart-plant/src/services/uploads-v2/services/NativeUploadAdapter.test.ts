@@ -26,6 +26,8 @@ jest.mock("skybolt", () => ({
     totalBytes: 10_000,
     uploadedBytes: 5_000,
     status: "uploading",
+    transferRateBps: 2_048,
+    estimatedCompletionMs: 3_200,
   }),
 }));
 
@@ -68,5 +70,7 @@ describe("native operations", () => {
     expect(progress).not.toBeNull();
     expect(progress!.totalFiles).toBe(10);
     expect(progress!.status).toBe("uploading");
+    expect(progress!.transferRateBps).toBe(2_048);
+    expect(progress!.estimatedRemainingSeconds).toBe(4);
   });
 });

@@ -42,11 +42,16 @@ export const contextMutators: Record<string, ContextMutator> = {
     if (event.type === "NATIVE_PROGRESS" || event.type === "POLL_TICK") {
       const m = event.type === "NATIVE_PROGRESS" ? event : event.metrics;
       if (!m) return undefined;
+      const transferRateBps = "transferRateBps" in m ? m.transferRateBps ?? null : null;
+      const estimatedRemainingSeconds =
+        "estimatedRemainingSeconds" in m ? m.estimatedRemainingSeconds ?? null : null;
       return {
         totalFiles: m.totalFiles,
         completedFiles: m.completedFiles,
         totalBytes: m.totalBytes,
         uploadedBytes: Math.min(m.uploadedBytes, m.totalBytes),
+        transferRateBps,
+        estimatedRemainingSeconds,
       };
     }
     // Para NATIVE_COMPLETED y NATIVE_STARTED: mantener métricas existentes
