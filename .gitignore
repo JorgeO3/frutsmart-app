@@ -30,3 +30,7 @@
 **/Thumbs.db
 **/.idea/
 **/.vscode/
+
+# Agents
+**/.agents/
+**/skills-lock.json
