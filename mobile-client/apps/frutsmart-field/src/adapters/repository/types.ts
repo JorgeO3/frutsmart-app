@@ -192,5 +192,38 @@ export interface AvailableReportRow {
 export interface Session {
   id: string; // UUID de la sesión
   start_timestamp: string; // Fecha y hora de inicio en formato ISO 8601
-  end_timestamp: string | null; // Fecha y hora de finalización en formato ISO 8601, puede ser null si la sesión está activa
+  end_timestamp: string | null; // Fecha y hora de finalización, puede ser null si la sesión está activa
+}
+
+// ============================================================
+// Tipos de Upload Jobs (Skybolt Resilient Upload Pipeline)
+// ============================================================
+
+export type UploadJobPipelineStep =
+  | "create_session"
+  | "upload"
+  | "complete_session"
+  | "evaluation"
+  | "done";
+
+export type UploadJobStatus = "pending" | "running" | "success" | "failed";
+
+export interface UploadJobRow {
+  id: string;
+  quality_classification_id: string | null;
+  domain: "plant" | "field";
+  client_batch_id: string;
+  backend_session_id: string | null;
+  skybolt_session_id: string | null;
+  pipeline_step: UploadJobPipelineStep;
+  step_status: UploadJobStatus;
+  total_files: number;
+  completed_files: number;
+  total_bytes: number;
+  uploaded_bytes: number;
+  last_error: string | null;
+  attempts_count: number;
+  last_attempt_at: string | null;
+  created_at: string;
+  updated_at: string;
 }

@@ -7,6 +7,7 @@ import { ClassificationPhotoRepository } from "./repositories/ClassificationPhot
 import { ClassificationResultRepository } from "./repositories/ClassificationResultRepository";
 import { QualityClassificationRepository } from "./repositories/QualityClassificationRepository";
 import { SessionRepository } from "./repositories/SessionsRepository";
+import { UploadJobsRepository } from "./repositories/UploadJobsRepository";
 
 /**
  * Clase Singleton que gestiona la conexión a la base de datos y sirve
@@ -31,6 +32,7 @@ export class Database {
   public readonly reportQueries: ReportQueryRepository;
   public readonly qualityClassifications: QualityClassificationRepository;
   public readonly sessions: SessionRepository;
+  public readonly uploadJobs: UploadJobsRepository;
 
   // ============================================================
   // Repositorios Privados (Detalles de implementación)
@@ -65,9 +67,11 @@ export class Database {
     //    inyectando las dependencias que necesita para funcionar.
     this.qualityClassifications = new QualityClassificationRepository(
       this.connection,
-      this.resultsRepository, // Inyectando la dependencia
-      this.photosRepository, // Inyectando la dependencia
+      this.resultsRepository,
+      this.photosRepository,
     );
+
+    this.uploadJobs = new UploadJobsRepository(this.connection);
   }
 
   /**

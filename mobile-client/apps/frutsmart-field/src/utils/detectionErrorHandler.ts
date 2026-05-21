@@ -2,7 +2,7 @@ import type { Href, Router } from "expo-router";
 import { Alert } from "react-native";
 
 // CAMBIO: Importamos NanoRTError para usarlo como nuestro tipo principal
-import { NanoRTError } from "@/modules/nano-rt";
+import { NanoRTError } from "nano-rt";
 
 // La estructura de datos que espera la pantalla de feedback
 export interface DetectionErrorData {

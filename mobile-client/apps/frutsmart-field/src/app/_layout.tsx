@@ -4,50 +4,52 @@ import { StatusBar } from "expo-status-bar";
 import { Stack } from "expo-router";
 import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
 
-import { useNanoRTReady } from "@/modules/nano-rt";
-import { useAppLoading } from "@hooks/useAppLoading";
-import { useScreenConfiguration } from "@hooks/useScreenConfiguration";
 import { useMenuHandlers } from "@hooks/useMenuHandlers";
+import { useRootBootstrap } from "@hooks/useRootBootstrap";
+import { useScreenConfiguration } from "@hooks/useScreenConfiguration";
+import { SkyboltUploadProvider } from "@src/providers/SkyboltUploadProvider";
+import { StorageProvider } from "@src/providers/StorageProvider";
 
 import AppSplash from "@components/AppSplash";
 import MenuModal from "@components/MenuModal";
+import NanoRTErrorView from "@components/NanoRTErrorView";
+import { StorageGuard } from "@components/StorageGuard";
 
 export default function RootLayout() {
-  const { isLoaded } = useAppLoading();
-  const { ready: nanoRtReady } = useNanoRTReady();
-  const appIsReady = isLoaded && nanoRtReady;
-
   const [isMenuVisible, setMenuVisible] = useState(false);
-  const [showMainApp, setShowMainApp] = useState(false);
+  
+  const { appIsReady, nanoRtError, showMainApp, handleSplashComplete } = useRootBootstrap();
+  const { handleUpload, handleOpenMenu, handleMenuNavigate } = useMenuHandlers({ setMenuVisible });
+  const { allScreens, headerBaseStyle } = useScreenConfiguration({ handleUpload, handleOpenMenu });
 
-  const { handleUpload, handleOpenMenu, handleMenuNavigate } = useMenuHandlers({
-    setMenuVisible,
-  });
-
-  const { allScreens, headerBaseStyle } = useScreenConfiguration({
-    handleUpload,
-    handleOpenMenu,
-  });
-
-  const handleSplashComplete = () => {
-    setShowMainApp(true);
-  };
+  if (nanoRtError) {
+    console.error("NanoRT initialization error:", nanoRtError);
+    return <NanoRTErrorView error={nanoRtError.message} />;
+  }
 
   return (
     <ThemeProvider value={DefaultTheme}>
       <StatusBar style="light" />
 
-      {showMainApp ? (
-        <Stack screenOptions={headerBaseStyle}>{allScreens}</Stack>
-      ) : (
-        <AppSplash onComplete={handleSplashComplete} isAppReady={appIsReady} />
-      )}
+      <SkyboltUploadProvider>
+        <StorageProvider>
+          <StorageGuard enabled={showMainApp} />
+          {showMainApp ? (
+            <Stack screenOptions={headerBaseStyle}>{allScreens}</Stack>
+          ) : (
+            <AppSplash
+              onComplete={handleSplashComplete}
+              isAppReady={appIsReady}
+            />
+          )}
 
-      <MenuModal
-        visible={isMenuVisible}
-        onClose={() => setMenuVisible(false)}
-        onNavigate={handleMenuNavigate}
-      />
+          <MenuModal
+            visible={isMenuVisible}
+            onClose={() => setMenuVisible(false)}
+            onNavigate={handleMenuNavigate}
+          />
+        </StorageProvider>
+      </SkyboltUploadProvider>
     </ThemeProvider>
   );
 }

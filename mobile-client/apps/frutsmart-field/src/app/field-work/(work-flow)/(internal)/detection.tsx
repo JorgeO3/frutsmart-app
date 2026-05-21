@@ -1,19 +1,19 @@
-import React, { useMemo, useCallback, useState } from "react";
-import { useRouter, useLocalSearchParams } from "expo-router";
+import { useCallback, useMemo, useState } from "react";
 
-import { useFieldWorkActions, type ClassifiedSegment } from "@stores/fieldWork";
-import { NanoRTClassifier, NanoRTError } from "@/modules/nano-rt";
+import { useLocalSearchParams, useRouter } from "expo-router";
+
+import { NanoRTClassifier, NanoRTError } from "nano-rt";
 import { ErrorHandler } from "@utils/detectionErrorHandler";
+import { compactExternalRawToTmp } from "@utils/compactExternalRawToTmp";
 
+import AppLoader, { type AsyncResult, Err, Ok } from "@components/AppLoader";
 import AppView from "@components/AppView";
-import AppText from "@components/AppText";
-import AppLoader, { type AsyncResult, Ok, Err } from "@components/AppLoader";
+import { useFieldWorkActions } from "@stores/fieldWork";
 
-type DetailedSegment = ClassifiedSegment;
+type Picture = { rawUri: string; id: string };
 type SegmentationError = Error | NanoRTError;
-type Picture = Pick<ClassifiedSegment, "rawUri">;
-type SegmentationResult = AsyncResult<SegmentationSuccess, SegmentationError>;
 type SegmentationSuccess = { items: { uri: string; confidences: number[] }[] };
+type SegmentationResult = AsyncResult<SegmentationSuccess, SegmentationError>;
 
 // biome-ignore format: true
 const ROUTES = {
@@ -21,20 +21,20 @@ const ROUTES = {
   DETECTION_FEEDBACK: "/field-work/(work-flow)/(internal)/detection-feedback",
   PICTURE: "/field-work/(work-flow)/(internal)/picture",
 } as const;
-const LABELS = ["Tipo A", "Tipo B", "Tipo C", "Tipo D"]; // Labels para la clasificación interna
+const LABELS = ["Tipo A", "Tipo B", "Tipo C", "Tipo D"];
 
 const InternalDetectionScreen = () => {
   const router = useRouter();
+  const [isTaskActive, setIsTaskActive] = useState(true);
+  const { updateInternalSegment, updateInternalResult } = useFieldWorkActions();
   const { picture: pictureString } = useLocalSearchParams<{
     picture: string;
   }>();
 
-  // Lógica para obtener la foto de los parámetros
   const currentPhoto = useMemo((): Picture | null => {
     if (!pictureString) return null;
     try {
-      const parsed = JSON.parse(pictureString);
-      return { rawUri: parsed.rawUri || parsed.uri }; // Compatible con ambos formatos
+      return JSON.parse(pictureString) as Picture;
     } catch (e) {
       console.error("Error al parsear el objeto 'picture' de los params:", e);
       return null;
@@ -47,81 +47,47 @@ const InternalDetectionScreen = () => {
     );
   }
 
-  // Usamos los hooks de nuestro store `fieldWorkStore`
-  const { updateInternalSegment } = useFieldWorkActions();
-  const [isTaskActive, setIsTaskActive] = useState(true);
-
-  // El ErrorHandler que ya entiende NanoRTError
   const errorHandler = useMemo(
     () =>
       new ErrorHandler(
         router,
-        currentPhoto?.rawUri || "",
+        currentPhoto.rawUri,
         ROUTES.DETECTION_FEEDBACK,
         ROUTES.PICTURE,
       ),
     [router, currentPhoto],
   );
 
-  // --- Tarea Asíncrona Refactorizada ---
-
-  const performSegmentation =
-    useCallback(async (): Promise<SegmentationResult> => {
-      if (!currentPhoto.rawUri) {
-        return Err(new Error("URI de la foto original no encontrada."));
-      }
-
-      try {
-        console.log(
-          `[NanoRT Debug] Iniciando pipeline 'classifyFieldExternal' para: ${currentPhoto.rawUri}`,
-        );
-
-        const { items } = await NanoRTClassifier.classifyFieldInternal(
-          currentPhoto.rawUri,
-          // "file:///data/data/com.anonymous.frutosmart/cache/TipoA-1.jpeg",
-        );
-
-        console.log("[NanoRT Debug] ¡Pipeline ejecutado con ÉXITO!");
-        console.log(
-          `[NanoRT Debug] Número de segmentos encontrados: ${items.length}`,
-        );
-
-        return Ok({ items });
-      } catch (e: unknown) {
-        if (e instanceof NanoRTError) {
-          return Err(e);
-        }
-        // Fallback para errores inesperados
-        return Err(new NanoRTError(String(e), "unknown_error"));
-      }
-    }, [currentPhoto]);
-
-  // --- Handlers ---
-
   const handleTaskComplete = useCallback(
-    ({ items }: SegmentationSuccess) => {
+    async ({ items }: SegmentationSuccess) => {
       setIsTaskActive(false);
-      const segment = items[0];
 
-      // Lógica para enriquecer el segmento antes de guardarlo
-      const bestClassIndex = segment.confidences.indexOf(
-        Math.max(...segment.confidences),
-      );
-      const bestClassName =
-        LABELS[bestClassIndex] ?? `Tipo ${bestClassIndex + 1}`;
+      const { confidences, uri } = items[0];
+      const bestConfidence = Math.max(...confidences);
+      const bestClassIndex = confidences.indexOf(bestConfidence);
+      const bestClassName = LABELS[bestClassIndex] ?? "N/A";
 
-      const finalSegment: DetailedSegment = {
-        rawUri: currentPhoto.rawUri,
-        segmentedUri: segment.uri,
-        bestConfidence: segment.confidences[bestClassIndex] ?? 0,
+      const compactedUri = await compactExternalRawToTmp(currentPhoto.rawUri);
+
+      updateInternalSegment({
+        rawUri: compactedUri,
+        segmentedUri: uri,
+        bestConfidence,
         bestClassName,
-        confidences: segment.confidences,
-      };
+        confidences,
+      });
 
-      updateInternalSegment(finalSegment);
+      updateInternalResult({
+        aiPrediction: {
+          className: bestClassName,
+          confidence: bestConfidence,
+          rawInference: { rawConfidences: confidences },
+        },
+      });
+
       router.replace(ROUTES.CLASSIFICATION_INTRO);
     },
-    [router, currentPhoto, updateInternalSegment],
+    [currentPhoto.rawUri, updateInternalSegment, updateInternalResult, router.replace],
   );
 
   const handleTaskError = useCallback(
@@ -132,20 +98,33 @@ const InternalDetectionScreen = () => {
     [errorHandler],
   );
 
-  // --- Render Logic ---
+  const performSegmentation = useCallback(async (): Promise<SegmentationResult> => {
+    if (!currentPhoto.rawUri) {
+      return Err(new Error("URI de la foto original no encontrada."));
+    }
 
-  if (!currentPhoto) {
-    // Si no hay foto, es un error irrecuperable en esta pantalla
-    return (
-      <AppView
-        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-      >
-        <AppText color="error">
-          Error: No se ha proporcionado una imagen para procesar.
-        </AppText>
-      </AppView>
-    );
-  }
+    try {
+      console.log(
+        `[NanoRT Debug] Iniciando pipeline 'classifyFieldInternal' para: ${currentPhoto.rawUri}`,
+      );
+
+      const rawUriToUse = process.env.EXPO_PUBLIC_USE_MOCK_IMAGES
+        ? "file:///data/data/com.anonymous.frutosmart/cache/TipoD-2.jpeg"
+        : currentPhoto.rawUri;
+
+      const { items } = await NanoRTClassifier.classifyFieldInternal(rawUriToUse);
+
+      console.log("[NanoRT Debug] ¡Pipeline ejecutado con ÉXITO!");
+      console.log(`[NanoRT Debug] Número de segmentos encontrados: ${items.length}`);
+
+      return Ok({ items });
+    } catch (e: unknown) {
+      if (e instanceof NanoRTError) {
+        return Err(e);
+      }
+      return Err(new NanoRTError(String(e), "unknown_error"));
+    }
+  }, [currentPhoto]);
 
   return (
     <AppView legalTextColor="#000">
@@ -155,7 +134,7 @@ const InternalDetectionScreen = () => {
         onTaskError={handleTaskError}
         onTaskComplete={handleTaskComplete}
         loadingMessage="Analizando imagen..."
-        fallbackTimeout={30000}
+        fallbackTimeout={2033}
       />
     </AppView>
   );

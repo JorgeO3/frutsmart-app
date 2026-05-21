@@ -1,5 +1,5 @@
 import { Asset } from "expo-asset";
-import * as FileSystem from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 import { type SQLiteDatabase, openDatabaseAsync } from "expo-sqlite";
 
 import { DatabaseHelpers } from "./DatabaseHelpers";
@@ -62,23 +62,15 @@ export class DatabaseConnection {
       const dbFileInfo = await FileSystem.getInfoAsync(dbPath);
 
 
-      if (ENABLE_MOCK_DATA && !dbFileInfo.exists) {
-        // --- INICIO DE LA LÓGICA CORREGIDA ---
+if (ENABLE_MOCK_DATA && !dbFileInfo.exists) {
         console.log("Modo Mock: Copiando base de datos desde assets...");
-
-        // a. Obtener el objeto Asset desde el require()
         const dbAsset = Asset.fromModule(DATABASE_ASSET_PATH);
-
-        // b. Asegurarse de que el asset esté descargado y disponible como archivo local.
         if (!dbAsset.downloaded) {
           await dbAsset.downloadAsync();
         }
-
         if (!dbAsset.localUri) {
           throw new Error("No se pudo obtener la URI local para el asset de la base de datos.");
         }
-
-        // c. Usar copyAsync para copiar el archivo local a su destino final.
         await FileSystem.copyAsync({
           from: dbAsset.localUri,
           to: dbPath,
@@ -89,12 +81,10 @@ export class DatabaseConnection {
       // Abrir la base de datos. Si no existe, se creará un archivo vacío.
       this.db = await openDatabaseAsync(this.databaseName);
 
-      if (!ENABLE_MOCK_DATA) {
-        // Modo Producción: Ejecutar el esquema para crear las tablas en la DB vacía.
-        // Se asume que en una ejecución posterior, las tablas ya existirán (CREATE TABLE IF NOT EXISTS).
-        console.log("Modo Producción: Ejecutando esquema SQL...");
-        await this._loadAndExecuteSchema(this.db);
-      }
+      // Siempre ejecutar el esquema para garantizar que todas las tablas existan.
+      // Esto asegura que nuevas tablas (como upload_jobs) se creen en DBs existentes.
+      console.log("Ejecutando esquema SQL para garantizar estructura...");
+      await this._loadAndExecuteSchema(this.db);
 
       // La configuración de conexión siempre es necesaria.
       await this.db.execAsync("PRAGMA journal_mode = WAL");

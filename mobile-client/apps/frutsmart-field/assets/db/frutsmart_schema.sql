@@ -232,3 +232,41 @@ CREATE INDEX IF NOT EXISTS idx_qc_session_time ON quality_classifications(sessio
 
 -- Speeds up finding a report by its session ID.
 CREATE INDEX IF NOT EXISTS idx_reports_session_id ON reports(session_id);
+
+
+-- =============================================================================
+-- SECTION 8: UPLOAD JOBS (Skybolt Resilient Upload Pipeline)
+-- Purpose: Persists upload job state for crash recovery and background uploads.
+-- =============================================================================
+
+CREATE TABLE IF NOT EXISTS upload_jobs (
+    id TEXT PRIMARY KEY,
+    quality_classification_id TEXT,
+    domain TEXT NOT NULL CHECK (domain IN ('plant', 'field')),
+    client_batch_id TEXT NOT NULL,
+    backend_session_id TEXT,
+    skybolt_session_id TEXT,
+    pipeline_step TEXT NOT NULL CHECK (
+        pipeline_step IN ('create_session', 'upload', 'complete_session', 'evaluation', 'done')
+    ),
+    step_status TEXT NOT NULL CHECK (
+        step_status IN ('pending', 'running', 'success', 'failed')
+    ),
+    total_files INTEGER NOT NULL DEFAULT 0,
+    completed_files INTEGER NOT NULL DEFAULT 0,
+    total_bytes INTEGER NOT NULL DEFAULT 0,
+    uploaded_bytes INTEGER NOT NULL DEFAULT 0,
+    last_error TEXT,
+    attempts_count INTEGER NOT NULL DEFAULT 0,
+    last_attempt_at TEXT,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (quality_classification_id)
+        REFERENCES quality_classifications(quality_classification_id) ON DELETE SET NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_upload_jobs_step_status
+    ON upload_jobs(pipeline_step, step_status);
+
+CREATE INDEX IF NOT EXISTS idx_upload_jobs_quality_classification
+    ON upload_jobs(quality_classification_id);
