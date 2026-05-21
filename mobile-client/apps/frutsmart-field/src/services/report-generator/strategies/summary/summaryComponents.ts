@@ -1,4 +1,4 @@
-import { Paths } from "expo-file-system/next";
+import { Paths } from "expo-file-system";
 
 import { escapeHtml } from "../../utils";
 import type {

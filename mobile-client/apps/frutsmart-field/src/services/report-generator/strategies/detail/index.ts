@@ -1,4 +1,4 @@
-import * as FileSystem from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 import { database } from "@adapters/repository/Database";
 
 import type { BunchDetail, DetailReportData, Photo } from "./types";

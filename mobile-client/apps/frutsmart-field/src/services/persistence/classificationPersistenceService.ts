@@ -1,6 +1,6 @@
 import * as Crypto from "expo-crypto";
 import * as Sharing from "expo-sharing";
-import * as FileSystem from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 import {
   SaveFormat,
   type ImageRef,

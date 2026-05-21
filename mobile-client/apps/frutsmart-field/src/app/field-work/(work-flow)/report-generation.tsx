@@ -2,7 +2,7 @@ import React, { useCallback } from "react";
 import { Alert } from "react-native";
 import { useRouter } from "expo-router";
 import * as Print from "expo-print";
-import * as FileSystem from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 
 // --- Componente reutilizable ---
 import AppLoader, { type AsyncResult, Ok, Err } from "@components/AppLoader";

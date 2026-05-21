@@ -2,7 +2,7 @@ import React, { useState, useCallback } from "react";
 import { View, Text, Button, StyleSheet, Alert } from "react-native";
 
 import * as Print from "expo-print";
-import { Paths, File } from "expo-file-system/next";
+import { Paths, File } from "expo-file-system";
 
 // --- COMPONENTES DE LA APLICACIÓN ---
 import AppLoader, { type AsyncResult, Ok, Err } from "@components/AppLoader";

@@ -1,4 +1,4 @@
-import * as FileSystem from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 
 /**
  * Nombre del subdirectorio que usaremos para nuestros archivos temporales.

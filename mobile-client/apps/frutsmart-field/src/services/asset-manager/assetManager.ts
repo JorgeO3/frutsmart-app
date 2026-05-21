@@ -1,5 +1,5 @@
 import { Asset } from 'expo-asset';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import * as Font from 'expo-font';
 import {
   Montserrat_400Regular,
