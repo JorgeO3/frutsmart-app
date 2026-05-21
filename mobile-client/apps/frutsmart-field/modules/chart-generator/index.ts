@@ -2,7 +2,7 @@
 // and on native platforms to ChartGeneratorModule.ts
 export * from './src/ChartGeneratorModule';
 
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import ChartGeneratorModule, { type ChartConfig } from './src/ChartGeneratorModule';
 
 /**
