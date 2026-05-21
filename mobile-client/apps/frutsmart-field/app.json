@@ -23,8 +23,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.anonymous.frutosmart",
-      "runtimeVersion": "1.0.0",
-      "edgeToEdgeEnabled": true
+      "runtimeVersion": "1.0.0"
     },
     "web": {
       "bundler": "metro",
@@ -64,7 +63,8 @@
           "project": "react-native",
           "organization": "osm-devel"
         }
-      ]
+      ],
+      "@sentry/react-native"
     ],
     "experiments": {
       "typedRoutes": true
@@ -79,7 +79,6 @@
     },
     "updates": {
       "url": "https://u.expo.dev/e0ae12af-d933-4ef8-8d73-3287e88f5f2e"
-    },
-    "sdkVersion": "53.0.0"
+    }
   }
 }
