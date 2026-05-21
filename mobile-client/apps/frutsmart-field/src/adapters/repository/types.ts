@@ -112,7 +112,7 @@ export interface ClassificationResult {
  * `QualityClassificationRepository`.
  */
 export interface CreateClassificationPayload {
-  classification: Omit<QualityClassification, "quality_classification_id">;
+  classification: QualityClassification;
   results: Omit<ClassificationResult, "id" | "quality_classification_id">[];
   photos: Omit<ClassificationPhoto, "id" | "quality_classification_id">[];
 }

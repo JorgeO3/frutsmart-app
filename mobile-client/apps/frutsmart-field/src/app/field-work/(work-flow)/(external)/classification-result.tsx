@@ -27,7 +27,7 @@ import Carousel, {
 import { scale } from "@utils/responsive";
 import {
   useFieldWorkActions,
-  useExternalSegments,
+  useExternalSegmentedUris,
   useExternalClassification,
   useFieldWorkStoreBase,
 } from "@stores/fieldWork";
@@ -220,7 +220,7 @@ const ClassificationIntroScreen = () => {
     isModalPreviewVisible: false,
   }));
 
-  const allRawUris = useExternalSegments();
+  const allRawUris = useExternalSegmentedUris();
   const { updateExternalResult } = useFieldWorkActions();
   const { result: finalResult } = useExternalClassification();
 
@@ -231,7 +231,7 @@ const ClassificationIntroScreen = () => {
 
   // Memorizar el array de fotos
   const photos = useMemo(
-    () => allRawUris.map((uri) => ({ uri: uri.rawUri })),
+    () => allRawUris.map((uri) => ({ uri })),
     [allRawUris],
   );
 

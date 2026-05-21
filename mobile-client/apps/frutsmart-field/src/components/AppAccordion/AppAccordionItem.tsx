@@ -3,6 +3,7 @@ import { StyleSheet, View, TouchableOpacity } from "react-native";
 
 import Animated, {
   Easing,
+  interpolateColor,
   withTiming,
   useSharedValue,
   useDerivedValue,
@@ -84,7 +85,11 @@ export default function AppAccordionItem({
 
   // Animación de fondo del header
   const headerStyle = useAnimatedStyle(() => ({
-    backgroundColor: `rgba(233,233,233,${highlight.value})`,
+    backgroundColor: interpolateColor(
+      highlight.value,
+      [0, 0.04],
+      ["rgba(233, 233, 233, 0)", "rgba(233, 233, 233, 0.04)"],
+    ),
   }));
 
   const chevronColor = useThemeColor({}, "tint");

@@ -69,9 +69,7 @@ const DetectionScreen = () => {
         rawUri: compactedUri,
         segmentedUri: item.uri,
         bestConfidence: Math.max(...item.confidences),
-        bestClassName:
-          LABELS[item.confidences.indexOf(Math.max(...item.confidences))] ||
-          "N/A",
+        bestClassName: LABELS[item.confidences.indexOf(Math.max(...item.confidences))] || "N/A",
         confidences: item.confidences,
       }));
 
@@ -108,9 +106,7 @@ const DetectionScreen = () => {
     }
 
     try {
-      console.log(
-        `[NanoRT Debug] Iniciando pipeline 'classifyFieldExternal' para: ${currentPhoto.rawUri}`,
-      );
+      console.log(`[NanoRT Debug] Iniciando pipeline 'classifyFieldExternal' para: ${currentPhoto.rawUri}`);
 
       const rawUriToUse = process.env.EXPO_PUBLIC_USE_MOCK_IMAGES
         ? "file:///data/data/com.anonymous.frutosmart/cache/Clase1.jpeg"

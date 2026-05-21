@@ -3,36 +3,13 @@ import type { SQLiteDatabase } from "expo-sqlite";
 import type {
   ClassificationPhoto,
   ClassificationResult,
+  CreateClassificationPayload,
+  FullQualityClassification,
   QualityClassification,
 } from "../types";
 import type { DatabaseConnection } from "../database/DatabaseConnection";
 import type { ClassificationPhotoRepository } from "./ClassificationPhotoRepository";
 import type { ClassificationResultRepository } from "./ClassificationResultRepository";
-
-// ============================================================
-// Tipos de Datos Específicos para este Repositorio
-// Nota: Estos tipos pueden vivir aquí o en un archivo central types.ts
-// ============================================================
-
-/**
- * Define la estructura de datos necesaria para crear una nueva clasificación completa.
- * Es el "Payload" que el servicio debe construir y enviar a este repositorio.
- */
-export interface CreateClassificationPayload {
-  classification: Omit<QualityClassification, "quality_classification_id">;
-  results: Omit<ClassificationResult, "id" | "quality_classification_id">[];
-  photos: Omit<ClassificationPhoto, "id" | "quality_classification_id">[];
-}
-
-/**
- * Representa una clasificación completa (un "Agregado"), incluyendo sus
- * entidades hijas (resultados y fotos). Es el tipo de dato que devuelven
- * los métodos de consulta como `findById`.
- */
-export interface FullQualityClassification extends QualityClassification {
-  results: ClassificationResult[];
-  photos: ClassificationPhoto[];
-}
 
 // ============================================================
 // Queries SQL para la tabla 'quality_classifications'
@@ -90,16 +67,11 @@ export class QualityClassificationRepository {
     payload: CreateClassificationPayload,
   ): Promise<QualityClassification> {
     const { classification, results, photos } = payload;
-    const classificationId = this.db.helpers.generateId();
-
-    const newClassification: QualityClassification = {
-      ...classification,
-      quality_classification_id: classificationId,
-    };
+    const classificationId = classification.quality_classification_id;
 
     await this.db.transaction(async (tx) => {
       // 1. Insertar el registro principal (responsabilidad de esta clase).
-      await this._insertMainClassification(tx, newClassification);
+      await this._insertMainClassification(tx, classification);
 
       // 2. Delegar la inserción de resultados al repositorio correspondiente.
       for (const result of results) {
@@ -112,7 +84,7 @@ export class QualityClassificationRepository {
       }
     });
 
-    return newClassification;
+    return classification;
   }
 
   /**

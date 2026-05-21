@@ -13,7 +13,7 @@ import type {
   UploadJobLiveMetrics,
   UploadJobViewModel,
 } from "@src/services/uploads/types";
-import { font, s, vs } from "@utils/responsive";
+import { font, s, vs } from "@utils/responsiveV2";
 
 type SessionStatus =
   | "preparing"
@@ -88,7 +88,11 @@ const formatSpeed = (speedBytesPerSec: number | null): string => {
 const errorToUserMessage = (lastError: string | null): string | null => {
   if (!lastError) return null;
   const normalized = lastError.toLowerCase();
-  if (normalized.includes("cert") || normalized.includes("trust anchor") || normalized.includes("ssl")) {
+  if (
+    normalized.includes("cert") ||
+    normalized.includes("trust anchor") ||
+    normalized.includes("ssl")
+  ) {
     return "Error de conexion segura. Verifica que el certificado Azurite este instalado.";
   }
   if (normalized.includes("auth") || normalized.includes("token")) {
@@ -109,7 +113,10 @@ const errorToUserMessage = (lastError: string | null): string | null => {
   return "No se pudo completar la sincronizacion del analisis.";
 };
 
-const toClassificationLabel = (classificationId: string | null, jobId: string): string => {
+const toClassificationLabel = (
+  classificationId: string | null,
+  jobId: string,
+): string => {
   const id = classificationId ?? jobId;
   return `Clasificacion ${id.slice(0, 8)}`;
 };
@@ -121,12 +128,15 @@ const mapStatus = (
   live: UploadJobLiveMetrics,
 ): { status: SessionStatus; label: string; message: string } => {
   if (job.status === "failed") {
-    const isPermanent = job.lastError ? /^\[PERMANENT\]/i.test(job.lastError) : false;
+    const isPermanent = job.lastError
+      ? /^\[PERMANENT\]/i.test(job.lastError)
+      : false;
     if (isPermanent || job.attemptsCount >= MAX_RETRY_ATTEMPTS) {
       return {
         status: "permanently_failed",
         label: "Error permanente",
-        message: "No se pudo completar la sincronizacion. Contacta al administrador.",
+        message:
+          "No se pudo completar la sincronizacion. Contacta al administrador.",
       };
     }
     return {
@@ -144,7 +154,10 @@ const mapStatus = (
     };
   }
 
-  if (job.pipelineStep === "complete_session" || job.pipelineStep === "evaluation") {
+  if (
+    job.pipelineStep === "complete_session" ||
+    job.pipelineStep === "evaluation"
+  ) {
     return {
       status: "finalizing",
       label: "Procesando resultado",
@@ -247,7 +260,8 @@ const mapJobToSession = (
     ? `Archivo actual: ${live.currentItemId.slice(0, 8)}`
     : null;
 
-  const cleanLastError = job.lastError?.replace(/^\[PERMANENT\]\s*/i, "") ?? null;
+  const cleanLastError =
+    job.lastError?.replace(/^\[PERMANENT\]\s*/i, "") ?? null;
   const userFacingError = errorToUserMessage(cleanLastError);
 
   return {
@@ -280,7 +294,8 @@ const getEtaLabel = (session: UploadSession): string => {
   if (session.estimatedSeconds && session.estimatedSeconds > 0) {
     return `Faltan ${formatDuration(session.estimatedSeconds)}`;
   }
-  if (session.progress >= 100 && session.status === "uploading") return "Finalizando carga";
+  if (session.progress >= 100 && session.status === "uploading")
+    return "Finalizando carga";
   if (session.status === "uploading") return "Calculando tiempo";
   if (session.status === "finalizing") return "Procesando resultado";
   return "Sin estimacion";
@@ -410,7 +425,10 @@ const SessionCard = ({
 }) => {
   const statusConfig = getStatusConfig(session.status);
   return (
-    <TouchableOpacity onPress={() => onPress(session)} style={styles.sessionCard}>
+    <TouchableOpacity
+      onPress={() => onPress(session)}
+      style={styles.sessionCard}
+    >
       <View style={styles.cardContent}>
         <AppText.H6 style={styles.sessionName} numberOfLines={1}>
           {session.name}
@@ -420,9 +438,20 @@ const SessionCard = ({
           {session.statusMessage}
         </AppText>
 
-        <View style={[styles.statusChip, { backgroundColor: statusConfig.backgroundColor }]}>
-          <MaterialCommunityIcons name={statusConfig.icon} size={14} color={statusConfig.color} />
-          <AppText style={[styles.statusChipText, { color: statusConfig.color }]}>
+        <View
+          style={[
+            styles.statusChip,
+            { backgroundColor: statusConfig.backgroundColor },
+          ]}
+        >
+          <MaterialCommunityIcons
+            name={statusConfig.icon}
+            size={14}
+            color={statusConfig.color}
+          />
+          <AppText
+            style={[styles.statusChipText, { color: statusConfig.color }]}
+          >
             {session.statusLabel}
           </AppText>
         </View>
@@ -432,9 +461,13 @@ const SessionCard = ({
         </AppText>
 
         <View style={styles.metricsRow}>
-          <AppText style={styles.metricText}>{formatBytes(session.uploadedBytes)}</AppText>
+          <AppText style={styles.metricText}>
+            {formatBytes(session.uploadedBytes)}
+          </AppText>
           <AppText style={styles.metricText}>•</AppText>
-          <AppText style={styles.metricText}>{formatSpeed(session.speedBytesPerSec)}</AppText>
+          <AppText style={styles.metricText}>
+            {formatSpeed(session.speedBytesPerSec)}
+          </AppText>
           <AppText style={styles.metricText}>•</AppText>
           <AppText style={styles.metricText}>{getEtaLabel(session)}</AppText>
         </View>
@@ -453,9 +486,15 @@ const SessionCard = ({
       </View>
 
       <View style={styles.statusButtonContainer}>
-        <TouchableOpacity style={styles.statusButton} onPress={() => onPress(session)}>
+        <TouchableOpacity
+          style={styles.statusButton}
+          onPress={() => onPress(session)}
+        >
           <View style={StyleSheet.absoluteFill}>
-            <RingProgressBarIcon progress={session.progress} color={statusConfig.color} />
+            <RingProgressBarIcon
+              progress={session.progress}
+              color={statusConfig.color}
+            />
           </View>
           <AppText style={styles.progressLabel}>{session.progress}%</AppText>
         </TouchableOpacity>
@@ -534,7 +573,10 @@ const UploadsScreen = () => {
             break;
         }
       } catch (err) {
-        console.warn("[uploads] handleAction failed:", { action, error: String(err) });
+        console.warn("[uploads] handleAction failed:", {
+          action,
+          error: String(err),
+        });
       }
     })();
   };
@@ -542,8 +584,8 @@ const UploadsScreen = () => {
   return (
     <AppView legalTextActive={false} style={styles.container}>
       <AppText style={styles.headerText}>
-        Sigue el avance de sincronizacion de tus clasificaciones y toma acciones cuando
-        sea necesario.
+        Sigue el avance de sincronizacion de tus clasificaciones y toma acciones
+        cuando sea necesario.
       </AppText>
 
       <ScrollView
@@ -552,9 +594,13 @@ const UploadsScreen = () => {
         contentContainerStyle={{ paddingBottom: 20 }}
       >
         {isRecovering ? (
-          <AppText style={styles.emptyText}>Recuperando cargas pendientes...</AppText>
+          <AppText style={styles.emptyText}>
+            Recuperando cargas pendientes...
+          </AppText>
         ) : sessions.length === 0 ? (
-          <AppText style={styles.emptyText}>No hay clasificaciones pendientes de sincronizar.</AppText>
+          <AppText style={styles.emptyText}>
+            No hay clasificaciones pendientes de sincronizar.
+          </AppText>
         ) : (
           sessions.map((session) => (
             <SessionCard

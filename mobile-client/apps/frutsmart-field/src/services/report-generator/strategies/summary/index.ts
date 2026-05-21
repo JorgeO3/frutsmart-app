@@ -1,7 +1,7 @@
 import { PixelRatio } from "react-native";
 import * as FileSystem from "expo-file-system/legacy";
 
-import * as ChartGenerator from "@/modules/chart-generator";
+import ChartForge, { ChartConfig } from "chart-forge";
 
 import { database } from "@adapters/repository/Database";
 
@@ -237,7 +237,7 @@ export class SummaryReportStrategy implements IReportStrategy {
     harvestCriteria: HarvestCriteriaSection;
     internalClassification: ClassificationSection;
   }): Promise<Map<string, string>> {
-    const chartConfigs: ChartGenerator.ChartConfig[] = [];
+    const chartConfigs: ChartConfig[] = [];
     const baseConfig = {
       width: 400 * PixelRatio.get(),
       height: 320 * PixelRatio.get(),
@@ -265,7 +265,7 @@ export class SummaryReportStrategy implements IReportStrategy {
     createConfigs(data.internalClassification, "int");
 
     const results = await Promise.allSettled(
-      chartConfigs.map((c) => ChartGenerator.generatePieChart(c)),
+      chartConfigs.map((c) => ChartForge.generatePieChart(c)),
     );
 
     const chartImageMap = new Map<string, string>();

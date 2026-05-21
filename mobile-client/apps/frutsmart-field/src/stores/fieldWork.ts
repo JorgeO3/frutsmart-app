@@ -274,11 +274,28 @@ export const useExternalRawUris = () =>
     })
   );
 
+export const useExternalSegmentedUris = () =>
+  useFieldWorkStoreBase(
+    useShallow((state) => {
+      const uris = state.externalClassification.segments.map(seg => seg.segmentedUri);
+      return [...new Set(uris)]; // Devuelve solo las URIs únicas
+    })
+  );
+
 /** Devuelve un array con las URIs de las fotos originales de la clasificación interna (sin duplicados). */
 export const useInternalRawUris = () =>
   useFieldWorkStoreBase(
     useShallow((state) => {
       const uris = state.internalClassification.segments.map(seg => seg.rawUri);
+      return [...new Set(uris)]; // Devuelve solo las URIs únicas
+    })
+  );
+
+/** Devuelve un array con las URIs de las fotos segmentadas de la clasificación interna (sin duplicados). */
+export const useInternalSegmentedUris = () =>
+  useFieldWorkStoreBase(
+    useShallow((state) => {
+      const uris = state.internalClassification.segments.map(seg => seg.segmentedUri);
       return [...new Set(uris)]; // Devuelve solo las URIs únicas
     })
   );

@@ -47,6 +47,14 @@ const HomeMenuCardData: HomeMenuCardData[] = [
     },
     Link: "/field-work/home",
   },
+  {
+    title: "Subir Archivos",
+    img: {
+      uri: require("@assets/images/field-work/home/upload-icon.webp"),
+      alt: "Icono subir archivos",
+    },
+    Link: "/field-work/uploads",
+  },
 ];
 
 const Home = () => {

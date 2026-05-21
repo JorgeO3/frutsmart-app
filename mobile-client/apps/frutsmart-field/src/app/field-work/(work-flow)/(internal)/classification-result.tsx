@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { use, useCallback, useEffect, useRef, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -18,7 +18,7 @@ import { useSharedValue } from "react-native-reanimated";
 import {
   useFieldWorkActions,
   useInternalClassification,
-  useInternalRawUris,
+  useInternalSegmentedUris,
   useFieldWorkStoreBase,
 } from "@stores/fieldWork";
 import { scale } from "@utils/responsive";
@@ -190,8 +190,8 @@ const CarouselItem = ({ imgSrc, index, handleZoom }: CarouselItemProps) => {
 const ClassificationIntroScreen = () => {
   const router = useRouter();
 
-  const allRawUris = useInternalRawUris();
-  const rawPhoto = allRawUris[0];
+  const allSegmentedUris = useInternalSegmentedUris();
+  const rawPhoto = allSegmentedUris[0];
 
   const { updateInternalResult } = useFieldWorkActions();
   const { result: finalResult } = useInternalClassification();
@@ -355,7 +355,7 @@ const ClassificationIntroScreen = () => {
             />
 
             <Pagination.Basic
-              data={allRawUris}
+              data={allSegmentedUris}
               progress={progress}
               onPress={onPressPagination}
               containerStyle={{ gap: scale(5), marginTop: scale(10) }}

@@ -640,6 +640,7 @@ class UploadOrchestrator {
     };
 
     for (const photo of classification.photos) {
+      if (photo.photo_type === "cropped") continue;
       add(photo.uri);
     }
 

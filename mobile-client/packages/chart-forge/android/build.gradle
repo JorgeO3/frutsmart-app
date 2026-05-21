@@ -26,11 +26,15 @@ buildscript {
   }
 }
 
-
 apply plugin: "com.android.library"
 apply plugin: "kotlin-android"
-
 apply plugin: "com.facebook.react"
+
+repositories {
+  google()
+  mavenCentral()
+  maven { url "https://jitpack.io" }
+}
 
 android {
   namespace "com.chartforge"
@@ -64,4 +68,5 @@ android {
 
 dependencies {
   implementation "com.facebook.react:react-android"
+  implementation "com.github.PhilJay:MPAndroidChart:v3.1.0"
 }

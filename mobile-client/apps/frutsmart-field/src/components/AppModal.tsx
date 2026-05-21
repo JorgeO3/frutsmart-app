@@ -7,6 +7,7 @@ import {
 } from "react-native";
 
 import Animated, {
+  interpolateColor,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -66,7 +67,11 @@ const AppModal = (props: AppModalProps) => {
   }));
 
   const backgroundAnimatedStyle = useAnimatedStyle(() => ({
-    backgroundColor: `rgba(0, 0, 0, ${animation.value * 0.5})`,
+    backgroundColor: interpolateColor(
+      animation.value,
+      [0, 1],
+      ["transparent", "rgba(0, 0, 0, 0.5)"],
+    ),
   }));
 
   return (

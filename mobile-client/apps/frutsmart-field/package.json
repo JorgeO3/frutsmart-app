@@ -22,6 +22,7 @@
     "@sentry/react-native": "~7.11.0",
     "@shopify/flash-list": "2.0.2",
     "@tabler/icons-react-native": "~3.31.0",
+    "chart-forge": "workspace:*",
     "expo": "~55.0.25",
     "expo-constants": "~55.0.16",
     "expo-crypto": "~55.0.15",
@@ -31,6 +32,7 @@
     "expo-image": "~55.0.10",
     "expo-image-manipulator": "~55.0.16",
     "expo-image-picker": "~55.0.20",
+    "expo-intent-launcher": "~55.0.12",
     "expo-linear-gradient": "~55.0.14",
     "expo-linking": "~55.0.15",
     "expo-location": "~55.1.10",
@@ -49,6 +51,7 @@
     "expo-web-browser": "~55.0.16",
     "lottie-react-native": "~7.3.4",
     "mitt": "~3.0.1",
+    "nano-rt": "workspace:*",
     "react": "19.2.0",
     "react-fast-compare": "~3.2.2",
     "react-hook-form": "~7.55.0",
@@ -62,9 +65,8 @@
     "react-native-ui-datepicker": "~3.1.2",
     "react-native-web": "~0.21.0",
     "react-native-webview": "~13.16.0",
-    "zustand": "~5.0.3",
-    "nano-rt": "workspace:*",
-    "skybolt": "workspace:*"
+    "skybolt": "workspace:*",
+    "zustand": "~5.0.3"
   },
   "devDependencies": {
     "@babel/core": "~7.25.2",

@@ -9,6 +9,7 @@ import AppLoader, { type AsyncResult, Ok, Err } from "@components/AppLoader";
 import { useSessionId } from "@stores/appStore";
 import { useFieldWorkData } from "@stores/fieldWork";
 import { classificationPersistenceService } from "@services/persistence/classificationPersistenceService";
+import { useSkyboltUploadContext } from "@src/providers/SkyboltUploadProvider";
 
 import AppView from "@components/AppView";
 
@@ -20,6 +21,7 @@ type AsyncTaskResult = AsyncResult<AsyncTaskSuccess, AsyncTaskError>;
 const SavingClassificationScreen = () => {
   const router = useRouter();
   const sessionId = useSessionId();
+  const { enqueueUploadFromAnalysis } = useSkyboltUploadContext();
 
   console.log("Rendering SavingClassificationScreen...");
 
@@ -74,6 +76,14 @@ const SavingClassificationScreen = () => {
     console.log(
       `Clasificación guardada exitosamente con ID: ${classificationId}`,
     );
+
+    void enqueueUploadFromAnalysis(classificationId).catch((error) => {
+      console.error("No se pudo encolar upload de clasificación", {
+        classificationId,
+        error,
+      });
+    });
+
     // Navega a la pantalla final del flujo.
     router.replace("/field-work/(work-flow)/cluster-summary");
   };

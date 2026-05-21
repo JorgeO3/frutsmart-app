@@ -1,0 +1,713 @@
+                                                                                                    javax.net.ssl.SSLHandshakeException: java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+                                                                                                    	at com.android.org.conscrypt.SSLUtils.toSSLHandshakeException(SSLUtils.java:358)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.convertException(ConscryptEngine.java:1131)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.readPlaintextData(ConscryptEngine.java:1086)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.unwrap(ConscryptEngine.java:873)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.unwrap(ConscryptEngine.java:744)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.unwrap(ConscryptEngine.java:709)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket$SSLInputStream.processDataFromSocket(ConscryptEngineSocket.java:907)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket$SSLInputStream.-$$Nest$mprocessDataFromSocket(Unknown Source:0)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket.doHandshake(ConscryptEngineSocket.java:242)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket.startHandshake(ConscryptEngineSocket.java:224)
+                                                                                                    	at okhttp3.internal.connection.RealConnection.connectTls(RealConnection.kt:379)
+                                                                                                    	at okhttp3.internal.connection.RealConnection.establishProtocol(RealConnection.kt:337)
+                                                                                                    	at okhttp3.internal.connection.RealConnection.connect(RealConnection.kt:209)
+                                                                                                    	at okhttp3.internal.connection.ExchangeFinder.findConnection(ExchangeFinder.kt:226)
+                                                                                                    	at okhttp3.internal.connection.ExchangeFinder.findHealthyConnection(ExchangeFinder.kt:106)
+                                                                                                    	at okhttp3.internal.connection.ExchangeFinder.find(ExchangeFinder.kt:74)
+                                                                                                    	at okhttp3.internal.connection.RealCall.initExchange$okhttp(RealCall.kt:255)
+                                                                                                    	at okhttp3.internal.connection.ConnectInterceptor.intercept(ConnectInterceptor.kt:32)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.cache.CacheInterceptor.intercept(CacheInterceptor.kt:95)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.http.BridgeInterceptor.intercept(BridgeInterceptor.kt:83)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.http.RetryAndFollowUpInterceptor.intercept(RetryAndFollowUpInterceptor.kt:76)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at expo.modules.kotlin.devtools.ExpoNetworkInspectOkHttpAppInterceptor.intercept(ExpoNetworkInspectOkHttpInterceptors.kt:60)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.connection.RealCall.getResponseWithInterceptorChain$okhttp(RealCall.kt:201)
+                                                                                                    	at okhttp3.internal.connection.RealCall.execute(RealCall.kt:154)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader.executeRequest(BlobUploader.kt:323)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader.retryWithSasRefresh(BlobUploader.kt:292)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader.access$retryWithSasRefresh(BlobUploader.kt:40)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader$retryWithSasRefresh$1.invokeSuspend(Unknown Source:15)
+                                                                                                    	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+                                                                                                    	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+                                                                                                    	at kotlinx.coroutines.internal.LimitedDispatcher$Worker.run(LimitedDispatcher.kt:124)
+                                                                                                    	at kotlinx.coroutines.scheduling.TaskImpl.run(Tasks.kt:89)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler.runSafely(CoroutineScheduler.kt:586)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.executeTask(CoroutineScheduler.kt:820)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.runWorker(CoroutineScheduler.kt:717)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.run(CoroutineScheduler.kt:704)
+2026-05-21 15:18:18.130  4825-5280  Skybolt-Skybolt-BlobUpl com.anonymous.frutosmart             W  Caused by: java.security.cert.CertificateException: java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+                                                                                                    	at com.android.org.conscrypt.TrustManagerImpl.checkTrustedRecursive(TrustManagerImpl.java:649)
+                                                                                                    	at com.android.org.conscrypt.TrustManagerImpl.checkTrusted(TrustManagerImpl.java:498)
+                                                                                                    	at com.android.org.conscrypt.TrustManagerImpl.checkTrusted(TrustManagerImpl.java:418)
+                                                                                                    	at com.android.org.conscrypt.TrustManagerImpl.getTrustedChainForServer(TrustManagerImpl.java:346)
+                                                                                                    	at android.security.net.config.NetworkSecurityTrustManager.checkServerTrusted(NetworkSecurityTrustManager.java:95)
+                                                                                                    	at android.security.net.config.RootTrustManager.checkServerTrusted(RootTrustManager.java:90)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket$2.checkServerTrusted(ConscryptEngineSocket.java:169)
+                                                                                                    	at com.android.org.conscrypt.Platform.checkServerTrusted(Platform.java:286)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.verifyCertificateChain(ConscryptEngine.java:1635)
+                                                                                                    	at com.android.org.conscrypt.NativeCrypto.ENGINE_SSL_read_direct(Native Method)
+                                                                                                    	at com.android.org.conscrypt.NativeSsl.readDirectByteBuffer(NativeSsl.java:574)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.readPlaintextDataDirect(ConscryptEngine.java:1092)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.readPlaintextData(ConscryptEngine.java:1076)
+                                                                                                    	... 38 more
+                                                                                                    Caused by: java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+                                                                                                    	... 51 more
+2026-05-21 15:18:18.130  4825-5280  Skybolt-Skybolt-BlobUpl com.anonymous.frutosmart             I  Network error, retrying in 4000ms (attempt 2/3): java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+2026-05-21 15:18:18.130  4825-5276  Skybolt-Skybolt-BlobUpl com.anonymous.frutosmart             W  IO exception during request: op=PUT_BLOB, error=java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+2026-05-21 15:18:18.130  4825-5276  Skybolt-Skybolt-BlobUpl com.anonymous.frutosmart             W  Network error: op=PUT_BLOB, item=265dd013-fe20-4aa5-9f3a-7ea79c0936f9, attempt=1, error=java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+                                                                                                    javax.net.ssl.SSLHandshakeException: java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+                                                                                                    	at com.android.org.conscrypt.SSLUtils.toSSLHandshakeException(SSLUtils.java:358)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.convertException(ConscryptEngine.java:1131)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.readPlaintextData(ConscryptEngine.java:1086)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.unwrap(ConscryptEngine.java:873)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.unwrap(ConscryptEngine.java:744)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.unwrap(ConscryptEngine.java:709)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket$SSLInputStream.processDataFromSocket(ConscryptEngineSocket.java:907)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket$SSLInputStream.-$$Nest$mprocessDataFromSocket(Unknown Source:0)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket.doHandshake(ConscryptEngineSocket.java:242)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket.startHandshake(ConscryptEngineSocket.java:224)
+                                                                                                    	at okhttp3.internal.connection.RealConnection.connectTls(RealConnection.kt:379)
+                                                                                                    	at okhttp3.internal.connection.RealConnection.establishProtocol(RealConnection.kt:337)
+                                                                                                    	at okhttp3.internal.connection.RealConnection.connect(RealConnection.kt:209)
+                                                                                                    	at okhttp3.internal.connection.ExchangeFinder.findConnection(ExchangeFinder.kt:226)
+                                                                                                    	at okhttp3.internal.connection.ExchangeFinder.findHealthyConnection(ExchangeFinder.kt:106)
+                                                                                                    	at okhttp3.internal.connection.ExchangeFinder.find(ExchangeFinder.kt:74)
+                                                                                                    	at okhttp3.internal.connection.RealCall.initExchange$okhttp(RealCall.kt:255)
+                                                                                                    	at okhttp3.internal.connection.ConnectInterceptor.intercept(ConnectInterceptor.kt:32)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.cache.CacheInterceptor.intercept(CacheInterceptor.kt:95)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.http.BridgeInterceptor.intercept(BridgeInterceptor.kt:83)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.http.RetryAndFollowUpInterceptor.intercept(RetryAndFollowUpInterceptor.kt:76)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at expo.modules.kotlin.devtools.ExpoNetworkInspectOkHttpAppInterceptor.intercept(ExpoNetworkInspectOkHttpInterceptors.kt:60)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.connection.RealCall.getResponseWithInterceptorChain$okhttp(RealCall.kt:201)
+                                                                                                    	at okhttp3.internal.connection.RealCall.execute(RealCall.kt:154)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader.executeRequest(BlobUploader.kt:323)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader.retryWithSasRefresh(BlobUploader.kt:292)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader.access$retryWithSasRefresh(BlobUploader.kt:40)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader$retryWithSasRefresh$1.invokeSuspend(Unknown Source:15)
+                                                                                                    	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+                                                                                                    	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+                                                                                                    	at kotlinx.coroutines.internal.LimitedDispatcher$Worker.run(LimitedDispatcher.kt:124)
+                                                                                                    	at kotlinx.coroutines.scheduling.TaskImpl.run(Tasks.kt:89)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler.runSafely(CoroutineScheduler.kt:586)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.executeTask(CoroutineScheduler.kt:820)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.runWorker(CoroutineScheduler.kt:717)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.run(CoroutineScheduler.kt:704)
+2026-05-21 15:18:18.131  4825-5276  Skybolt-Skybolt-BlobUpl com.anonymous.frutosmart             W  Caused by: java.security.cert.CertificateException: java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+                                                                                                    	at com.android.org.conscrypt.TrustManagerImpl.checkTrustedRecursive(TrustManagerImpl.java:649)
+                                                                                                    	at com.android.org.conscrypt.TrustManagerImpl.checkTrusted(TrustManagerImpl.java:498)
+                                                                                                    	at com.android.org.conscrypt.TrustManagerImpl.checkTrusted(TrustManagerImpl.java:418)
+                                                                                                    	at com.android.org.conscrypt.TrustManagerImpl.getTrustedChainForServer(TrustManagerImpl.java:346)
+                                                                                                    	at android.security.net.config.NetworkSecurityTrustManager.checkServerTrusted(NetworkSecurityTrustManager.java:95)
+                                                                                                    	at android.security.net.config.RootTrustManager.checkServerTrusted(RootTrustManager.java:90)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket$2.checkServerTrusted(ConscryptEngineSocket.java:169)
+                                                                                                    	at com.android.org.conscrypt.Platform.checkServerTrusted(Platform.java:286)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.verifyCertificateChain(ConscryptEngine.java:1635)
+                                                                                                    	at com.android.org.conscrypt.NativeCrypto.ENGINE_SSL_read_direct(Native Method)
+                                                                                                    	at com.android.org.conscrypt.NativeSsl.readDirectByteBuffer(NativeSsl.java:574)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.readPlaintextDataDirect(ConscryptEngine.java:1092)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.readPlaintextData(ConscryptEngine.java:1076)
+                                                                                                    	... 38 more
+                                                                                                    Caused by: java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+                                                                                                    	... 51 more
+2026-05-21 15:18:18.131  4825-5276  Skybolt-Skybolt-BlobUpl com.anonymous.frutosmart             I  Network error, retrying in 4000ms (attempt 2/3): java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+2026-05-21 15:18:18.133  4825-5132  Skybolt-Skybolt-BlobUpl com.anonymous.frutosmart             W  IO exception during request: op=PUT_BLOB, error=java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+2026-05-21 15:18:18.133  4825-5132  Skybolt-Skybolt-BlobUpl com.anonymous.frutosmart             W  Network error: op=PUT_BLOB, item=2927719b-99e4-4cb9-85fd-1c684b91c733, attempt=1, error=java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+                                                                                                    javax.net.ssl.SSLHandshakeException: java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+                                                                                                    	at com.android.org.conscrypt.SSLUtils.toSSLHandshakeException(SSLUtils.java:358)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.convertException(ConscryptEngine.java:1131)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.readPlaintextData(ConscryptEngine.java:1086)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.unwrap(ConscryptEngine.java:873)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.unwrap(ConscryptEngine.java:744)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.unwrap(ConscryptEngine.java:709)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket$SSLInputStream.processDataFromSocket(ConscryptEngineSocket.java:907)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket$SSLInputStream.-$$Nest$mprocessDataFromSocket(Unknown Source:0)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket.doHandshake(ConscryptEngineSocket.java:242)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket.startHandshake(ConscryptEngineSocket.java:224)
+                                                                                                    	at okhttp3.internal.connection.RealConnection.connectTls(RealConnection.kt:379)
+                                                                                                    	at okhttp3.internal.connection.RealConnection.establishProtocol(RealConnection.kt:337)
+                                                                                                    	at okhttp3.internal.connection.RealConnection.connect(RealConnection.kt:209)
+                                                                                                    	at okhttp3.internal.connection.ExchangeFinder.findConnection(ExchangeFinder.kt:226)
+                                                                                                    	at okhttp3.internal.connection.ExchangeFinder.findHealthyConnection(ExchangeFinder.kt:106)
+                                                                                                    	at okhttp3.internal.connection.ExchangeFinder.find(ExchangeFinder.kt:74)
+                                                                                                    	at okhttp3.internal.connection.RealCall.initExchange$okhttp(RealCall.kt:255)
+                                                                                                    	at okhttp3.internal.connection.ConnectInterceptor.intercept(ConnectInterceptor.kt:32)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.cache.CacheInterceptor.intercept(CacheInterceptor.kt:95)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.http.BridgeInterceptor.intercept(BridgeInterceptor.kt:83)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.http.RetryAndFollowUpInterceptor.intercept(RetryAndFollowUpInterceptor.kt:76)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at expo.modules.kotlin.devtools.ExpoNetworkInspectOkHttpAppInterceptor.intercept(ExpoNetworkInspectOkHttpInterceptors.kt:60)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.connection.RealCall.getResponseWithInterceptorChain$okhttp(RealCall.kt:201)
+                                                                                                    	at okhttp3.internal.connection.RealCall.execute(RealCall.kt:154)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader.executeRequest(BlobUploader.kt:323)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader.retryWithSasRefresh(BlobUploader.kt:292)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader.access$retryWithSasRefresh(BlobUploader.kt:40)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader$retryWithSasRefresh$1.invokeSuspend(Unknown Source:15)
+                                                                                                    	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+                                                                                                    	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+                                                                                                    	at kotlinx.coroutines.internal.LimitedDispatcher$Worker.run(LimitedDispatcher.kt:124)
+                                                                                                    	at kotlinx.coroutines.scheduling.TaskImpl.run(Tasks.kt:89)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler.runSafely(CoroutineScheduler.kt:586)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.executeTask(CoroutineScheduler.kt:820)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.runWorker(CoroutineScheduler.kt:717)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.run(CoroutineScheduler.kt:704)
+2026-05-21 15:18:18.133  4825-5132  Skybolt-Skybolt-BlobUpl com.anonymous.frutosmart             W  Caused by: java.security.cert.CertificateException: java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+                                                                                                    	at com.android.org.conscrypt.TrustManagerImpl.checkTrustedRecursive(TrustManagerImpl.java:649)
+                                                                                                    	at com.android.org.conscrypt.TrustManagerImpl.checkTrusted(TrustManagerImpl.java:498)
+                                                                                                    	at com.android.org.conscrypt.TrustManagerImpl.checkTrusted(TrustManagerImpl.java:418)
+                                                                                                    	at com.android.org.conscrypt.TrustManagerImpl.getTrustedChainForServer(TrustManagerImpl.java:346)
+                                                                                                    	at android.security.net.config.NetworkSecurityTrustManager.checkServerTrusted(NetworkSecurityTrustManager.java:95)
+                                                                                                    	at android.security.net.config.RootTrustManager.checkServerTrusted(RootTrustManager.java:90)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket$2.checkServerTrusted(ConscryptEngineSocket.java:169)
+                                                                                                    	at com.android.org.conscrypt.Platform.checkServerTrusted(Platform.java:286)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.verifyCertificateChain(ConscryptEngine.java:1635)
+                                                                                                    	at com.android.org.conscrypt.NativeCrypto.ENGINE_SSL_read_direct(Native Method)
+                                                                                                    	at com.android.org.conscrypt.NativeSsl.readDirectByteBuffer(NativeSsl.java:574)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.readPlaintextDataDirect(ConscryptEngine.java:1092)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.readPlaintextData(ConscryptEngine.java:1076)
+                                                                                                    	... 38 more
+                                                                                                    Caused by: java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+                                                                                                    	... 51 more
+2026-05-21 15:18:18.133  4825-5132  Skybolt-Skybolt-BlobUpl com.anonymous.frutosmart             I  Network error, retrying in 4000ms (attempt 2/3): java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+2026-05-21 15:18:19.103  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  '[Skybolt DIAG] getSessionProgress:', '0c99b66e-6730-456e-8747-f4dc72e0fda2', 'status=uploading'
+2026-05-21 15:18:19.103  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] UploadStore dispatch — jobId=9febf884-c594-4d73-9f28-4f65be7a98b0, event=POLL_TICK, transition: upload.uploading → upload.uploading (2 effects), elapsed=0ms
+2026-05-21 15:18:19.103  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] UploadOrchestrator effect start — type=persistMetrics, jobId=9febf884-c594-4d73-9f28-4f65be7a98b0
+2026-05-21 15:18:19.104  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] SkyboltUploadProvider — render
+2026-05-21 15:18:19.104  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  '[DIAG] SkyboltUploadProvider — snapshots:', [ { jobId: '9febf884',
+                                                                                                        state: 'upload.uploading',
+                                                                                                        skyboltSessionId: '0c99b66e',
+                                                                                                        backendSessionId: '0c99b66e',
+                                                                                                        progress: '0/4' } ], 'elapsed:', 0
+2026-05-21 15:18:19.104  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  '[DIAG] SkyboltUploadProvider — jobs count:', 1
+2026-05-21 15:18:19.104  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] SkyboltUploadProvider — value memo recalculated
+2026-05-21 15:18:19.107  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] UploadOrchestrator effect done — type=persistMetrics, jobId=9febf884-c594-4d73-9f28-4f65be7a98b0, elapsed=4ms
+2026-05-21 15:18:19.107  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] UploadOrchestrator effect start — type=log, jobId=9febf884-c594-4d73-9f28-4f65be7a98b0
+2026-05-21 15:18:19.108  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  '[UploadMachine] Transition 9febf884-c594-4d73-9f28-4f65be7a98b0: logInfo', { from: 'upload.uploading',
+                                                                                                      event: 'POLL_TICK',
+                                                                                                      to: 'upload.uploading' }
+2026-05-21 15:18:19.108  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] UploadOrchestrator effect done — type=log, jobId=9febf884-c594-4d73-9f28-4f65be7a98b0, elapsed=1ms
+2026-05-21 15:18:22.120  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  '[Skybolt DIAG] getSessionProgress:', '0c99b66e-6730-456e-8747-f4dc72e0fda2', 'status=uploading'
+2026-05-21 15:18:22.120  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] UploadStore dispatch — jobId=9febf884-c594-4d73-9f28-4f65be7a98b0, event=POLL_TICK, transition: upload.uploading → upload.uploading (2 effects), elapsed=0ms
+2026-05-21 15:18:22.120  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] UploadOrchestrator effect start — type=persistMetrics, jobId=9febf884-c594-4d73-9f28-4f65be7a98b0
+2026-05-21 15:18:22.121  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] SkyboltUploadProvider — render
+2026-05-21 15:18:22.121  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  '[DIAG] SkyboltUploadProvider — snapshots:', [ { jobId: '9febf884',
+                                                                                                        state: 'upload.uploading',
+                                                                                                        skyboltSessionId: '0c99b66e',
+                                                                                                        backendSessionId: '0c99b66e',
+                                                                                                        progress: '0/4' } ], 'elapsed:', 0
+2026-05-21 15:18:22.121  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  '[DIAG] SkyboltUploadProvider — jobs count:', 1
+2026-05-21 15:18:22.121  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] SkyboltUploadProvider — value memo recalculated
+2026-05-21 15:18:22.125  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] UploadOrchestrator effect done — type=persistMetrics, jobId=9febf884-c594-4d73-9f28-4f65be7a98b0, elapsed=5ms
+2026-05-21 15:18:22.125  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] UploadOrchestrator effect start — type=log, jobId=9febf884-c594-4d73-9f28-4f65be7a98b0
+2026-05-21 15:18:22.125  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  '[UploadMachine] Transition 9febf884-c594-4d73-9f28-4f65be7a98b0: logInfo', { from: 'upload.uploading',
+                                                                                                      event: 'POLL_TICK',
+                                                                                                      to: 'upload.uploading' }
+2026-05-21 15:18:22.125  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] UploadOrchestrator effect done — type=log, jobId=9febf884-c594-4d73-9f28-4f65be7a98b0, elapsed=0ms
+2026-05-21 15:18:22.134  4825-5132  Skybolt-Skybolt-BlobUpl com.anonymous.frutosmart             W  IO exception during request: op=PUT_BLOB, error=java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+2026-05-21 15:18:22.135  4825-5132  Skybolt-Skybolt-BlobUpl com.anonymous.frutosmart             W  Network error: op=PUT_BLOB, item=24e1337e-1659-4030-9c5f-ec11a00f0ff7, attempt=2, error=java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+                                                                                                    javax.net.ssl.SSLHandshakeException: java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+                                                                                                    	at com.android.org.conscrypt.SSLUtils.toSSLHandshakeException(SSLUtils.java:358)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.convertException(ConscryptEngine.java:1131)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.readPlaintextData(ConscryptEngine.java:1086)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.unwrap(ConscryptEngine.java:873)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.unwrap(ConscryptEngine.java:744)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.unwrap(ConscryptEngine.java:709)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket$SSLInputStream.processDataFromSocket(ConscryptEngineSocket.java:907)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket$SSLInputStream.-$$Nest$mprocessDataFromSocket(Unknown Source:0)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket.doHandshake(ConscryptEngineSocket.java:242)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket.startHandshake(ConscryptEngineSocket.java:224)
+                                                                                                    	at okhttp3.internal.connection.RealConnection.connectTls(RealConnection.kt:379)
+                                                                                                    	at okhttp3.internal.connection.RealConnection.establishProtocol(RealConnection.kt:337)
+                                                                                                    	at okhttp3.internal.connection.RealConnection.connect(RealConnection.kt:209)
+                                                                                                    	at okhttp3.internal.connection.ExchangeFinder.findConnection(ExchangeFinder.kt:226)
+                                                                                                    	at okhttp3.internal.connection.ExchangeFinder.findHealthyConnection(ExchangeFinder.kt:106)
+                                                                                                    	at okhttp3.internal.connection.ExchangeFinder.find(ExchangeFinder.kt:74)
+                                                                                                    	at okhttp3.internal.connection.RealCall.initExchange$okhttp(RealCall.kt:255)
+                                                                                                    	at okhttp3.internal.connection.ConnectInterceptor.intercept(ConnectInterceptor.kt:32)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.cache.CacheInterceptor.intercept(CacheInterceptor.kt:95)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.http.BridgeInterceptor.intercept(BridgeInterceptor.kt:83)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.http.RetryAndFollowUpInterceptor.intercept(RetryAndFollowUpInterceptor.kt:76)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at expo.modules.kotlin.devtools.ExpoNetworkInspectOkHttpAppInterceptor.intercept(ExpoNetworkInspectOkHttpInterceptors.kt:60)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.connection.RealCall.getResponseWithInterceptorChain$okhttp(RealCall.kt:201)
+                                                                                                    	at okhttp3.internal.connection.RealCall.execute(RealCall.kt:154)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader.executeRequest(BlobUploader.kt:323)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader.retryWithSasRefresh(BlobUploader.kt:292)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader.access$retryWithSasRefresh(BlobUploader.kt:40)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader$retryWithSasRefresh$1.invokeSuspend(Unknown Source:15)
+                                                                                                    	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+                                                                                                    	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+                                                                                                    	at kotlinx.coroutines.internal.LimitedDispatcher$Worker.run(LimitedDispatcher.kt:124)
+                                                                                                    	at kotlinx.coroutines.scheduling.TaskImpl.run(Tasks.kt:89)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler.runSafely(CoroutineScheduler.kt:586)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.executeTask(CoroutineScheduler.kt:820)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.runWorker(CoroutineScheduler.kt:717)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.run(CoroutineScheduler.kt:704)
+2026-05-21 15:18:22.135  4825-5132  Skybolt-Skybolt-BlobUpl com.anonymous.frutosmart             W  Caused by: java.security.cert.CertificateException: java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+                                                                                                    	at com.android.org.conscrypt.TrustManagerImpl.checkTrustedRecursive(TrustManagerImpl.java:649)
+                                                                                                    	at com.android.org.conscrypt.TrustManagerImpl.checkTrusted(TrustManagerImpl.java:498)
+                                                                                                    	at com.android.org.conscrypt.TrustManagerImpl.checkTrusted(TrustManagerImpl.java:418)
+                                                                                                    	at com.android.org.conscrypt.TrustManagerImpl.getTrustedChainForServer(TrustManagerImpl.java:346)
+                                                                                                    	at android.security.net.config.NetworkSecurityTrustManager.checkServerTrusted(NetworkSecurityTrustManager.java:95)
+                                                                                                    	at android.security.net.config.RootTrustManager.checkServerTrusted(RootTrustManager.java:90)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket$2.checkServerTrusted(ConscryptEngineSocket.java:169)
+                                                                                                    	at com.android.org.conscrypt.Platform.checkServerTrusted(Platform.java:286)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.verifyCertificateChain(ConscryptEngine.java:1635)
+                                                                                                    	at com.android.org.conscrypt.NativeCrypto.ENGINE_SSL_read_direct(Native Method)
+                                                                                                    	at com.android.org.conscrypt.NativeSsl.readDirectByteBuffer(NativeSsl.java:574)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.readPlaintextDataDirect(ConscryptEngine.java:1092)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.readPlaintextData(ConscryptEngine.java:1076)
+                                                                                                    	... 38 more
+                                                                                                    Caused by: java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+                                                                                                    	... 51 more
+2026-05-21 15:18:22.135  4825-5132  Skybolt-Skybolt-BlobUpl com.anonymous.frutosmart             I  Network error, retrying in 8000ms (attempt 3/3): java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+2026-05-21 15:18:22.136  4825-5276  Skybolt-Skybolt-BlobUpl com.anonymous.frutosmart             W  IO exception during request: op=PUT_BLOB, error=java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+2026-05-21 15:18:22.136  4825-5276  Skybolt-Skybolt-BlobUpl com.anonymous.frutosmart             W  Network error: op=PUT_BLOB, item=265dd013-fe20-4aa5-9f3a-7ea79c0936f9, attempt=2, error=java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+                                                                                                    javax.net.ssl.SSLHandshakeException: java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+                                                                                                    	at com.android.org.conscrypt.SSLUtils.toSSLHandshakeException(SSLUtils.java:358)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.convertException(ConscryptEngine.java:1131)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.readPlaintextData(ConscryptEngine.java:1086)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.unwrap(ConscryptEngine.java:873)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.unwrap(ConscryptEngine.java:744)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.unwrap(ConscryptEngine.java:709)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket$SSLInputStream.processDataFromSocket(ConscryptEngineSocket.java:907)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket$SSLInputStream.-$$Nest$mprocessDataFromSocket(Unknown Source:0)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket.doHandshake(ConscryptEngineSocket.java:242)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket.startHandshake(ConscryptEngineSocket.java:224)
+                                                                                                    	at okhttp3.internal.connection.RealConnection.connectTls(RealConnection.kt:379)
+                                                                                                    	at okhttp3.internal.connection.RealConnection.establishProtocol(RealConnection.kt:337)
+                                                                                                    	at okhttp3.internal.connection.RealConnection.connect(RealConnection.kt:209)
+                                                                                                    	at okhttp3.internal.connection.ExchangeFinder.findConnection(ExchangeFinder.kt:226)
+                                                                                                    	at okhttp3.internal.connection.ExchangeFinder.findHealthyConnection(ExchangeFinder.kt:106)
+                                                                                                    	at okhttp3.internal.connection.ExchangeFinder.find(ExchangeFinder.kt:74)
+                                                                                                    	at okhttp3.internal.connection.RealCall.initExchange$okhttp(RealCall.kt:255)
+                                                                                                    	at okhttp3.internal.connection.ConnectInterceptor.intercept(ConnectInterceptor.kt:32)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.cache.CacheInterceptor.intercept(CacheInterceptor.kt:95)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.http.BridgeInterceptor.intercept(BridgeInterceptor.kt:83)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.http.RetryAndFollowUpInterceptor.intercept(RetryAndFollowUpInterceptor.kt:76)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at expo.modules.kotlin.devtools.ExpoNetworkInspectOkHttpAppInterceptor.intercept(ExpoNetworkInspectOkHttpInterceptors.kt:60)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.connection.RealCall.getResponseWithInterceptorChain$okhttp(RealCall.kt:201)
+                                                                                                    	at okhttp3.internal.connection.RealCall.execute(RealCall.kt:154)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader.executeRequest(BlobUploader.kt:323)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader.retryWithSasRefresh(BlobUploader.kt:292)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader.access$retryWithSasRefresh(BlobUploader.kt:40)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader$retryWithSasRefresh$1.invokeSuspend(Unknown Source:15)
+                                                                                                    	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+                                                                                                    	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+                                                                                                    	at kotlinx.coroutines.internal.LimitedDispatcher$Worker.run(LimitedDispatcher.kt:124)
+                                                                                                    	at kotlinx.coroutines.scheduling.TaskImpl.run(Tasks.kt:89)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler.runSafely(CoroutineScheduler.kt:586)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.executeTask(CoroutineScheduler.kt:820)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.runWorker(CoroutineScheduler.kt:717)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.run(CoroutineScheduler.kt:704)
+2026-05-21 15:18:22.136  4825-5276  Skybolt-Skybolt-BlobUpl com.anonymous.frutosmart             W  Caused by: java.security.cert.CertificateException: java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+                                                                                                    	at com.android.org.conscrypt.TrustManagerImpl.checkTrustedRecursive(TrustManagerImpl.java:649)
+                                                                                                    	at com.android.org.conscrypt.TrustManagerImpl.checkTrusted(TrustManagerImpl.java:498)
+                                                                                                    	at com.android.org.conscrypt.TrustManagerImpl.checkTrusted(TrustManagerImpl.java:418)
+                                                                                                    	at com.android.org.conscrypt.TrustManagerImpl.getTrustedChainForServer(TrustManagerImpl.java:346)
+                                                                                                    	at android.security.net.config.NetworkSecurityTrustManager.checkServerTrusted(NetworkSecurityTrustManager.java:95)
+                                                                                                    	at android.security.net.config.RootTrustManager.checkServerTrusted(RootTrustManager.java:90)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket$2.checkServerTrusted(ConscryptEngineSocket.java:169)
+                                                                                                    	at com.android.org.conscrypt.Platform.checkServerTrusted(Platform.java:286)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.verifyCertificateChain(ConscryptEngine.java:1635)
+                                                                                                    	at com.android.org.conscrypt.NativeCrypto.ENGINE_SSL_read_direct(Native Method)
+                                                                                                    	at com.android.org.conscrypt.NativeSsl.readDirectByteBuffer(NativeSsl.java:574)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.readPlaintextDataDirect(ConscryptEngine.java:1092)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.readPlaintextData(ConscryptEngine.java:1076)
+                                                                                                    	... 38 more
+                                                                                                    Caused by: java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+                                                                                                    	... 51 more
+2026-05-21 15:18:22.136  4825-5276  Skybolt-Skybolt-BlobUpl com.anonymous.frutosmart             I  Network error, retrying in 8000ms (attempt 3/3): java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+2026-05-21 15:18:22.137  4825-5280  Skybolt-Skybolt-BlobUpl com.anonymous.frutosmart             W  IO exception during request: op=PUT_BLOB, error=java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+2026-05-21 15:18:22.138  4825-5280  Skybolt-Skybolt-BlobUpl com.anonymous.frutosmart             W  Network error: op=PUT_BLOB, item=2927719b-99e4-4cb9-85fd-1c684b91c733, attempt=2, error=java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+                                                                                                    javax.net.ssl.SSLHandshakeException: java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+                                                                                                    	at com.android.org.conscrypt.SSLUtils.toSSLHandshakeException(SSLUtils.java:358)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.convertException(ConscryptEngine.java:1131)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.readPlaintextData(ConscryptEngine.java:1086)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.unwrap(ConscryptEngine.java:873)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.unwrap(ConscryptEngine.java:744)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.unwrap(ConscryptEngine.java:709)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket$SSLInputStream.processDataFromSocket(ConscryptEngineSocket.java:907)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket$SSLInputStream.-$$Nest$mprocessDataFromSocket(Unknown Source:0)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket.doHandshake(ConscryptEngineSocket.java:242)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket.startHandshake(ConscryptEngineSocket.java:224)
+                                                                                                    	at okhttp3.internal.connection.RealConnection.connectTls(RealConnection.kt:379)
+                                                                                                    	at okhttp3.internal.connection.RealConnection.establishProtocol(RealConnection.kt:337)
+                                                                                                    	at okhttp3.internal.connection.RealConnection.connect(RealConnection.kt:209)
+                                                                                                    	at okhttp3.internal.connection.ExchangeFinder.findConnection(ExchangeFinder.kt:226)
+                                                                                                    	at okhttp3.internal.connection.ExchangeFinder.findHealthyConnection(ExchangeFinder.kt:106)
+                                                                                                    	at okhttp3.internal.connection.ExchangeFinder.find(ExchangeFinder.kt:74)
+                                                                                                    	at okhttp3.internal.connection.RealCall.initExchange$okhttp(RealCall.kt:255)
+                                                                                                    	at okhttp3.internal.connection.ConnectInterceptor.intercept(ConnectInterceptor.kt:32)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.cache.CacheInterceptor.intercept(CacheInterceptor.kt:95)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.http.BridgeInterceptor.intercept(BridgeInterceptor.kt:83)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.http.RetryAndFollowUpInterceptor.intercept(RetryAndFollowUpInterceptor.kt:76)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at expo.modules.kotlin.devtools.ExpoNetworkInspectOkHttpAppInterceptor.intercept(ExpoNetworkInspectOkHttpInterceptors.kt:60)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.connection.RealCall.getResponseWithInterceptorChain$okhttp(RealCall.kt:201)
+                                                                                                    	at okhttp3.internal.connection.RealCall.execute(RealCall.kt:154)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader.executeRequest(BlobUploader.kt:323)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader.retryWithSasRefresh(BlobUploader.kt:292)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader.access$retryWithSasRefresh(BlobUploader.kt:40)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader$retryWithSasRefresh$1.invokeSuspend(Unknown Source:15)
+                                                                                                    	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+                                                                                                    	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+                                                                                                    	at kotlinx.coroutines.internal.LimitedDispatcher$Worker.run(LimitedDispatcher.kt:124)
+                                                                                                    	at kotlinx.coroutines.scheduling.TaskImpl.run(Tasks.kt:89)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler.runSafely(CoroutineScheduler.kt:586)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.executeTask(CoroutineScheduler.kt:820)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.runWorker(CoroutineScheduler.kt:717)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.run(CoroutineScheduler.kt:704)
+2026-05-21 15:18:22.138  4825-5280  Skybolt-Skybolt-BlobUpl com.anonymous.frutosmart             W  Caused by: java.security.cert.CertificateException: java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+                                                                                                    	at com.android.org.conscrypt.TrustManagerImpl.checkTrustedRecursive(TrustManagerImpl.java:649)
+                                                                                                    	at com.android.org.conscrypt.TrustManagerImpl.checkTrusted(TrustManagerImpl.java:498)
+                                                                                                    	at com.android.org.conscrypt.TrustManagerImpl.checkTrusted(TrustManagerImpl.java:418)
+                                                                                                    	at com.android.org.conscrypt.TrustManagerImpl.getTrustedChainForServer(TrustManagerImpl.java:346)
+                                                                                                    	at android.security.net.config.NetworkSecurityTrustManager.checkServerTrusted(NetworkSecurityTrustManager.java:95)
+                                                                                                    	at android.security.net.config.RootTrustManager.checkServerTrusted(RootTrustManager.java:90)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket$2.checkServerTrusted(ConscryptEngineSocket.java:169)
+                                                                                                    	at com.android.org.conscrypt.Platform.checkServerTrusted(Platform.java:286)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.verifyCertificateChain(ConscryptEngine.java:1635)
+                                                                                                    	at com.android.org.conscrypt.NativeCrypto.ENGINE_SSL_read_direct(Native Method)
+                                                                                                    	at com.android.org.conscrypt.NativeSsl.readDirectByteBuffer(NativeSsl.java:574)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.readPlaintextDataDirect(ConscryptEngine.java:1092)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.readPlaintextData(ConscryptEngine.java:1076)
+                                                                                                    	... 38 more
+                                                                                                    Caused by: java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+                                                                                                    	... 51 more
+2026-05-21 15:18:22.138  4825-5280  Skybolt-Skybolt-BlobUpl com.anonymous.frutosmart             I  Network error, retrying in 8000ms (attempt 3/3): java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+2026-05-21 15:18:25.137  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  '[Skybolt DIAG] getSessionProgress:', '0c99b66e-6730-456e-8747-f4dc72e0fda2', 'status=uploading'
+2026-05-21 15:18:25.137  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] UploadStore dispatch — jobId=9febf884-c594-4d73-9f28-4f65be7a98b0, event=POLL_TICK, transition: upload.uploading → upload.uploading (2 effects), elapsed=0ms
+2026-05-21 15:18:25.137  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] UploadOrchestrator effect start — type=persistMetrics, jobId=9febf884-c594-4d73-9f28-4f65be7a98b0
+2026-05-21 15:18:25.138  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] SkyboltUploadProvider — render
+2026-05-21 15:18:25.138  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  '[DIAG] SkyboltUploadProvider — snapshots:', [ { jobId: '9febf884',
+                                                                                                        state: 'upload.uploading',
+                                                                                                        skyboltSessionId: '0c99b66e',
+                                                                                                        backendSessionId: '0c99b66e',
+                                                                                                        progress: '0/4' } ], 'elapsed:', 0
+2026-05-21 15:18:25.138  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  '[DIAG] SkyboltUploadProvider — jobs count:', 1
+2026-05-21 15:18:25.139  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] SkyboltUploadProvider — value memo recalculated
+2026-05-21 15:18:25.148  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] UploadOrchestrator effect done — type=persistMetrics, jobId=9febf884-c594-4d73-9f28-4f65be7a98b0, elapsed=11ms
+2026-05-21 15:18:25.148  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] UploadOrchestrator effect start — type=log, jobId=9febf884-c594-4d73-9f28-4f65be7a98b0
+2026-05-21 15:18:25.149  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  '[UploadMachine] Transition 9febf884-c594-4d73-9f28-4f65be7a98b0: logInfo', { from: 'upload.uploading',
+                                                                                                      event: 'POLL_TICK',
+                                                                                                      to: 'upload.uploading' }
+2026-05-21 15:18:25.149  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] UploadOrchestrator effect done — type=log, jobId=9febf884-c594-4d73-9f28-4f65be7a98b0, elapsed=1ms
+2026-05-21 15:18:28.153  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  '[Skybolt DIAG] getSessionProgress:', '0c99b66e-6730-456e-8747-f4dc72e0fda2', 'status=uploading'
+2026-05-21 15:18:28.153  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] UploadStore dispatch — jobId=9febf884-c594-4d73-9f28-4f65be7a98b0, event=POLL_TICK, transition: upload.uploading → upload.uploading (2 effects), elapsed=0ms
+2026-05-21 15:18:28.153  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] UploadOrchestrator effect start — type=persistMetrics, jobId=9febf884-c594-4d73-9f28-4f65be7a98b0
+2026-05-21 15:18:28.154  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] SkyboltUploadProvider — render
+2026-05-21 15:18:28.154  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  '[DIAG] SkyboltUploadProvider — snapshots:', [ { jobId: '9febf884',
+                                                                                                        state: 'upload.uploading',
+                                                                                                        skyboltSessionId: '0c99b66e',
+                                                                                                        backendSessionId: '0c99b66e',
+                                                                                                        progress: '0/4' } ], 'elapsed:', 0
+2026-05-21 15:18:28.154  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  '[DIAG] SkyboltUploadProvider — jobs count:', 1
+2026-05-21 15:18:28.154  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] SkyboltUploadProvider — value memo recalculated
+2026-05-21 15:18:28.157  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] UploadOrchestrator effect done — type=persistMetrics, jobId=9febf884-c594-4d73-9f28-4f65be7a98b0, elapsed=4ms
+2026-05-21 15:18:28.158  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] UploadOrchestrator effect start — type=log, jobId=9febf884-c594-4d73-9f28-4f65be7a98b0
+2026-05-21 15:18:28.158  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  '[UploadMachine] Transition 9febf884-c594-4d73-9f28-4f65be7a98b0: logInfo', { from: 'upload.uploading',
+                                                                                                      event: 'POLL_TICK',
+                                                                                                      to: 'upload.uploading' }
+2026-05-21 15:18:28.158  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] UploadOrchestrator effect done — type=log, jobId=9febf884-c594-4d73-9f28-4f65be7a98b0, elapsed=1ms
+2026-05-21 15:18:30.141  4825-5276  Skybolt-Skybolt-BlobUpl com.anonymous.frutosmart             W  IO exception during request: op=PUT_BLOB, error=java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+2026-05-21 15:18:30.142  4825-5276  Skybolt-Skybolt-BlobUpl com.anonymous.frutosmart             W  Network error: op=PUT_BLOB, item=265dd013-fe20-4aa5-9f3a-7ea79c0936f9, attempt=3, error=java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+                                                                                                    javax.net.ssl.SSLHandshakeException: java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+                                                                                                    	at com.android.org.conscrypt.SSLUtils.toSSLHandshakeException(SSLUtils.java:358)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.convertException(ConscryptEngine.java:1131)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.readPlaintextData(ConscryptEngine.java:1086)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.unwrap(ConscryptEngine.java:873)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.unwrap(ConscryptEngine.java:744)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.unwrap(ConscryptEngine.java:709)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket$SSLInputStream.processDataFromSocket(ConscryptEngineSocket.java:907)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket$SSLInputStream.-$$Nest$mprocessDataFromSocket(Unknown Source:0)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket.doHandshake(ConscryptEngineSocket.java:242)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket.startHandshake(ConscryptEngineSocket.java:224)
+                                                                                                    	at okhttp3.internal.connection.RealConnection.connectTls(RealConnection.kt:379)
+                                                                                                    	at okhttp3.internal.connection.RealConnection.establishProtocol(RealConnection.kt:337)
+                                                                                                    	at okhttp3.internal.connection.RealConnection.connect(RealConnection.kt:209)
+                                                                                                    	at okhttp3.internal.connection.ExchangeFinder.findConnection(ExchangeFinder.kt:226)
+                                                                                                    	at okhttp3.internal.connection.ExchangeFinder.findHealthyConnection(ExchangeFinder.kt:106)
+                                                                                                    	at okhttp3.internal.connection.ExchangeFinder.find(ExchangeFinder.kt:74)
+                                                                                                    	at okhttp3.internal.connection.RealCall.initExchange$okhttp(RealCall.kt:255)
+                                                                                                    	at okhttp3.internal.connection.ConnectInterceptor.intercept(ConnectInterceptor.kt:32)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.cache.CacheInterceptor.intercept(CacheInterceptor.kt:95)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.http.BridgeInterceptor.intercept(BridgeInterceptor.kt:83)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.http.RetryAndFollowUpInterceptor.intercept(RetryAndFollowUpInterceptor.kt:76)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at expo.modules.kotlin.devtools.ExpoNetworkInspectOkHttpAppInterceptor.intercept(ExpoNetworkInspectOkHttpInterceptors.kt:60)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.connection.RealCall.getResponseWithInterceptorChain$okhttp(RealCall.kt:201)
+                                                                                                    	at okhttp3.internal.connection.RealCall.execute(RealCall.kt:154)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader.executeRequest(BlobUploader.kt:323)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader.retryWithSasRefresh(BlobUploader.kt:292)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader.access$retryWithSasRefresh(BlobUploader.kt:40)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader$retryWithSasRefresh$1.invokeSuspend(Unknown Source:15)
+                                                                                                    	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+                                                                                                    	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+                                                                                                    	at kotlinx.coroutines.internal.LimitedDispatcher$Worker.run(LimitedDispatcher.kt:124)
+                                                                                                    	at kotlinx.coroutines.scheduling.TaskImpl.run(Tasks.kt:89)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler.runSafely(CoroutineScheduler.kt:586)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.executeTask(CoroutineScheduler.kt:820)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.runWorker(CoroutineScheduler.kt:717)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.run(CoroutineScheduler.kt:704)
+2026-05-21 15:18:30.142  4825-5276  Skybolt-Skybolt-BlobUpl com.anonymous.frutosmart             W  Caused by: java.security.cert.CertificateException: java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+                                                                                                    	at com.android.org.conscrypt.TrustManagerImpl.checkTrustedRecursive(TrustManagerImpl.java:649)
+                                                                                                    	at com.android.org.conscrypt.TrustManagerImpl.checkTrusted(TrustManagerImpl.java:498)
+                                                                                                    	at com.android.org.conscrypt.TrustManagerImpl.checkTrusted(TrustManagerImpl.java:418)
+                                                                                                    	at com.android.org.conscrypt.TrustManagerImpl.getTrustedChainForServer(TrustManagerImpl.java:346)
+                                                                                                    	at android.security.net.config.NetworkSecurityTrustManager.checkServerTrusted(NetworkSecurityTrustManager.java:95)
+                                                                                                    	at android.security.net.config.RootTrustManager.checkServerTrusted(RootTrustManager.java:90)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket$2.checkServerTrusted(ConscryptEngineSocket.java:169)
+                                                                                                    	at com.android.org.conscrypt.Platform.checkServerTrusted(Platform.java:286)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.verifyCertificateChain(ConscryptEngine.java:1635)
+                                                                                                    	at com.android.org.conscrypt.NativeCrypto.ENGINE_SSL_read_direct(Native Method)
+                                                                                                    	at com.android.org.conscrypt.NativeSsl.readDirectByteBuffer(NativeSsl.java:574)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.readPlaintextDataDirect(ConscryptEngine.java:1092)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.readPlaintextData(ConscryptEngine.java:1076)
+                                                                                                    	... 38 more
+                                                                                                    Caused by: java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+                                                                                                    	... 51 more
+2026-05-21 15:18:30.142  4825-5276  Skybolt-Skybolt-BlobUpl com.anonymous.frutosmart             E  Max retries exceeded for network error: java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+2026-05-21 15:18:30.142  4825-5276  Skybolt-Skybolt-BlobUpl com.anonymous.frutosmart             E  uploadBlockBlob:error | duration=14.056724634s
+                                                                                                    NetIo(message=java.security.cert.CertPathValidatorException: Trust anchor for certification path not found., detail=javax.net.ssl.SSLHandshakeException: java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader.handleNetworkError(BlobUploader.kt:389)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader.retryWithSasRefresh(BlobUploader.kt:307)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader.access$retryWithSasRefresh(BlobUploader.kt:40)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader$retryWithSasRefresh$1.invokeSuspend(Unknown Source:15)
+                                                                                                    	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+                                                                                                    	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+                                                                                                    	at kotlinx.coroutines.internal.LimitedDispatcher$Worker.run(LimitedDispatcher.kt:124)
+                                                                                                    	at kotlinx.coroutines.scheduling.TaskImpl.run(Tasks.kt:89)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler.runSafely(CoroutineScheduler.kt:586)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.executeTask(CoroutineScheduler.kt:820)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.runWorker(CoroutineScheduler.kt:717)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.run(CoroutineScheduler.kt:704)
+2026-05-21 15:18:30.142  4825-5276  Skybolt-Skybolt-BlobDri com.anonymous.frutosmart             E  Item upload failed: 265dd013-fe20-4aa5-9f3a-7ea79c0936f9, error=java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+2026-05-21 15:18:30.142  4825-5276  Skybolt-Skybolt-Session com.anonymous.frutosmart             W  Marking item failed: sessionId=0c99b66e-6730-456e-8747-f4dc72e0fda2, item=265dd013-fe20-4aa5-9f3a-7ea79c0936f9, errorCode=NetIo
+2026-05-21 15:18:30.142  4825-5280  Skybolt-Skybolt-BlobUpl com.anonymous.frutosmart             W  IO exception during request: op=PUT_BLOB, error=java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+2026-05-21 15:18:30.143  4825-5280  Skybolt-Skybolt-BlobUpl com.anonymous.frutosmart             W  Network error: op=PUT_BLOB, item=24e1337e-1659-4030-9c5f-ec11a00f0ff7, attempt=3, error=java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+                                                                                                    javax.net.ssl.SSLHandshakeException: java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+                                                                                                    	at com.android.org.conscrypt.SSLUtils.toSSLHandshakeException(SSLUtils.java:358)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.convertException(ConscryptEngine.java:1131)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.readPlaintextData(ConscryptEngine.java:1086)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.unwrap(ConscryptEngine.java:873)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.unwrap(ConscryptEngine.java:744)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.unwrap(ConscryptEngine.java:709)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket$SSLInputStream.processDataFromSocket(ConscryptEngineSocket.java:907)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket$SSLInputStream.-$$Nest$mprocessDataFromSocket(Unknown Source:0)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket.doHandshake(ConscryptEngineSocket.java:242)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket.startHandshake(ConscryptEngineSocket.java:224)
+                                                                                                    	at okhttp3.internal.connection.RealConnection.connectTls(RealConnection.kt:379)
+                                                                                                    	at okhttp3.internal.connection.RealConnection.establishProtocol(RealConnection.kt:337)
+                                                                                                    	at okhttp3.internal.connection.RealConnection.connect(RealConnection.kt:209)
+                                                                                                    	at okhttp3.internal.connection.ExchangeFinder.findConnection(ExchangeFinder.kt:226)
+                                                                                                    	at okhttp3.internal.connection.ExchangeFinder.findHealthyConnection(ExchangeFinder.kt:106)
+                                                                                                    	at okhttp3.internal.connection.ExchangeFinder.find(ExchangeFinder.kt:74)
+                                                                                                    	at okhttp3.internal.connection.RealCall.initExchange$okhttp(RealCall.kt:255)
+                                                                                                    	at okhttp3.internal.connection.ConnectInterceptor.intercept(ConnectInterceptor.kt:32)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.cache.CacheInterceptor.intercept(CacheInterceptor.kt:95)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.http.BridgeInterceptor.intercept(BridgeInterceptor.kt:83)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.http.RetryAndFollowUpInterceptor.intercept(RetryAndFollowUpInterceptor.kt:76)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at expo.modules.kotlin.devtools.ExpoNetworkInspectOkHttpAppInterceptor.intercept(ExpoNetworkInspectOkHttpInterceptors.kt:60)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.connection.RealCall.getResponseWithInterceptorChain$okhttp(RealCall.kt:201)
+                                                                                                    	at okhttp3.internal.connection.RealCall.execute(RealCall.kt:154)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader.executeRequest(BlobUploader.kt:323)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader.retryWithSasRefresh(BlobUploader.kt:292)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader.access$retryWithSasRefresh(BlobUploader.kt:40)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader$retryWithSasRefresh$1.invokeSuspend(Unknown Source:15)
+                                                                                                    	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+                                                                                                    	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+                                                                                                    	at kotlinx.coroutines.internal.LimitedDispatcher$Worker.run(LimitedDispatcher.kt:124)
+                                                                                                    	at kotlinx.coroutines.scheduling.TaskImpl.run(Tasks.kt:89)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler.runSafely(CoroutineScheduler.kt:586)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.executeTask(CoroutineScheduler.kt:820)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.runWorker(CoroutineScheduler.kt:717)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.run(CoroutineScheduler.kt:704)
+2026-05-21 15:18:30.143  4825-5280  Skybolt-Skybolt-BlobUpl com.anonymous.frutosmart             W  Caused by: java.security.cert.CertificateException: java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+                                                                                                    	at com.android.org.conscrypt.TrustManagerImpl.checkTrustedRecursive(TrustManagerImpl.java:649)
+                                                                                                    	at com.android.org.conscrypt.TrustManagerImpl.checkTrusted(TrustManagerImpl.java:498)
+                                                                                                    	at com.android.org.conscrypt.TrustManagerImpl.checkTrusted(TrustManagerImpl.java:418)
+                                                                                                    	at com.android.org.conscrypt.TrustManagerImpl.getTrustedChainForServer(TrustManagerImpl.java:346)
+                                                                                                    	at android.security.net.config.NetworkSecurityTrustManager.checkServerTrusted(NetworkSecurityTrustManager.java:95)
+                                                                                                    	at android.security.net.config.RootTrustManager.checkServerTrusted(RootTrustManager.java:90)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket$2.checkServerTrusted(ConscryptEngineSocket.java:169)
+                                                                                                    	at com.android.org.conscrypt.Platform.checkServerTrusted(Platform.java:286)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.verifyCertificateChain(ConscryptEngine.java:1635)
+                                                                                                    	at com.android.org.conscrypt.NativeCrypto.ENGINE_SSL_read_direct(Native Method)
+                                                                                                    	at com.android.org.conscrypt.NativeSsl.readDirectByteBuffer(NativeSsl.java:574)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.readPlaintextDataDirect(ConscryptEngine.java:1092)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.readPlaintextData(ConscryptEngine.java:1076)
+                                                                                                    	... 38 more
+                                                                                                    Caused by: java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+                                                                                                    	... 51 more
+2026-05-21 15:18:30.143  4825-5280  Skybolt-Skybolt-BlobUpl com.anonymous.frutosmart             E  Max retries exceeded for network error: java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+2026-05-21 15:18:30.143  4825-5280  Skybolt-Skybolt-BlobUpl com.anonymous.frutosmart             E  uploadBlockBlob:error | duration=14.057929832s
+                                                                                                    NetIo(message=java.security.cert.CertPathValidatorException: Trust anchor for certification path not found., detail=javax.net.ssl.SSLHandshakeException: java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader.handleNetworkError(BlobUploader.kt:389)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader.retryWithSasRefresh(BlobUploader.kt:307)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader.access$retryWithSasRefresh(BlobUploader.kt:40)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader$retryWithSasRefresh$1.invokeSuspend(Unknown Source:15)
+                                                                                                    	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+                                                                                                    	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+                                                                                                    	at kotlinx.coroutines.internal.LimitedDispatcher$Worker.run(LimitedDispatcher.kt:124)
+                                                                                                    	at kotlinx.coroutines.scheduling.TaskImpl.run(Tasks.kt:89)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler.runSafely(CoroutineScheduler.kt:586)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.executeTask(CoroutineScheduler.kt:820)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.runWorker(CoroutineScheduler.kt:717)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.run(CoroutineScheduler.kt:704)
+2026-05-21 15:18:30.143  4825-5280  Skybolt-Skybolt-BlobDri com.anonymous.frutosmart             E  Item upload failed: 24e1337e-1659-4030-9c5f-ec11a00f0ff7, error=java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+2026-05-21 15:18:30.143  4825-5280  Skybolt-Skybolt-Session com.anonymous.frutosmart             W  Marking item failed: sessionId=0c99b66e-6730-456e-8747-f4dc72e0fda2, item=24e1337e-1659-4030-9c5f-ec11a00f0ff7, errorCode=NetIo
+2026-05-21 15:18:30.144  4825-5132  Skybolt-Skybolt-BlobUpl com.anonymous.frutosmart             W  IO exception during request: op=PUT_BLOB, error=java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+2026-05-21 15:18:30.144  4825-5132  Skybolt-Skybolt-BlobUpl com.anonymous.frutosmart             W  Network error: op=PUT_BLOB, item=2927719b-99e4-4cb9-85fd-1c684b91c733, attempt=3, error=java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+                                                                                                    javax.net.ssl.SSLHandshakeException: java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+                                                                                                    	at com.android.org.conscrypt.SSLUtils.toSSLHandshakeException(SSLUtils.java:358)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.convertException(ConscryptEngine.java:1131)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.readPlaintextData(ConscryptEngine.java:1086)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.unwrap(ConscryptEngine.java:873)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.unwrap(ConscryptEngine.java:744)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.unwrap(ConscryptEngine.java:709)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket$SSLInputStream.processDataFromSocket(ConscryptEngineSocket.java:907)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket$SSLInputStream.-$$Nest$mprocessDataFromSocket(Unknown Source:0)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket.doHandshake(ConscryptEngineSocket.java:242)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket.startHandshake(ConscryptEngineSocket.java:224)
+                                                                                                    	at okhttp3.internal.connection.RealConnection.connectTls(RealConnection.kt:379)
+                                                                                                    	at okhttp3.internal.connection.RealConnection.establishProtocol(RealConnection.kt:337)
+                                                                                                    	at okhttp3.internal.connection.RealConnection.connect(RealConnection.kt:209)
+                                                                                                    	at okhttp3.internal.connection.ExchangeFinder.findConnection(ExchangeFinder.kt:226)
+                                                                                                    	at okhttp3.internal.connection.ExchangeFinder.findHealthyConnection(ExchangeFinder.kt:106)
+                                                                                                    	at okhttp3.internal.connection.ExchangeFinder.find(ExchangeFinder.kt:74)
+                                                                                                    	at okhttp3.internal.connection.RealCall.initExchange$okhttp(RealCall.kt:255)
+                                                                                                    	at okhttp3.internal.connection.ConnectInterceptor.intercept(ConnectInterceptor.kt:32)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.cache.CacheInterceptor.intercept(CacheInterceptor.kt:95)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.http.BridgeInterceptor.intercept(BridgeInterceptor.kt:83)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.http.RetryAndFollowUpInterceptor.intercept(RetryAndFollowUpInterceptor.kt:76)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at expo.modules.kotlin.devtools.ExpoNetworkInspectOkHttpAppInterceptor.intercept(ExpoNetworkInspectOkHttpInterceptors.kt:60)
+                                                                                                    	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
+                                                                                                    	at okhttp3.internal.connection.RealCall.getResponseWithInterceptorChain$okhttp(RealCall.kt:201)
+                                                                                                    	at okhttp3.internal.connection.RealCall.execute(RealCall.kt:154)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader.executeRequest(BlobUploader.kt:323)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader.retryWithSasRefresh(BlobUploader.kt:292)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader.access$retryWithSasRefresh(BlobUploader.kt:40)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader$retryWithSasRefresh$1.invokeSuspend(Unknown Source:15)
+                                                                                                    	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+                                                                                                    	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+                                                                                                    	at kotlinx.coroutines.internal.LimitedDispatcher$Worker.run(LimitedDispatcher.kt:124)
+                                                                                                    	at kotlinx.coroutines.scheduling.TaskImpl.run(Tasks.kt:89)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler.runSafely(CoroutineScheduler.kt:586)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.executeTask(CoroutineScheduler.kt:820)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.runWorker(CoroutineScheduler.kt:717)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.run(CoroutineScheduler.kt:704)
+2026-05-21 15:18:30.145  4825-5132  Skybolt-Skybolt-BlobUpl com.anonymous.frutosmart             W  Caused by: java.security.cert.CertificateException: java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+                                                                                                    	at com.android.org.conscrypt.TrustManagerImpl.checkTrustedRecursive(TrustManagerImpl.java:649)
+                                                                                                    	at com.android.org.conscrypt.TrustManagerImpl.checkTrusted(TrustManagerImpl.java:498)
+                                                                                                    	at com.android.org.conscrypt.TrustManagerImpl.checkTrusted(TrustManagerImpl.java:418)
+                                                                                                    	at com.android.org.conscrypt.TrustManagerImpl.getTrustedChainForServer(TrustManagerImpl.java:346)
+                                                                                                    	at android.security.net.config.NetworkSecurityTrustManager.checkServerTrusted(NetworkSecurityTrustManager.java:95)
+                                                                                                    	at android.security.net.config.RootTrustManager.checkServerTrusted(RootTrustManager.java:90)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngineSocket$2.checkServerTrusted(ConscryptEngineSocket.java:169)
+                                                                                                    	at com.android.org.conscrypt.Platform.checkServerTrusted(Platform.java:286)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.verifyCertificateChain(ConscryptEngine.java:1635)
+                                                                                                    	at com.android.org.conscrypt.NativeCrypto.ENGINE_SSL_read_direct(Native Method)
+                                                                                                    	at com.android.org.conscrypt.NativeSsl.readDirectByteBuffer(NativeSsl.java:574)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.readPlaintextDataDirect(ConscryptEngine.java:1092)
+                                                                                                    	at com.android.org.conscrypt.ConscryptEngine.readPlaintextData(ConscryptEngine.java:1076)
+                                                                                                    	... 38 more
+                                                                                                    Caused by: java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+                                                                                                    	... 51 more
+2026-05-21 15:18:30.145  4825-5132  Skybolt-Skybolt-BlobUpl com.anonymous.frutosmart             E  Max retries exceeded for network error: java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+2026-05-21 15:18:30.145  4825-5132  Skybolt-Skybolt-BlobUpl com.anonymous.frutosmart             E  uploadBlockBlob:error | duration=14.059016658s
+                                                                                                    NetIo(message=java.security.cert.CertPathValidatorException: Trust anchor for certification path not found., detail=javax.net.ssl.SSLHandshakeException: java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader.handleNetworkError(BlobUploader.kt:389)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader.retryWithSasRefresh(BlobUploader.kt:307)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader.access$retryWithSasRefresh(BlobUploader.kt:40)
+                                                                                                    	at com.skybolt.azureblob.runtime.BlobUploader$retryWithSasRefresh$1.invokeSuspend(Unknown Source:15)
+                                                                                                    	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+                                                                                                    	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+                                                                                                    	at kotlinx.coroutines.internal.LimitedDispatcher$Worker.run(LimitedDispatcher.kt:124)
+                                                                                                    	at kotlinx.coroutines.scheduling.TaskImpl.run(Tasks.kt:89)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler.runSafely(CoroutineScheduler.kt:586)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.executeTask(CoroutineScheduler.kt:820)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.runWorker(CoroutineScheduler.kt:717)
+                                                                                                    	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.run(CoroutineScheduler.kt:704)
+2026-05-21 15:18:30.145  4825-5132  Skybolt-Skybolt-BlobDri com.anonymous.frutosmart             E  Item upload failed: 2927719b-99e4-4cb9-85fd-1c684b91c733, error=java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+2026-05-21 15:18:30.145  4825-5132  Skybolt-Skybolt-Session com.anonymous.frutosmart             W  Marking item failed: sessionId=0c99b66e-6730-456e-8747-f4dc72e0fda2, item=2927719b-99e4-4cb9-85fd-1c684b91c733, errorCode=NetIo
+2026-05-21 15:18:30.149  4825-5132  Skybolt-Skybolt-Events  com.anonymous.frutosmart             D  Emitting event: error:network
+2026-05-21 15:18:30.150  4825-5132  Skybolt-Skybolt-NativeS com.anonymous.frutosmart             I  [DIAG] NativeEventSink: type=error:network, payloadSize=4
+2026-05-21 15:18:30.150  4825-5132  Skybolt-Skybolt-NativeS com.anonymous.frutosmart             I  [DIAG] sendEvent emitted OK: onUploadEvent
+2026-05-21 15:18:30.150  4825-5132  Skybolt-Skybolt-NativeS com.anonymous.frutosmart             I  [DIAG] sendEvent completed for type=error:network
+2026-05-21 15:18:30.151  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  '[Skybolt DIAG] JS received native event:', 'error:network', 'sessionId:', '0c99b66e-6730-456e-8747-f4dc72e0fda2'
+2026-05-21 15:18:30.151  4825-4864  Skybolt-Skybolt-Compani com.anonymous.frutosmart             D  Progress writer finished for session 0c99b66e-6730-456e-8747-f4dc72e0fda2
+2026-05-21 15:18:30.151  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  '[Skybolt DIAG] converted to UploadEvent:', 'error:network'
+2026-05-21 15:18:30.151  4825-4864  Skybolt-Skybolt-Compani com.anonymous.frutosmart             I  RetryLater requested for session 0c99b66e-6730-456e-8747-f4dc72e0fda2. Backing off.
+2026-05-21 15:18:30.151  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  '[DIAG] NativeUploadAdapter — EVENT_IN type=error:network sessionId=0c99b66e-6730-456e-8747-f4dc72e0fda2 fullPayload=', '{"type":"error:network","sessionId":"0c99b66e-6730-456e-8747-f4dc72e0fda2","payload":{"clientItemId":"265dd013-fe20-4aa5-9f3a-7ea79c0936f9","message":"java.security.cert.CertPathValidatorException: Tr'
+2026-05-21 15:18:30.151  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] NativeUploadAdapter — SESSION_MATCH sessionId=0c99b66e-6730-456e-8747-f4dc72e0fda2 → jobId=9febf884-c594-4d73-9f28-4f65be7a98b0
+2026-05-21 15:18:30.151  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] NativeUploadAdapter — translate native=error:network → machine=NATIVE_FAILED
+2026-05-21 15:18:30.152  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] UploadStore dispatch — jobId=9febf884-c594-4d73-9f28-4f65be7a98b0, event=NATIVE_FAILED, transition: upload.uploading → upload.failed (3 effects), elapsed=0ms
+2026-05-21 15:18:30.152  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] UploadOrchestrator effect start — type=stopPolling, jobId=9febf884-c594-4d73-9f28-4f65be7a98b0
+2026-05-21 15:18:30.153  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] UploadOrchestrator effect done — type=stopPolling, jobId=9febf884-c594-4d73-9f28-4f65be7a98b0, elapsed=0ms
+2026-05-21 15:18:30.153  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] NativeUploadAdapter — dispatch returned, elapsed=2ms
+2026-05-21 15:18:30.153  4825-4861  WM-WorkerWrapper        com.anonymous.frutosmart             I  Worker result RETRY for Work [ id=9563e2dd-b744-4bc7-9341-2a20df8c5a51, tags={ com.skybolt.core.bg.UploadWorker,0c99b66e-6730-456e-8747-f4dc72e0fda2,skybolt-upload } ]
+2026-05-21 15:18:30.153  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] SkyboltUploadProvider — render
+2026-05-21 15:18:30.154  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  '[DIAG] SkyboltUploadProvider — snapshots:', [ { jobId: '9febf884',
+                                                                                                        state: 'upload.failed',
+                                                                                                        skyboltSessionId: '0c99b66e',
+                                                                                                        backendSessionId: '0c99b66e',
+                                                                                                        progress: '0/4' } ], 'elapsed:', 0
+2026-05-21 15:18:30.154  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  '[DIAG] SkyboltUploadProvider — jobs count:', 1
+2026-05-21 15:18:30.154  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] SkyboltUploadProvider — value memo recalculated
+2026-05-21 15:18:30.155  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] UploadOrchestrator effect start — type=persistError, jobId=9febf884-c594-4d73-9f28-4f65be7a98b0
+2026-05-21 15:18:30.156  4825-4825  WM-Processor            com.anonymous.frutosmart             D  Processor 9563e2dd-b744-4bc7-9341-2a20df8c5a51 executed; reschedule = true
+2026-05-21 15:18:30.156  4825-4825  WM-GreedyScheduler      com.anonymous.frutosmart             D  Stopping tracking for WorkGenerationalId(workSpecId=9563e2dd-b744-4bc7-9341-2a20df8c5a51, generation=0)
+2026-05-21 15:18:30.156  4825-4825  WM-SystemFgDispatcher   com.anonymous.frutosmart             D  Removing Notification (id: 16051128, workSpecId: WorkGenerationalId(workSpecId=9563e2dd-b744-4bc7-9341-2a20df8c5a51, generation=0), notificationType: 1
+2026-05-21 15:18:30.157  4825-4825  WM-SystemFgDispatcher   com.anonymous.frutosmart             I  Stopping foreground service
+2026-05-21 15:18:30.157  4825-4825  WM-SystemFgService      com.anonymous.frutosmart             D  Shutting down.
+2026-05-21 15:18:30.157  4825-4861  WM-GreedyScheduler      com.anonymous.frutosmart             D  Cancelling work ID 9563e2dd-b744-4bc7-9341-2a20df8c5a51
+2026-05-21 15:18:30.159  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] UploadOrchestrator effect done — type=persistError, jobId=9febf884-c594-4d73-9f28-4f65be7a98b0, elapsed=5ms
+2026-05-21 15:18:30.159  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] UploadOrchestrator effect start — type=log, jobId=9febf884-c594-4d73-9f28-4f65be7a98b0
+2026-05-21 15:18:30.159  4825-5121  ReactNativeJS           com.anonymous.frutosmart             E  '[UploadMachine] Transition 9febf884-c594-4d73-9f28-4f65be7a98b0: logError', { from: 'upload.uploading',
+                                                                                                      event: 'NATIVE_FAILED',
+                                                                                                      to: 'upload.failed' }
+2026-05-21 15:18:30.159  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] UploadOrchestrator effect done — type=log, jobId=9febf884-c594-4d73-9f28-4f65be7a98b0, elapsed=0ms
+2026-05-21 15:18:30.161  4825-4861  WM-SystemJobScheduler   com.anonymous.frutosmart             D  Scheduling work ID 9563e2dd-b744-4bc7-9341-2a20df8c5a51Job ID 4
+2026-05-21 15:18:30.162  4825-4861  WM-NetworkStateTracker  com.anonymous.frutosmart             D  Unregistering network callback
+2026-05-21 15:18:40.402  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] uploadStore dispatch NOOP — jobId=9febf884-c594-4d73-9f28-4f65be7a98b0, event=SCHEDULER_TICK, state=upload.failed, reason=no_matching_transition
+2026-05-21 15:18:40.402  4825-5121  ReactNativeJS           com.anonymous.frutosmart             I  [DIAG] UploadOrchestrator dispatch DROPPED — jobId=9febf884-c594-4d73-9f28-4f65be7a98b0, event=SCHEDULER_TICK, currentState=upload.failed, reason=no_transition_defined
